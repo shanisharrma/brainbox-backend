@@ -1,3 +1,3 @@
-import { THttpResponse, THttpError } from './types';
+import { THttpResponse, THttpError, ILogAttributes } from './types';
 
-export { THttpResponse, THttpError };
+export { THttpResponse, THttpError, ILogAttributes };

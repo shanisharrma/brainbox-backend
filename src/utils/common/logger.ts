@@ -9,6 +9,7 @@ import { ServerConfig } from '../../config';
 import path from 'path';
 import { red, blue, yellow, green, magenta } from 'colorette';
 import * as sourceMapSupport from 'source-map-support';
+import SequelizeTransport from '../sequelize-transport';
 
 // Linking Trace Support
 sourceMapSupport.install();
@@ -91,9 +92,22 @@ const FileTransport = (): Array<FileTransportInstance> => {
     ];
 };
 
+// Custom Sequelize transport for logging into the database
+const sequelizeTransport = (): SequelizeTransport[] => {
+    return [
+        new SequelizeTransport({
+            level: 'info', // Set logging level for Sequelize transport.
+        }),
+    ];
+};
+
 export default createLogger({
     defaultMeta: {
         meta: {},
     },
-    transports: [...FileTransport(), ...consoleTransport()],
+    transports: [
+        ...FileTransport(),
+        ...consoleTransport(),
+        ...sequelizeTransport(),
+    ],
 });
