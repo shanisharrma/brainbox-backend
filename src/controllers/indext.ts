@@ -1,3 +1,3 @@
-import ApiController from './api.controller';
+import ApiController from './api-controller';
 
 export { ApiController };

@@ -1,0 +1,11 @@
+export enum EApplicationEnvironment {
+    PRODUCTION = 'production',
+    DEVELOPMENT = 'development',
+}
+
+export enum EApplicationEvent {
+    APPLICATION_STARTED = 'APPLICATION_STARTED',
+    APPLICATION_ERROR = 'APPLICATION_ERROR',
+    CONTROLLER_ERROR_RESPONSE = `CONTROLLER_ERROR_RESPONSE`,
+    CONTROLLER_RESPONSE = `CONTROLLER_RESPONSE`,
+}
