@@ -1,15 +1,24 @@
 import app from './app';
-import { ServerConfig } from './config';
+import { initRateLimiter, ServerConfig } from './config';
 import connection from './database/sequelize';
 import { Logger } from './utils/common';
 import { Enums } from './utils/constants';
 
 // Start the server and handle server-specific errors
 const server = app.listen(ServerConfig.PORT, () => {
+    // Database Connection
     if (connection)
         Logger.info(Enums.EApplicationEvent.DATABASE_CONNECTED, {
             meta: { Host: ServerConfig.DB_HOST, PORT: ServerConfig.DB_PORT },
         });
+
+    // Initiating the Rate Limiter
+    initRateLimiter(connection);
+    Logger.info(Enums.EApplicationEvent.RATE_LIMITER_INITIATED, {
+        meta: { POINTS: ServerConfig.POINTS, DURATION: ServerConfig.DURATION },
+    });
+
+    // Starting the server
     Logger.info(Enums.EApplicationEvent.APPLICATION_STARTED, {
         meta: {
             PORT: ServerConfig.PORT,
