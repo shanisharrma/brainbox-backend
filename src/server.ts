@@ -1,10 +1,15 @@
 import app from './app';
 import { ServerConfig } from './config';
+import connection from './database/sequelize';
 import { Logger } from './utils/common';
 import { Enums } from './utils/constants';
 
 // Start the server and handle server-specific errors
 const server = app.listen(ServerConfig.PORT, () => {
+    if (connection)
+        Logger.info(Enums.EApplicationEvent.DATABASE_CONNECTED, {
+            meta: { Host: ServerConfig.DB_HOST, PORT: ServerConfig.DB_PORT },
+        });
     Logger.info(Enums.EApplicationEvent.APPLICATION_STARTED, {
         meta: {
             PORT: ServerConfig.PORT,
