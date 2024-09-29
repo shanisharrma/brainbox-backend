@@ -1,10 +1,11 @@
 import app from './app';
 import { ServerConfig } from './config';
+import { Logger } from './utils/common';
+import { Enums } from './utils/constants';
 
 // Start the server and handle server-specific errors
 const server = app.listen(ServerConfig.PORT, () => {
-    // eslint-disable-next-line no-console
-    console.info(`APPLICATION_STARTED`, {
+    Logger.info(Enums.EApplicationEvent.APPLICATION_STARTED, {
         meta: {
             PORT: ServerConfig.PORT,
             SERVER_URL: ServerConfig.SERVER_URL,
@@ -14,13 +15,13 @@ const server = app.listen(ServerConfig.PORT, () => {
 
 // Handle server errors
 server.on('error', (error) => {
-    // eslint-disable-next-line no-console
-    console.error(`SERVER_ERROR`, { meta: error });
+    Logger.error(Enums.EApplicationEvent.APPLICATION_ERROR, { meta: error });
 
     server.close((closeError) => {
         if (closeError) {
-            // eslint-disable-next-line no-console
-            console.error(`SERVER_CLOSE_ERROR`, { meta: closeError });
+            Logger.error(Enums.EApplicationEvent.SERVER_CLOSE_ERROR, {
+                meta: closeError,
+            });
         }
         process.exit(1); // Exit the process after closing the server
     });
@@ -28,13 +29,15 @@ server.on('error', (error) => {
 
 // Catch unhandled promise rejections
 process.on('unhandledRejection', (reason) => {
-    // eslint-disable-next-line no-console
-    console.error(`UNHANDLED_PROMISE_REJECTION`, { meta: reason });
+    Logger.error(Enums.EApplicationEvent.UNHANDLED_PROMISE_REJECTION, {
+        meta: reason,
+    });
 
     server.close((closeError) => {
         if (closeError) {
-            // eslint-disable-next-line no-console
-            console.error(`SERVER_CLOSE_ERROR`, { meta: closeError });
+            Logger.error(Enums.EApplicationEvent.SERVER_CLOSE_ERROR, {
+                meta: closeError,
+            });
         }
         process.exit(1);
     });
@@ -42,13 +45,13 @@ process.on('unhandledRejection', (reason) => {
 
 // Catch uncaught exceptions
 process.on('uncaughtException', (error) => {
-    // eslint-disable-next-line no-console
-    console.error(`UNCAUGHT_EXCEPTION`, { meta: error });
+    Logger.error(Enums.EApplicationEvent.UNCAUGHT_EXCEPTION, { meta: error });
 
     server.close((closeError) => {
         if (closeError) {
-            // eslint-disable-next-line no-console
-            console.error(`SERVER_CLOSE_ERROR`, { meta: closeError });
+            Logger.error(Enums.EApplicationEvent.SERVER_CLOSE_ERROR, {
+                meta: closeError,
+            });
         }
         process.exit(1);
     });

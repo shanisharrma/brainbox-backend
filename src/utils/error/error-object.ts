@@ -3,6 +3,7 @@ import AppError from './app-error';
 import { THttpError } from '../../types';
 import { Enums, ResponseMessage } from '../constants';
 import { ServerConfig } from '../../config';
+import { Logger } from '../common';
 
 export default (
     err: AppError | unknown,
@@ -25,8 +26,7 @@ export default (
         trace: err instanceof AppError ? { error: err.stack } : null,
     };
 
-    // eslint-disable-next-line no-console
-    console.error(Enums.EApplicationEvent.CONTROLLER_ERROR_RESPONSE, {
+    Logger.error(Enums.EApplicationEvent.CONTROLLER_ERROR_RESPONSE, {
         meta: errObj,
     });
 

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { THttpResponse } from '../../types';
 import { ServerConfig } from '../../config';
 import { Enums } from '../constants';
+import { Logger } from '.';
 
 export default (
     req: Request,
@@ -22,8 +23,7 @@ export default (
         data: data,
     };
 
-    // eslint-disable-next-line no-console
-    console.info(Enums.EApplicationEvent.CONTROLLER_RESPONSE, {
+    Logger.info(Enums.EApplicationEvent.CONTROLLER_RESPONSE, {
         meta: response,
     });
 
