@@ -18,4 +18,7 @@ export default {
     POINTS: Number(process.env.POINTS),
     DURATION: Number(process.env.DURATION),
     BLOCK_DURATION: Number(process.env.BLOCK_DURATION),
+
+    // Password Configuration
+    SALT_ROUNDS: Number(process.env.SALT_ROUNDS),
 };

@@ -1,5 +1,6 @@
 import os from 'os';
 import { ServerConfig } from '../../config';
+import bcrypt from 'bcrypt';
 
 class Quicker {
     public static getSystemHealth() {
@@ -19,6 +20,10 @@ class Quicker {
                 heapUsed: `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`,
             },
         };
+    }
+
+    public static async hashPassword(password: string) {
+        return await bcrypt.hash(password, ServerConfig.SALT_ROUNDS);
     }
 }
 
