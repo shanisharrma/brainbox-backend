@@ -1,9 +1,15 @@
 'use strict';
 
-import { DataTypes, Model, Optional } from 'sequelize';
+import {
+    BelongsToManyAddAssociationMixin,
+    DataTypes,
+    Model,
+    Optional,
+} from 'sequelize';
 import connection from '../sequelize';
 import { IRoleAttributes, IUserAttributes } from '../../types';
 import { Quicker } from '../../utils/helper';
+import Role from './role';
 
 type TUserCreationAttributes = Optional<IUserAttributes, 'id'>;
 
@@ -25,6 +31,9 @@ class User
 
     // Associations
     public roles?: IRoleAttributes[] | undefined;
+
+    //
+    declare addRole: BelongsToManyAddAssociationMixin<Role, Role['id']>;
 }
 
 User.init(
@@ -67,7 +76,6 @@ User.init(
         },
         lastLoginAt: {
             type: DataTypes.DATE,
-            allowNull: false,
         },
         consent: {
             type: DataTypes.BOOLEAN,

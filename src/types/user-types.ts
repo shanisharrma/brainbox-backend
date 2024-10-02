@@ -5,7 +5,7 @@ export interface IUserAttributes {
     username: string;
     email: string;
     password: string;
-    lastLoginAt: string;
+    lastLoginAt?: string;
     timezone: string;
     consent: boolean;
     createdAt?: Date;
@@ -85,4 +85,15 @@ export interface IResetPasswordAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
     user?: IUserAttributes;
+}
+
+export interface IRegisterRequestBody {
+    firstName: string;
+    lastName: string;
+    username: string;
+    email: string;
+    password: string;
+    phoneNumber: string;
+    role: string;
+    consent: boolean;
 }

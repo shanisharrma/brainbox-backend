@@ -7,6 +7,7 @@ import {
     IAccountConfirmationAttributes,
     IRefreshTokenAttributes,
     IResetPasswordAttributes,
+    IRegisterRequestBody,
 } from './user-types';
 
 export {
@@ -20,4 +21,5 @@ export {
     IAccountConfirmationAttributes,
     IRefreshTokenAttributes,
     IResetPasswordAttributes,
+    IRegisterRequestBody,
 };

@@ -1,6 +1,8 @@
 import os from 'os';
 import { ServerConfig } from '../../config';
 import bcrypt from 'bcrypt';
+import { parsePhoneNumber } from 'libphonenumber-js';
+import { getTimezonesForCountry } from 'countries-and-timezones';
 
 class Quicker {
     public static getSystemHealth() {
@@ -24,6 +26,28 @@ class Quicker {
 
     public static async hashPassword(password: string) {
         return await bcrypt.hash(password, ServerConfig.SALT_ROUNDS);
+    }
+
+    public static parsePhoneNumber(phoneNumber: string) {
+        const parsedPhoneNumber = parsePhoneNumber(phoneNumber);
+
+        if (!parsedPhoneNumber) {
+            return {
+                countryCode: null,
+                isoCode: null,
+                internationalNumber: null,
+            };
+        }
+
+        return {
+            countryCode: parsedPhoneNumber.countryCallingCode,
+            isoCode: parsedPhoneNumber.country || null,
+            internationalNumber: parsedPhoneNumber.formatInternational(),
+        };
+    }
+
+    public static getCountryTimezone(isoCode: string) {
+        return getTimezonesForCountry(isoCode);
     }
 }
 
