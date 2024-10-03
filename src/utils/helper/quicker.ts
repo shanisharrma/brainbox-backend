@@ -7,6 +7,7 @@ import { randomInt } from 'crypto';
 import { v4 as uuid } from 'uuid';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import jwt from 'jsonwebtoken';
 
 dayjs.extend(utc);
 
@@ -32,6 +33,13 @@ class Quicker {
 
     public static async hashPassword(password: string) {
         return await bcrypt.hash(password, ServerConfig.SALT_ROUNDS);
+    }
+
+    public static async comparePassword(
+        attemptedPassword: string,
+        hashedPassword: string,
+    ) {
+        return await bcrypt.compare(attemptedPassword, hashedPassword);
     }
 
     public static parsePhoneNumber(phoneNumber: string) {
@@ -70,12 +78,31 @@ class Quicker {
         return dayjs().valueOf() + minute * 60 * 1000;
     }
 
+    public static generateRefreshTokenExpiry(days: number) {
+        return dayjs().valueOf() + days * 1000;
+    }
+
     public static getCurrentTimeStamp() {
         return dayjs().valueOf();
     }
 
     public static getCurrentDateAndTime() {
         return dayjs().utc().toDate();
+    }
+
+    public static generateToken(
+        payload: object,
+        secret: string,
+        expiry: number,
+    ) {
+        return jwt.sign(payload, secret, {
+            expiresIn: expiry,
+        });
+    }
+
+    public static getDomainFromUrl(url: string) {
+        const parsedUrl = new URL(url);
+        return parsedUrl.hostname;
     }
 }
 

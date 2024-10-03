@@ -1,6 +1,11 @@
 import { StatusCodes } from 'http-status-codes';
 import { RoleRepository, UserRepository } from '../repositories';
-import { IRegisterRequestBody, IUserAttributes } from '../types';
+import {
+    ILoginRequestBody,
+    IRefreshTokenAttributes,
+    IRegisterRequestBody,
+    IUserAttributes,
+} from '../types';
 import { Enums, ResponseMessage } from '../utils/constants';
 import { AppError } from '../utils/error';
 import { Quicker } from '../utils/helper';
@@ -9,6 +14,7 @@ import AccountConfirmationService from './account-confirmation-service';
 import MailService from './mail-service';
 import { ServerConfig } from '../config';
 import { Logger } from '../utils/common';
+import RefreshTokenService from './refresh-token-service';
 
 class UserService {
     private userRepository: UserRepository;
@@ -16,6 +22,7 @@ class UserService {
     private phoneNumberService: PhoneNumberService;
     private accountConfirmationService: AccountConfirmationService;
     private mailService: MailService;
+    private refreshTokenService: RefreshTokenService;
 
     constructor() {
         this.userRepository = new UserRepository();
@@ -23,6 +30,7 @@ class UserService {
         this.phoneNumberService = new PhoneNumberService();
         this.accountConfirmationService = new AccountConfirmationService();
         this.mailService = new MailService();
+        this.refreshTokenService = new RefreshTokenService();
     }
 
     public async registerUser(data: IRegisterRequestBody) {
@@ -35,7 +43,6 @@ class UserService {
                 lastName,
                 password,
                 phoneNumber,
-                username,
                 role,
             } = data;
 
@@ -78,7 +85,6 @@ class UserService {
                 email,
                 password,
                 consent,
-                username,
                 timezone: timezone[0].name,
             });
 
@@ -196,7 +202,7 @@ class UserService {
             // * create email body
             const to = [accountConfirmationDetails.user.email];
             const subject = `Account Verified Successfully`;
-            const text = `Hey ${accountConfirmationDetails.user.username}, Your account ahs been successfully verified.`;
+            const text = `Hey ${accountConfirmationDetails.user.firstName}, Your account ahs been successfully verified.`;
 
             // * send verified account email
             await this.mailService
@@ -208,6 +214,85 @@ class UserService {
                 });
 
             return accountVerified;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(
+                ResponseMessage.SOMETHING_WENT_WRONG,
+                StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public async login(data: ILoginRequestBody) {
+        try {
+            // * destructure data
+            const { email, password } = data;
+
+            // * check if user exists with this email
+            const user =
+                await this.userRepository.findByEmailWithPassword(email);
+            if (!user) {
+                throw new AppError(
+                    ResponseMessage.INVALID_CREDENTIALS,
+                    StatusCodes.UNAUTHORIZED,
+                );
+            }
+
+            // * check isPasswordMatched
+            const isPasswordMatched = await Quicker.comparePassword(
+                password,
+                user.password,
+            );
+            if (!isPasswordMatched) {
+                throw new AppError(
+                    ResponseMessage.INVALID_CREDENTIALS,
+                    StatusCodes.UNAUTHORIZED,
+                );
+            }
+
+            // * create accessToken and refreshToken
+            const accessToken = Quicker.generateToken(
+                { userId: user.id },
+                ServerConfig.ACCESS_TOKEN.SECRET as string,
+                ServerConfig.ACCESS_TOKEN.EXPIRY,
+            );
+            const refreshToken = Quicker.generateToken(
+                { userId: user.id },
+                ServerConfig.REFRESH_TOKEN.SECRET as string,
+                ServerConfig.REFRESH_TOKEN.EXPIRY,
+            );
+
+            // * update last login information
+            const lastLoginAt = Quicker.getCurrentDateAndTime();
+            await this.userRepository.update(user.id, { lastLoginAt });
+
+            // * create payload for refreshToken record
+            const refreshTokenPayload: IRefreshTokenAttributes = {
+                token: refreshToken,
+                userId: user.id,
+                expiresAt: Quicker.generateRefreshTokenExpiry(
+                    ServerConfig.REFRESH_TOKEN.EXPIRY,
+                ),
+                revoked: false,
+            };
+
+            // * store refreshToken in DB
+            const rftDetails =
+                await this.refreshTokenService.findRefreshTokenByUserId(
+                    user.id,
+                );
+            if (rftDetails && rftDetails.token) {
+                await this.refreshTokenService.updateRefreshToken(
+                    rftDetails.id,
+                    refreshTokenPayload,
+                );
+            } else {
+                await this.refreshTokenService.createRefreshToken(
+                    refreshTokenPayload,
+                );
+            }
+            // * return accessToken and refreshToken
+            return { accessToken, refreshToken };
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(

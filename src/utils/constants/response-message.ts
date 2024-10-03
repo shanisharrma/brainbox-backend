@@ -9,6 +9,8 @@ export default {
     INVALID_VERIFICATION_CODE_TOKEN: `Invalid verification code or token.`, //400
     ACCOUNT_ALREADY_VERIFIED: `Account already verified.`, //400
     EXPIRED_CONFIRMATION_URL: `Account verification url expired. Please request another.`, //400
+    LOGIN_SUCCESS: `Login successful.`, //200
+    INVALID_CREDENTIALS: `Invalid credentials.`, //401
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
 };

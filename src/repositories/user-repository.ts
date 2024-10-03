@@ -10,6 +10,12 @@ class UserRepository extends CrudRepository<User> {
         const response = await User.findOne({ where: { email: email } });
         return response;
     }
-}
 
+    public async findByEmailWithPassword(email: string): Promise<User | null> {
+        const response = await User.scope('withPassword').findOne({
+            where: { email: email },
+        });
+        return response;
+    }
+}
 export default UserRepository;

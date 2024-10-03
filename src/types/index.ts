@@ -14,6 +14,7 @@ import {
     IRefreshTokenAttributes,
     IResetPasswordAttributes,
     IRegisterRequestBody,
+    ILoginRequestBody,
 } from './user-types';
 
 export {
@@ -30,4 +31,5 @@ export {
     IRegisterRequestBody,
     TWithAssociations,
     TAccountConfirmationWithUser,
+    ILoginRequestBody,
 };

@@ -25,4 +25,15 @@ export default {
 
     // Email Service
     EMAIL_SERVICE_API_KEY: process.env.EMAIL_SERVICE_API_KEY,
+
+    // JWT Access and Refresh Secret Key
+    ACCESS_TOKEN: {
+        SECRET: process.env.ACCESS_TOKEN_SECRET,
+        EXPIRY: 15 * 60,
+    },
+
+    REFRESH_TOKEN: {
+        SECRET: process.env.REFRESH_TOKEN_SECRET,
+        EXPIRY: 15 * 24 * 60 * 60,
+    },
 };

@@ -20,12 +20,11 @@ class User
     public id!: number;
     public firstName!: string;
     public lastName!: string;
-    public username!: string;
     public email!: string;
     public password!: string;
     public timezone!: string;
     public consent!: boolean;
-    public lastLoginAt!: string;
+    public lastLoginAt!: Date;
     public readonly createdAt?: Date | undefined;
     public readonly updatedAt?: Date | undefined;
 
@@ -51,13 +50,6 @@ User.init(
         lastName: {
             type: DataTypes.STRING,
             allowNull: true,
-        },
-        username: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            validate: {
-                len: [3, 72],
-            },
         },
         email: {
             type: DataTypes.STRING,
