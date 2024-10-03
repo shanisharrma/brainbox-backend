@@ -21,6 +21,7 @@ class Account_Confirmation
     public token!: string;
     public code!: string;
     public status!: boolean;
+    public expiresAt!: number;
     public verifiedAt!: Date;
     public readonly createdAt?: Date | undefined;
     public readonly updatedAt?: Date | undefined;
@@ -37,7 +38,8 @@ Account_Confirmation.init(
         token: { type: DataTypes.STRING, allowNull: false },
         code: { type: DataTypes.STRING, allowNull: false },
         status: { type: DataTypes.BOOLEAN, allowNull: false },
-        verifiedAt: { type: DataTypes.DATE, allowNull: false },
+        expiresAt: { type: DataTypes.BIGINT, allowNull: false },
+        verifiedAt: { type: DataTypes.DATE },
         createdAt: {
             type: DataTypes.DATE,
             allowNull: false,

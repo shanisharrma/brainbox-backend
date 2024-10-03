@@ -55,7 +55,8 @@ export interface IAccountConfirmationAttributes {
     token: string;
     code: string;
     status: boolean;
-    verifiedAt: Date;
+    expiresAt: number;
+    verifiedAt?: Date;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;

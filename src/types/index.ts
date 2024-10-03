@@ -1,4 +1,10 @@
-import { THttpResponse, THttpError, ILogAttributes } from './types';
+import {
+    THttpResponse,
+    THttpError,
+    ILogAttributes,
+    TWithAssociations,
+    TAccountConfirmationWithUser,
+} from './types';
 import {
     IUserAttributes,
     IRoleAttributes,
@@ -22,4 +28,6 @@ export {
     IRefreshTokenAttributes,
     IResetPasswordAttributes,
     IRegisterRequestBody,
+    TWithAssociations,
+    TAccountConfirmationWithUser,
 };

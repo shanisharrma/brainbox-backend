@@ -6,6 +6,7 @@ export default {
     ENV: process.env.ENV,
     PORT: process.env.PORT,
     SERVER_URL: process.env.SERVER_URL,
+    FRONTEND_URL: process.env.FRONTEND_URL,
 
     // Database Configuration
     DB_USER: process.env.DB_USER,
@@ -21,4 +22,7 @@ export default {
 
     // Password Configuration
     SALT_ROUNDS: Number(process.env.SALT_ROUNDS),
+
+    // Email Service
+    EMAIL_SERVICE_API_KEY: process.env.EMAIL_SERVICE_API_KEY,
 };

@@ -3,6 +3,12 @@ import { ServerConfig } from '../../config';
 import bcrypt from 'bcrypt';
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { getTimezonesForCountry } from 'countries-and-timezones';
+import { randomInt } from 'crypto';
+import { v4 as uuid } from 'uuid';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 class Quicker {
     public static getSystemHealth() {
@@ -48,6 +54,28 @@ class Quicker {
 
     public static getCountryTimezone(isoCode: string) {
         return getTimezonesForCountry(isoCode);
+    }
+
+    public static generateRandomOTP(length: number) {
+        const min = Math.pow(10, length - 1);
+        const max = Math.pow(10, length) - 1;
+        return randomInt(min, max).toString();
+    }
+
+    public static generateRandomTokenId() {
+        return uuid();
+    }
+
+    public static generateAccountConfirmationExpiry(minute: number) {
+        return dayjs().valueOf() + minute * 60 * 1000;
+    }
+
+    public static getCurrentTimeStamp() {
+        return dayjs().valueOf();
+    }
+
+    public static getCurrentDateAndTime() {
+        return dayjs().utc().toDate();
     }
 }
 

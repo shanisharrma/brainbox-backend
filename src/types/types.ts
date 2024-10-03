@@ -1,3 +1,5 @@
+import { IAccountConfirmationAttributes, IUserAttributes } from './user-types';
+
 export type THttpResponse = {
     success: boolean;
     statusCode: number;
@@ -33,3 +35,10 @@ export interface ILogAttributes {
     deletedAt?: Date;
     updatedAt?: Date;
 }
+
+export type TWithAssociations<T, Associations> = T & Partial<Associations>;
+
+export type TAccountConfirmationWithUser = TWithAssociations<
+    IAccountConfirmationAttributes,
+    { user: IUserAttributes }
+>;

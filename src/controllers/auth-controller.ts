@@ -10,6 +10,15 @@ interface IRegisterRequest extends Request {
     body: IRegisterRequestBody;
 }
 
+interface IConfirmRequest extends Request {
+    params: {
+        token: string;
+    };
+    query: {
+        code: string;
+    };
+}
+
 class AuthController {
     private static userService: UserService = new UserService();
 
@@ -30,6 +39,40 @@ class AuthController {
                 res,
                 StatusCodes.CREATED,
                 ResponseMessage.REGISTRATION_SUCCESS,
+                response,
+            );
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError
+                    ? error.statusCode
+                    : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async confirmation(
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ) {
+        try {
+            const { params, query } = req as IConfirmRequest;
+            const { token } = params;
+            const { code } = query;
+
+            const response = await AuthController.userService.confirmation({
+                token,
+                code,
+            });
+
+            HttpResponse(
+                req,
+                res,
+                StatusCodes.OK,
+                ResponseMessage.ACCOUNT_VERIFIED,
                 response,
             );
         } catch (error) {

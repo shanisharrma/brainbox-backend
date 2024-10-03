@@ -14,4 +14,7 @@ router
         AuthController.register,
     );
 
+// Account Confirmation : PUT /api/v1/account-confirmation/:token?code=123456
+router.route('/account-confirmation/:token').put(AuthController.confirmation);
+
 export default router;
