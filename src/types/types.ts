@@ -1,4 +1,10 @@
-import { IAccountConfirmationAttributes, IPhoneNumberAttributes, IRoleAttributes, IUserAttributes } from './user-types';
+import {
+    IAccountConfirmationAttributes,
+    IPhoneNumberAttributes,
+    IResetPasswordAttributes,
+    IRoleAttributes,
+    IUserAttributes,
+} from './user-types';
 
 export type THttpResponse = {
     success: boolean;
@@ -43,4 +49,9 @@ export type TAccountConfirmationWithUser = TWithAssociations<IAccountConfirmatio
 export type TUserWithAssociations = TWithAssociations<
     IUserAttributes,
     { accountConfirmation: IAccountConfirmationAttributes; phoneNumber: IPhoneNumberAttributes; role: IRoleAttributes }
+>;
+
+export type TUserWithAccountConfirmationAndResetPassword = TWithAssociations<
+    IUserAttributes,
+    { accountConfirmation: IAccountConfirmationAttributes; resetPassword: IResetPasswordAttributes }
 >;

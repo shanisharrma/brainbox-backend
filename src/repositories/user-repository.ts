@@ -1,5 +1,5 @@
-import { Account_Confirmation, Phone_Number, Role, User } from '../database/models';
-import { TUserWithAssociations } from '../types';
+import { Account_Confirmation, Phone_Number, Reset_Password, Role, User } from '../database/models';
+import { TUserWithAccountConfirmationAndResetPassword, TUserWithAssociations } from '../types';
 import CrudRepository from './crud-repository';
 
 class UserRepository extends CrudRepository<User> {
@@ -26,6 +26,17 @@ class UserRepository extends CrudRepository<User> {
                 { model: Phone_Number, required: true, as: 'phoneNumber' },
                 { model: Role, required: true, as: 'roles' },
                 { model: Account_Confirmation, as: 'accountConfirmation' },
+            ],
+        });
+        return response;
+    }
+
+    public async getUserWithAccountConfirmationAndResetPasswordByEmail(email: string) {
+        const response: TUserWithAccountConfirmationAndResetPassword = await this.getOne({
+            where: { email: email },
+            include: [
+                { model: Account_Confirmation, as: 'accountConfirmation' },
+                { model: Reset_Password, as: 'resetPassword' },
             ],
         });
         return response;

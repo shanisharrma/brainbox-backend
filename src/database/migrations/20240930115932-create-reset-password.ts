@@ -26,11 +26,10 @@ module.exports = {
             },
             used: {
                 type: Sequelize.BOOLEAN,
-                allowNull: false,
+                defaultValue: false,
             },
             lastResetAt: {
                 type: Sequelize.DATE,
-                allowNull: false,
             },
             expiresAt: {
                 type: Sequelize.BIGINT,

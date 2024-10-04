@@ -40,11 +40,10 @@ Reset_Password.init(
         },
         used: {
             type: DataTypes.BOOLEAN,
-            allowNull: false,
+            defaultValue: false,
         },
         lastResetAt: {
             type: DataTypes.DATE,
-            allowNull: false,
         },
         expiresAt: {
             type: DataTypes.BIGINT,

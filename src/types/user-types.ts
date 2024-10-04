@@ -78,9 +78,9 @@ export interface IResetPasswordAttributes {
     id?: number;
     userId: number;
     token: string;
-    used: boolean;
-    lastResetAt: Date;
     expiresAt: number;
+    used?: boolean;
+    lastResetAt?: Date;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -100,4 +100,8 @@ export interface IRegisterRequestBody {
 export interface ILoginRequestBody {
     email: string;
     password: string;
+}
+
+export interface IForgotRequestBody {
+    email: string;
 }

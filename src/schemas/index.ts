@@ -1,6 +1,7 @@
-import { registerSchema, loginSchema } from './auth-schema';
+import { registerSchema, loginSchema, forgotPasswordSchema } from './auth-schema';
 
 export default {
     registerSchema,
     loginSchema,
+    forgotPasswordSchema,
 };

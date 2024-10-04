@@ -3,7 +3,7 @@ import { AppError } from '../utils/error';
 import { HttpError, HttpResponse } from '../utils/common';
 import { StatusCodes } from 'http-status-codes';
 import { Enums, ResponseMessage } from '../utils/constants';
-import { ILoginRequestBody, IRegisterRequestBody } from '../types';
+import { IForgotRequestBody, ILoginRequestBody, IRegisterRequestBody } from '../types';
 import { UserService } from '../services';
 import { ServerConfig } from '../config';
 import { Quicker } from '../utils/helper';
@@ -27,6 +27,10 @@ interface ILoginRequest extends Request {
 
 interface IProfileRequest extends Request {
     id: number;
+}
+
+interface IForgotRequest extends Request {
+    body: IForgotRequestBody;
 }
 
 class AuthController {
@@ -209,6 +213,22 @@ class AuthController {
             });
 
             HttpResponse(req, res, StatusCodes.OK, ResponseMessage.TOKEN_REFRESH_SUCCESS, accessToken);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async forgotPassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { body } = req as IForgotRequest;
+
+            const response = await AuthController.userService.forgotPassword(body);
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.FORGOT_PASSWORD_SENT_SUCCESS, response);
         } catch (error) {
             HttpError(
                 next,

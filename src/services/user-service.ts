@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import { RoleRepository, UserRepository } from '../repositories';
 import {
     IAccountConfirmationAttributes,
+    IForgotRequestBody,
     ILoginRequestBody,
     IRefreshTokenAttributes,
     IRegisterRequestBody,
@@ -18,6 +19,7 @@ import { ServerConfig } from '../config';
 import { Logger } from '../utils/common';
 import RefreshTokenService from './refresh-token-service';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
+import ResetPasswordService from './reset-password-service';
 
 interface IDecryptedJWT {
     userId: number;
@@ -35,6 +37,7 @@ class UserService {
     private accountConfirmationService: AccountConfirmationService;
     private mailService: MailService;
     private refreshTokenService: RefreshTokenService;
+    private resetPasswordService: ResetPasswordService;
 
     constructor() {
         this.userRepository = new UserRepository();
@@ -43,6 +46,7 @@ class UserService {
         this.accountConfirmationService = new AccountConfirmationService();
         this.mailService = new MailService();
         this.refreshTokenService = new RefreshTokenService();
+        this.resetPasswordService = new ResetPasswordService();
     }
 
     public async registerUser(data: IRegisterRequestBody) {
@@ -392,6 +396,50 @@ class UserService {
 
             // * return access token
             return accessToken;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async forgotPassword(data: IForgotRequestBody) {
+        try {
+            // * get email from data
+            const { email } = data;
+
+            // * check user exists with this email
+            const user = await this.userRepository.getUserWithAccountConfirmationAndResetPasswordByEmail(email);
+            if (!user) {
+                throw new AppError(ResponseMessage.INVALID_CREDENTIALS, StatusCodes.BAD_REQUEST);
+            }
+
+            // * check if user is verified or not
+            if (user.accountConfirmation && user.accountConfirmation.status === false) {
+                throw new AppError(ResponseMessage.ACCOUNT_NOT_VERIFIED, StatusCodes.FORBIDDEN);
+            }
+
+            // * generate forgot password payload
+            const token = Quicker.generateRandomTokenId();
+            const expiresAt = Quicker.generateResetPasswordExpiry(15);
+
+            // * check if user has already applied for forgot password
+            if (user.resetPassword && (user.resetPassword.used || user.resetPassword.token)) {
+                // * update the existing record
+                await this.resetPasswordService.updateResetPassword(user.resetPassword.id!, { token, expiresAt });
+            } else {
+                // * create new record
+                await this.resetPasswordService.createResetPassword({ token, expiresAt, userId: user.id! });
+            }
+
+            // * create mail payload
+            const resetPasswordURL = `${ServerConfig.FRONTEND_URL}/reset-password/${token}`;
+            const to = [user.email];
+            const subject = `Account Password Reset Requested`;
+            const text = `Hey ${user.firstName + ' ' + user.lastName}, Please reset your account password by clicking on the line below.\n\n${resetPasswordURL}\n\nLink will expire within 15 minutes.`;
+
+            await this.mailService.sendEmail(to, subject, text).catch((error) => {
+                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, { meta: error });
+            });
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
