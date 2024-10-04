@@ -131,6 +131,21 @@ class AuthController {
             );
         }
     }
+
+    public static async requestConfirmation(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req as IProfileRequest;
+            await AuthController.userService.requestConfirmation(id);
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.VERIFICATION_LINK_SENT, StatusCodes.OK);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
 }
 
 export default AuthController;

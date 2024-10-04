@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { RoleRepository, UserRepository } from '../repositories';
 import {
+    IAccountConfirmationAttributes,
     ILoginRequestBody,
     IRefreshTokenAttributes,
     IRegisterRequestBody,
@@ -281,6 +282,54 @@ class UserService {
                 throw new AppError(ResponseMessage.AUTHORIZATION_REQUIRED, StatusCodes.UNAUTHORIZED);
             }
             return user.id;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async requestConfirmation(id: number) {
+        try {
+            // * get the user using the received id
+            const userWithAssociations = await this.userRepository.getUserWithAssociationsById(id);
+
+            // * check uer exists
+            if (!userWithAssociations) {
+                throw new AppError(ResponseMessage.AUTHORIZATION_REQUIRED, StatusCodes.UNAUTHORIZED);
+            }
+
+            // * check account verified
+            if (
+                userWithAssociations &&
+                userWithAssociations.accountConfirmation &&
+                userWithAssociations.accountConfirmation.status === true
+            ) {
+                throw new AppError(ResponseMessage.ACCOUNT_ALREADY_VERIFIED, StatusCodes.BAD_REQUEST);
+            }
+
+            // * prepare payload
+            const accountConfirmationPayload: IAccountConfirmationAttributes = {
+                code: Quicker.generateRandomOTP(6),
+                token: Quicker.generateRandomTokenId(),
+                expiresAt: Quicker.generateAccountConfirmationExpiry(10),
+                status: false,
+                userId: userWithAssociations.id!,
+            };
+
+            // * create new account confirmation in db
+            const accountConfirmationDetails =
+                await this.accountConfirmationService.createAccountConfirmation(accountConfirmationPayload);
+
+            // * prepare email payload
+            const confirmationUrl = `${ServerConfig.FRONTEND_URL}/${accountConfirmationDetails.token}?code=${accountConfirmationDetails.code}`;
+            const to = [userWithAssociations.email];
+            const subject = `Account Verification`;
+            const text = `Hey ${userWithAssociations.firstName + ' ' + userWithAssociations.lastName}, Please click the below link to verify you email for the account creation at Learnovous.\n\nThe confirmation email valid for 10 minutes only.\n\n\n${confirmationUrl}`;
+
+            // * send new verification link
+            await this.mailService.sendEmail(to, subject, text).catch((error) => {
+                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, { meta: error });
+            });
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

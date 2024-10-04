@@ -19,4 +19,7 @@ router.route('/login').post(ValidationMiddleware.validateRequest(loginSchema), A
 // Profile : GET /api/v1/profile
 router.route('/profile').get(AuthMiddleware.checkAuth, AuthController.profile);
 
+// Request Email Verification : POST /api/v1/account-confirmation
+router.route('/account-confirmation').post(AuthMiddleware.checkAuth, AuthController.requestConfirmation);
+
 export default router;
