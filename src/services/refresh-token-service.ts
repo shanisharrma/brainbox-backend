@@ -37,6 +37,15 @@ class RefreshTokenService {
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public async deleteRefreshTokenByToken(token: string) {
+        try {
+            return this.refreshTokenRepository.deleteRefreshTokenByToken(token);
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
 export default RefreshTokenService;

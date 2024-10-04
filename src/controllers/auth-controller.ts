@@ -146,6 +146,45 @@ class AuthController {
             );
         }
     }
+
+    public static async logout(req: Request, res: Response, next: NextFunction) {
+        try {
+            // * get cookies
+            const { cookies } = req;
+
+            // * get refresh token
+            const { refreshToken } = cookies;
+
+            // * delete refresh token from DB
+            await AuthController.userService.logout(refreshToken);
+
+            // get domain
+            const DOMAIN = Quicker.getDomainFromUrl(ServerConfig.SERVER_URL as string);
+
+            // * clear cookies
+            res.clearCookie('accessToken', {
+                path: '/api/v1',
+                domain: DOMAIN,
+                sameSite: 'strict',
+                httpOnly: true,
+                secure: !(ServerConfig.ENV === Enums.EApplicationEnvironment.DEVELOPMENT),
+            }).clearCookie('refreshToken', {
+                path: '/api/v1',
+                domain: DOMAIN,
+                sameSite: 'strict',
+                httpOnly: true,
+                secure: !(ServerConfig.ENV === Enums.EApplicationEnvironment.DEVELOPMENT),
+            });
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.LOGOUT_SUCCESS, StatusCodes.OK);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
 }
 
 export default AuthController;

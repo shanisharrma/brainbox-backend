@@ -18,6 +18,7 @@ export default {
     INVALID_AUTHORIZATION_TOKEN: `Invalid authorization token.`, //401
     AUTHORIZATION_REQUIRED: `Authentication required.`, //401
     VERIFICATION_LINK_SENT: `Verification link sent to your email.`, //200
+    LOGOUT_SUCCESS: `Logout successful.`, //200
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
 };

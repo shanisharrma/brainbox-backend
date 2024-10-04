@@ -335,6 +335,21 @@ class UserService {
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public async logout(token: string) {
+        try {
+            // * check token exists
+            if (!token) {
+                throw new AppError(ResponseMessage.AUTHORIZATION_TOKEN_MISSING, StatusCodes.UNAUTHORIZED);
+            }
+
+            // * delete token from database
+            await this.refreshTokenService.deleteRefreshTokenByToken(token);
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
 export default UserService;
