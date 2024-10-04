@@ -29,7 +29,7 @@ export default {
     // JWT Access and Refresh Secret Key
     ACCESS_TOKEN: {
         SECRET: process.env.ACCESS_TOKEN_SECRET,
-        EXPIRY: 15 * 60,
+        EXPIRY: 60 * 60,
     },
 
     REFRESH_TOKEN: {

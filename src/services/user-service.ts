@@ -17,6 +17,7 @@ import MailService from './mail-service';
 import { ServerConfig } from '../config';
 import { Logger } from '../utils/common';
 import RefreshTokenService from './refresh-token-service';
+import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 
 interface IDecryptedJWT {
     userId: number;
@@ -284,6 +285,12 @@ class UserService {
             return user.id;
         } catch (error) {
             if (error instanceof AppError) throw error;
+            if (error instanceof JsonWebTokenError) {
+                if (error instanceof TokenExpiredError) {
+                    throw new AppError(ResponseMessage.AUTHORIZATION_TOKEN_EXPIRED, StatusCodes.UNAUTHORIZED);
+                }
+                throw new AppError(ResponseMessage.INVALID_AUTHORIZATION_TOKEN, StatusCodes.UNAUTHORIZED);
+            }
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
@@ -345,6 +352,46 @@ class UserService {
 
             // * delete token from database
             await this.refreshTokenService.deleteRefreshTokenByToken(token);
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async refreshToken(token: string) {
+        try {
+            // * check domain exists
+            if (!token) {
+                throw new AppError(ResponseMessage.NOT_FOUND('Refresh Token'), StatusCodes.NOT_FOUND);
+            }
+
+            // * find refresh token details with token
+            const rftDetails = await this.refreshTokenService.findRefreshTokenByToken(token);
+
+            // * check details exists
+            if (!rftDetails) {
+                throw new AppError(ResponseMessage.SESSION_EXPIRED, StatusCodes.UNAUTHORIZED);
+            }
+
+            // * check expiry date of refresh token
+            const currentTimestamp = Quicker.getCurrentTimeStamp();
+            if (rftDetails.expiresAt < currentTimestamp) {
+                await this.refreshTokenService.deleteRefreshTokenByToken(token);
+                throw new AppError(ResponseMessage.SESSION_EXPIRED, StatusCodes.UNAUTHORIZED);
+            }
+
+            // * get payload of refresh token
+            const { userId } = rftDetails;
+
+            // * generate new access token with payload
+            const accessToken = Quicker.generateToken(
+                { userId: userId },
+                ServerConfig.ACCESS_TOKEN.SECRET as string,
+                ServerConfig.ACCESS_TOKEN.EXPIRY,
+            );
+
+            // * return access token
+            return accessToken;
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

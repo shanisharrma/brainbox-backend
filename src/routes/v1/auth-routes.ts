@@ -25,4 +25,7 @@ router.route('/account-confirmation').post(AuthMiddleware.checkAuth, AuthControl
 // Logout : POST /api/v1/logout
 router.route('/logout').post(AuthMiddleware.checkAuth, AuthController.logout);
 
+// Refresh Token : POST /api/v1/refresh-token
+router.route('/refresh-token').post(AuthMiddleware.checkAuth, AuthController.refreshToken);
+
 export default router;

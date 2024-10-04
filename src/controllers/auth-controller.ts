@@ -185,6 +185,39 @@ class AuthController {
             );
         }
     }
+
+    public static async refreshToken(req: Request, res: Response, next: NextFunction) {
+        try {
+            // * get cookies
+            const { cookies } = req;
+            // * get refresh token
+            const { refreshToken } = cookies;
+
+            // * generate access token from refresh token
+            const accessToken = await AuthController.userService.refreshToken(refreshToken);
+
+            // * generate domain url path
+            const DOMAIN = Quicker.getDomainFromUrl(ServerConfig.SERVER_URL as string);
+
+            res.cookie('accessToken', accessToken, {
+                path: '/api/v1',
+                domain: DOMAIN,
+                sameSite: 'strict',
+                maxAge: 1000 * ServerConfig.ACCESS_TOKEN.EXPIRY,
+                httpOnly: true,
+                secure: !(ServerConfig.ENV === Enums.EApplicationEnvironment.DEVELOPMENT),
+            });
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.TOKEN_REFRESH_SUCCESS, accessToken);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
 }
 
 export default AuthController;

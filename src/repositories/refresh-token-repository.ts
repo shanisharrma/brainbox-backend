@@ -17,6 +17,11 @@ class RefreshTokenRepository extends CrudRepository<Refresh_Token> {
         const refreshToken = await this.getOne({ where: { token: token } });
         return await refreshToken.destroy();
     }
+
+    public async findRefreshTokenByToken(token: string) {
+        const refreshToken = await this.getOne({ where: { token: token } });
+        return refreshToken;
+    }
 }
 
 export default RefreshTokenRepository;

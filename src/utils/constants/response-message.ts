@@ -19,6 +19,9 @@ export default {
     AUTHORIZATION_REQUIRED: `Authentication required.`, //401
     VERIFICATION_LINK_SENT: `Verification link sent to your email.`, //200
     LOGOUT_SUCCESS: `Logout successful.`, //200
+    NOT_LOGGED_IN: `You are not logged in.`, //401
+    TOKEN_REFRESH_SUCCESS: `Token refreshed successfully.`, //200
+    SESSION_EXPIRED: `Session expired. Please log in again.`, //401
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
 };
