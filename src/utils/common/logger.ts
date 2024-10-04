@@ -1,9 +1,6 @@
 import { createLogger, format, transports } from 'winston';
 import util from 'util';
-import {
-    ConsoleTransportInstance,
-    FileTransportInstance,
-} from 'winston/lib/winston/transports';
+import { ConsoleTransportInstance, FileTransportInstance } from 'winston/lib/winston/transports';
 import { Enums } from '../constants';
 import { ServerConfig } from '../../config';
 import path from 'path';
@@ -78,14 +75,7 @@ const fileLogFormat = format.printf((info) => {
 const FileTransport = (): Array<FileTransportInstance> => {
     return [
         new transports.File({
-            filename: path.join(
-                __dirname,
-                '../',
-                '../',
-                '../',
-                'logs',
-                `${ServerConfig.ENV}.log`,
-            ),
+            filename: path.join(__dirname, '../', '../', '../', 'logs', `${ServerConfig.ENV}.log`),
             level: 'info',
             format: format.combine(format.timestamp(), fileLogFormat),
         }),
@@ -105,9 +95,5 @@ export default createLogger({
     defaultMeta: {
         meta: {},
     },
-    transports: [
-        ...FileTransport(),
-        ...consoleTransport(),
-        ...sequelizeTransport(),
-    ],
+    transports: [...FileTransport(), ...consoleTransport(), ...sequelizeTransport()],
 });

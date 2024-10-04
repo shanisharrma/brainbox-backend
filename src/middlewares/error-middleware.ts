@@ -18,19 +18,9 @@ class ErrorMiddleware {
 
     public static notFound(req: Request, _: Response, next: NextFunction) {
         try {
-            throw new AppError(
-                ResponseMessage.NOT_FOUND('Route'),
-                StatusCodes.NOT_FOUND,
-            );
+            throw new AppError(ResponseMessage.NOT_FOUND('Route'), StatusCodes.NOT_FOUND);
         } catch (error) {
-            HttpError(
-                next,
-                error,
-                req,
-                error instanceof AppError
-                    ? error.statusCode
-                    : StatusCodes.NOT_FOUND,
-            );
+            HttpError(next, error, req, error instanceof AppError ? error.statusCode : StatusCodes.NOT_FOUND);
         }
     }
 }

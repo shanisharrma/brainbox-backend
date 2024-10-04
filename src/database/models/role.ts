@@ -6,10 +6,7 @@ import { IRoleAttributes, IUserAttributes } from '../../types';
 
 type TRoleCreationAttributes = Optional<IRoleAttributes, 'id'>;
 
-class Role
-    extends Model<IRoleAttributes, TRoleCreationAttributes>
-    implements IRoleAttributes
-{
+class Role extends Model<IRoleAttributes, TRoleCreationAttributes> implements IRoleAttributes {
     public id!: number;
     public role!: string;
     public description!: string;

@@ -18,10 +18,7 @@ class CrudRepository<T extends Model> {
     public async getOneById(id: number): Promise<T> {
         const response = await this.model.findByPk(id);
         if (!response) {
-            throw new AppError(
-                ResponseMessage.NOT_FOUND('Resource'),
-                StatusCodes.NOT_FOUND,
-            );
+            throw new AppError(ResponseMessage.NOT_FOUND('Resource'), StatusCodes.NOT_FOUND);
         }
         return response;
     }
@@ -34,10 +31,7 @@ class CrudRepository<T extends Model> {
     public async getOne(options: FindOptions): Promise<T> {
         const response = await this.model.findOne(options);
         if (!response) {
-            throw new AppError(
-                ResponseMessage.NOT_FOUND('Resource'),
-                StatusCodes.NOT_FOUND,
-            );
+            throw new AppError(ResponseMessage.NOT_FOUND('Resource'), StatusCodes.NOT_FOUND);
         }
         return response;
     }
@@ -48,10 +42,7 @@ class CrudRepository<T extends Model> {
         return true;
     }
 
-    public async update(
-        id: number,
-        data: Partial<T['_attributes']>,
-    ): Promise<T> {
+    public async update(id: number, data: Partial<T['_attributes']>): Promise<T> {
         const response = await this.getOneById(id);
         return await response.update(data);
     }

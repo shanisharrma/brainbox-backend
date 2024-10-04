@@ -5,10 +5,7 @@ import connection from '../sequelize';
 import { IUserRolesAttributes } from '../../types';
 
 type TUserRoleCreationAttributes = Optional<IUserRolesAttributes, 'id'>;
-class User_Role
-    extends Model<IUserRolesAttributes, TUserRoleCreationAttributes>
-    implements IUserRolesAttributes
-{
+class User_Role extends Model<IUserRolesAttributes, TUserRoleCreationAttributes> implements IUserRolesAttributes {
     public id!: number;
     public userId!: number;
     public roleId!: number;

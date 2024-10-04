@@ -8,9 +8,15 @@ export default {
     ACCOUNT_VERIFIED: `Account successfully verified.`, //200
     INVALID_VERIFICATION_CODE_TOKEN: `Invalid verification code or token.`, //400
     ACCOUNT_ALREADY_VERIFIED: `Account already verified.`, //400
+    ACCOUNT_NOT_VERIFIED: `"Email not verified. Please verify your email to access all features."`, //403
     EXPIRED_CONFIRMATION_URL: `Account verification url expired. Please request another.`, //400
     LOGIN_SUCCESS: `Login successful.`, //200
     INVALID_CREDENTIALS: `Invalid credentials.`, //401
+    PROFILE_SUCCESS: `Profile retrieved successfully.`, //200
+    AUTHORIZATION_TOKEN_MISSING: `Authorization token doesn't exists`, //401
+    AUTHORIZATION_TOKEN_EXPIRED: `Authorization token expired.`, //401
+    INVALID_AUTHORIZATION_TOKEN: `Invalid authorization token.`, //401
+    AUTHORIZATION_REQUIRED: `Authentication required.`, //401
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
 };

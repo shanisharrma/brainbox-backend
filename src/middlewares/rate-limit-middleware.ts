@@ -17,12 +17,7 @@ export default (req: Request, _: Response, next: NextFunction) => {
                 next();
             })
             .catch(() => {
-                HttpError(
-                    next,
-                    new AppError(ResponseMessage.TOO_MANY_REQUESTS),
-                    req,
-                    StatusCodes.TOO_MANY_REQUESTS,
-                );
+                HttpError(next, new AppError(ResponseMessage.TOO_MANY_REQUESTS), req, StatusCodes.TOO_MANY_REQUESTS);
             });
     }
 };

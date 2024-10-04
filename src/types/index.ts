@@ -4,6 +4,7 @@ import {
     ILogAttributes,
     TWithAssociations,
     TAccountConfirmationWithUser,
+    TUserWithAssociations,
 } from './types';
 import {
     IUserAttributes,
@@ -32,4 +33,5 @@ export {
     TWithAssociations,
     TAccountConfirmationWithUser,
     ILoginRequestBody,
+    TUserWithAssociations,
 };

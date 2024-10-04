@@ -20,10 +20,7 @@ class MailService {
             });
 
             if (error) {
-                throw new AppError(
-                    error.message,
-                    StatusCodes.UNPROCESSABLE_ENTITY,
-                );
+                throw new AppError(error.message, StatusCodes.UNPROCESSABLE_ENTITY);
             }
         } catch (error) {
             if (error instanceof AppError) throw error;

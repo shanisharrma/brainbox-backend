@@ -25,45 +25,32 @@ interface ILoginRequest extends Request {
     body: ILoginRequestBody;
 }
 
+interface IProfileRequest extends Request {
+    id: number;
+}
+
 class AuthController {
     private static userService: UserService = new UserService();
 
-    public static async register(
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ) {
+    public static async register(req: Request, res: Response, next: NextFunction) {
         try {
             const { body } = req as IRegisterRequest;
 
             // call the user register service
-            const response =
-                await AuthController.userService.registerUser(body);
+            const response = await AuthController.userService.registerUser(body);
 
-            HttpResponse(
-                req,
-                res,
-                StatusCodes.CREATED,
-                ResponseMessage.REGISTRATION_SUCCESS,
-                response,
-            );
+            HttpResponse(req, res, StatusCodes.CREATED, ResponseMessage.REGISTRATION_SUCCESS, response);
         } catch (error) {
             HttpError(
                 next,
                 error,
                 req,
-                error instanceof AppError
-                    ? error.statusCode
-                    : StatusCodes.INTERNAL_SERVER_ERROR,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
             );
         }
     }
 
-    public static async confirmation(
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ) {
+    public static async confirmation(req: Request, res: Response, next: NextFunction) {
         try {
             const { params, query } = req as IConfirmRequest;
             const { token } = params;
@@ -74,21 +61,13 @@ class AuthController {
                 code,
             });
 
-            HttpResponse(
-                req,
-                res,
-                StatusCodes.OK,
-                ResponseMessage.ACCOUNT_VERIFIED,
-                response,
-            );
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.ACCOUNT_VERIFIED, response);
         } catch (error) {
             HttpError(
                 next,
                 error,
                 req,
-                error instanceof AppError
-                    ? error.statusCode
-                    : StatusCodes.INTERNAL_SERVER_ERROR,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
             );
         }
     }
@@ -104,9 +83,7 @@ class AuthController {
             });
 
             // get domain
-            const DOMAIN = Quicker.getDomainFromUrl(
-                ServerConfig.SERVER_URL as string,
-            );
+            const DOMAIN = Quicker.getDomainFromUrl(ServerConfig.SERVER_URL as string);
 
             // * destructure access token and refresh token
             const { accessToken, refreshToken } = response;
@@ -118,36 +95,39 @@ class AuthController {
                 sameSite: 'strict',
                 maxAge: 1000 * ServerConfig.ACCESS_TOKEN.EXPIRY,
                 httpOnly: true,
-                secure: !(
-                    ServerConfig.ENV ===
-                    Enums.EApplicationEnvironment.DEVELOPMENT
-                ),
+                secure: !(ServerConfig.ENV === Enums.EApplicationEnvironment.DEVELOPMENT),
             }).cookie('refreshToken', refreshToken, {
                 path: '/api/v1',
                 domain: DOMAIN,
                 sameSite: 'strict',
                 maxAge: 1000 * ServerConfig.REFRESH_TOKEN.EXPIRY,
                 httpOnly: true,
-                secure: !(
-                    ServerConfig.ENV ===
-                    Enums.EApplicationEnvironment.DEVELOPMENT
-                ),
+                secure: !(ServerConfig.ENV === Enums.EApplicationEnvironment.DEVELOPMENT),
             });
 
-            HttpResponse(
-                req,
-                res,
-                StatusCodes.OK,
-                ResponseMessage.LOGIN_SUCCESS,
-            );
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.LOGIN_SUCCESS);
         } catch (error) {
             HttpError(
                 next,
                 error,
                 req,
-                error instanceof AppError
-                    ? error.statusCode
-                    : StatusCodes.INTERNAL_SERVER_ERROR,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async profile(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req as IProfileRequest;
+            const response = await AuthController.userService.profile(id);
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.PROFILE_SUCCESS, response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
             );
         }
     }

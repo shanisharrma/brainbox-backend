@@ -1,4 +1,4 @@
-import { IAccountConfirmationAttributes, IUserAttributes } from './user-types';
+import { IAccountConfirmationAttributes, IPhoneNumberAttributes, IRoleAttributes, IUserAttributes } from './user-types';
 
 export type THttpResponse = {
     success: boolean;
@@ -38,7 +38,9 @@ export interface ILogAttributes {
 
 export type TWithAssociations<T, Associations> = T & Partial<Associations>;
 
-export type TAccountConfirmationWithUser = TWithAssociations<
-    IAccountConfirmationAttributes,
-    { user: IUserAttributes }
+export type TAccountConfirmationWithUser = TWithAssociations<IAccountConfirmationAttributes, { user: IUserAttributes }>;
+
+export type TUserWithAssociations = TWithAssociations<
+    IUserAttributes,
+    { accountConfirmation: IAccountConfirmationAttributes; phoneNumber: IPhoneNumberAttributes; role: IRoleAttributes }
 >;

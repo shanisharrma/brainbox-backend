@@ -78,12 +78,4 @@ Reset_Password.belongsTo(User, {
     onUpdate: 'CASCADE',
 });
 
-export {
-    Log,
-    Role,
-    User,
-    Phone_Number,
-    Account_Confirmation,
-    Refresh_Token,
-    Reset_Password,
-};
+export { Log, Role, User, Phone_Number, Account_Confirmation, Refresh_Token, Reset_Password };

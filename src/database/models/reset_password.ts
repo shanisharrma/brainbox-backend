@@ -4,10 +4,7 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import connection from '../sequelize';
 import { IResetPasswordAttributes, IUserAttributes } from '../../types';
 
-type TResetPasswordCreationAttributes = Optional<
-    IResetPasswordAttributes,
-    'id'
->;
+type TResetPasswordCreationAttributes = Optional<IResetPasswordAttributes, 'id'>;
 
 class Reset_Password
     extends Model<IResetPasswordAttributes, TResetPasswordCreationAttributes>

@@ -4,16 +4,10 @@ import { DataTypes, Model, Optional } from 'sequelize';
 import connection from '../sequelize';
 import { IAccountConfirmationAttributes } from '../../types';
 
-type TAccountConfirmationCreationAttributes = Optional<
-    IAccountConfirmationAttributes,
-    'id'
->;
+type TAccountConfirmationCreationAttributes = Optional<IAccountConfirmationAttributes, 'id'>;
 
 class Account_Confirmation
-    extends Model<
-        IAccountConfirmationAttributes,
-        TAccountConfirmationCreationAttributes
-    >
+    extends Model<IAccountConfirmationAttributes, TAccountConfirmationCreationAttributes>
     implements IAccountConfirmationAttributes
 {
     public id!: number;

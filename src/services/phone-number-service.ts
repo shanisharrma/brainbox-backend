@@ -25,10 +25,7 @@ class PhoneNumberService {
             return response;
         } catch (error) {
             if (error instanceof AppError) throw error;
-            throw new AppError(
-                ResponseMessage.SOMETHING_WENT_WRONG,
-                StatusCodes.INTERNAL_SERVER_ERROR,
-            );
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 }

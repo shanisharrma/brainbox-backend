@@ -16,39 +16,25 @@ class RefreshTokenService {
             return await this.refreshTokenRepository.create(payload);
         } catch (error) {
             if (error instanceof AppError) throw error;
-            throw new AppError(
-                ResponseMessage.SOMETHING_WENT_WRONG,
-                StatusCodes.INTERNAL_SERVER_ERROR,
-            );
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
     public async findRefreshTokenByUserId(userId: number) {
         try {
-            return await this.refreshTokenRepository.findRefreshTokenByUserId(
-                userId,
-            );
+            return await this.refreshTokenRepository.findRefreshTokenByUserId(userId);
         } catch (error) {
             if (error instanceof AppError) throw error;
-            throw new AppError(
-                ResponseMessage.SOMETHING_WENT_WRONG,
-                StatusCodes.INTERNAL_SERVER_ERROR,
-            );
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public async updateRefreshToken(
-        id: number,
-        data: Partial<IRefreshTokenAttributes>,
-    ) {
+    public async updateRefreshToken(id: number, data: Partial<IRefreshTokenAttributes>) {
         try {
             return await this.refreshTokenRepository.update(id, data);
         } catch (error) {
             if (error instanceof AppError) throw error;
-            throw new AppError(
-                ResponseMessage.SOMETHING_WENT_WRONG,
-                StatusCodes.INTERNAL_SERVER_ERROR,
-            );
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 }

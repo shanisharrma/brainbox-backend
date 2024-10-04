@@ -7,10 +7,7 @@ export const registerSchema = Joi.object<IRegisterRequestBody, true>({
     email: Joi.string().email().trim().required(),
     password: Joi.string().min(8).trim().required(),
     phoneNumber: Joi.string().min(4).max(20).trim().required(),
-    role: Joi.string()
-        .valid('student', 'admin', 'instructor')
-        .trim()
-        .required(),
+    role: Joi.string().valid('student', 'admin', 'instructor').trim().required(),
     consent: Joi.boolean().valid(true).required(),
 });
 

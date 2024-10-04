@@ -21,13 +21,7 @@ class ApiController {
                 timestamp: Date.now(),
             };
 
-            HttpResponse(
-                req,
-                res,
-                StatusCodes.OK,
-                ResponseMessage.SUCCESS,
-                healthData,
-            );
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, healthData);
         } catch (error) {
             HttpError(next, error, req, StatusCodes.INTERNAL_SERVER_ERROR);
         }

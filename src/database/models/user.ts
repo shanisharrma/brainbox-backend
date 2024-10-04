@@ -1,11 +1,6 @@
 'use strict';
 
-import {
-    BelongsToManyAddAssociationMixin,
-    DataTypes,
-    Model,
-    Optional,
-} from 'sequelize';
+import { BelongsToManyAddAssociationMixin, DataTypes, Model, Optional } from 'sequelize';
 import connection from '../sequelize';
 import { IRoleAttributes, IUserAttributes } from '../../types';
 import { Quicker } from '../../utils/helper';
@@ -13,10 +8,7 @@ import Role from './role';
 
 type TUserCreationAttributes = Optional<IUserAttributes, 'id'>;
 
-class User
-    extends Model<IUserAttributes, TUserCreationAttributes>
-    implements IUserAttributes
-{
+class User extends Model<IUserAttributes, TUserCreationAttributes> implements IUserAttributes {
     public id!: number;
     public firstName!: string;
     public lastName!: string;

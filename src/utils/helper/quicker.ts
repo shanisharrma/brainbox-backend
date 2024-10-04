@@ -35,10 +35,7 @@ class Quicker {
         return await bcrypt.hash(password, ServerConfig.SALT_ROUNDS);
     }
 
-    public static async comparePassword(
-        attemptedPassword: string,
-        hashedPassword: string,
-    ) {
+    public static async comparePassword(attemptedPassword: string, hashedPassword: string) {
         return await bcrypt.compare(attemptedPassword, hashedPassword);
     }
 
@@ -90,14 +87,14 @@ class Quicker {
         return dayjs().utc().toDate();
     }
 
-    public static generateToken(
-        payload: object,
-        secret: string,
-        expiry: number,
-    ) {
+    public static generateToken(payload: object, secret: string, expiry: number) {
         return jwt.sign(payload, secret, {
             expiresIn: expiry,
         });
+    }
+
+    public static verifyToken(token: string, secret: string) {
+        return jwt.verify(token, secret);
     }
 
     public static getDomainFromUrl(url: string) {

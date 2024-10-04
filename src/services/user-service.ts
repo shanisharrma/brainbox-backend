@@ -5,6 +5,7 @@ import {
     IRefreshTokenAttributes,
     IRegisterRequestBody,
     IUserAttributes,
+    TUserWithAssociations,
 } from '../types';
 import { Enums, ResponseMessage } from '../utils/constants';
 import { AppError } from '../utils/error';
@@ -15,6 +16,15 @@ import MailService from './mail-service';
 import { ServerConfig } from '../config';
 import { Logger } from '../utils/common';
 import RefreshTokenService from './refresh-token-service';
+
+interface IDecryptedJWT {
+    userId: number;
+}
+
+interface IProfileResponse {
+    user: TUserWithAssociations;
+    warning?: string;
+}
 
 class UserService {
     private userRepository: UserRepository;
@@ -36,26 +46,14 @@ class UserService {
     public async registerUser(data: IRegisterRequestBody) {
         try {
             // * destructure data;
-            const {
-                consent,
-                email,
-                firstName,
-                lastName,
-                password,
-                phoneNumber,
-                role,
-            } = data;
+            const { consent, email, firstName, lastName, password, phoneNumber, role } = data;
 
             // * Parsing the phone number
-            const { countryCode, internationalNumber, isoCode } =
-                Quicker.parsePhoneNumber('+' + phoneNumber);
+            const { countryCode, internationalNumber, isoCode } = Quicker.parsePhoneNumber('+' + phoneNumber);
 
             // ----> check if any key is empty
             if (!countryCode || !isoCode || !internationalNumber) {
-                throw new AppError(
-                    ResponseMessage.INVALID_PHONE_NUMBER,
-                    StatusCodes.UNPROCESSABLE_ENTITY,
-                );
+                throw new AppError(ResponseMessage.INVALID_PHONE_NUMBER, StatusCodes.UNPROCESSABLE_ENTITY);
             }
 
             // * get timezone from phone number iso code
@@ -63,19 +61,13 @@ class UserService {
 
             // * check timezone exists or not
             if (!timezone || timezone.length === 0) {
-                throw new AppError(
-                    ResponseMessage.INVALID_PHONE_NUMBER,
-                    StatusCodes.UNPROCESSABLE_ENTITY,
-                );
+                throw new AppError(ResponseMessage.INVALID_PHONE_NUMBER, StatusCodes.UNPROCESSABLE_ENTITY);
             }
 
             // * check if user already exists
             const isUserExists = await this.userRepository.findByEmail(email);
             if (isUserExists) {
-                throw new AppError(
-                    ResponseMessage.EMAIL_ALREADY_IN_USE,
-                    StatusCodes.BAD_REQUEST,
-                );
+                throw new AppError(ResponseMessage.EMAIL_ALREADY_IN_USE, StatusCodes.BAD_REQUEST);
             }
 
             // * create new user
@@ -93,30 +85,29 @@ class UserService {
             if (user_role) {
                 user.addRole(user_role);
             } else {
-                throw new AppError(
-                    ResponseMessage.NOT_FOUND('Role'),
-                    StatusCodes.NOT_FOUND,
-                );
+                throw new AppError(ResponseMessage.NOT_FOUND('Role'), StatusCodes.NOT_FOUND);
             }
 
             // * create Phone number entry
-            const newPhoneNumber =
-                await this.phoneNumberService.createPhoneNumber({
-                    isoCode,
-                    internationalNumber,
-                    countryCode,
-                    userId: user.id,
-                });
+            const newPhoneNumber = await this.phoneNumberService.createPhoneNumber({
+                isoCode,
+                internationalNumber,
+                countryCode,
+                userId: user.id,
+            });
 
             // * create OTP and random token for account verification
             const code = Quicker.generateRandomOTP(6);
             const token = Quicker.generateRandomTokenId();
             const expiresAt = Quicker.generateAccountConfirmationExpiry(10);
 
-            const accountConfirmation =
-                await this.accountConfirmationService.createAccountConfirmation(
-                    { code, token, userId: user.id, status: false, expiresAt },
-                );
+            const accountConfirmation = await this.accountConfirmationService.createAccountConfirmation({
+                code,
+                token,
+                userId: user.id,
+                status: false,
+                expiresAt,
+            });
 
             // create mail payload
             const confirmationUrl = `${ServerConfig.FRONTEND_URL}/account-confirmation/${token}?code=${code}`;
@@ -125,13 +116,11 @@ class UserService {
             const text = `Hey ${user.firstName + ' ' + user.lastName}, Please click the below link to verify you email for the account creation at Learnovous.\n\nThe confirmation email valid for 10 minutes only.\n\n\n${confirmationUrl}`;
 
             // * send email
-            await this.mailService
-                .sendEmail(to, subject, text)
-                .catch((error) => {
-                    Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, {
-                        meta: error,
-                    });
+            await this.mailService.sendEmail(to, subject, text).catch((error) => {
+                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, {
+                    meta: error,
                 });
+            });
 
             // * return the complete user
             const userDetails: IUserAttributes = {
@@ -144,10 +133,7 @@ class UserService {
         } catch (error) {
             if (error instanceof AppError) throw error;
 
-            throw new AppError(
-                ResponseMessage.SOMETHING_WENT_WRONG,
-                StatusCodes.INTERNAL_SERVER_ERROR,
-            );
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -156,48 +142,32 @@ class UserService {
             // * destructure data
             const { token, code } = data;
             // * find the account confirmation details based on token and code
-            const accountConfirmationDetails =
-                await this.accountConfirmationService.findAccountConfirmationWithUser(
-                    token,
-                    code,
-                );
+            const accountConfirmationDetails = await this.accountConfirmationService.findAccountConfirmationWithUser(
+                token,
+                code,
+            );
             // * check user exist with given userId in account confirmation details
-            if (
-                !accountConfirmationDetails ||
-                !accountConfirmationDetails.user
-            ) {
-                throw new AppError(
-                    ResponseMessage.INVALID_VERIFICATION_CODE_TOKEN,
-                    StatusCodes.BAD_REQUEST,
-                );
+            if (!accountConfirmationDetails || !accountConfirmationDetails.user) {
+                throw new AppError(ResponseMessage.INVALID_VERIFICATION_CODE_TOKEN, StatusCodes.BAD_REQUEST);
             }
             // * check is User Already verified?
             if (accountConfirmationDetails.status === true) {
-                throw new AppError(
-                    ResponseMessage.ACCOUNT_ALREADY_VERIFIED,
-                    StatusCodes.BAD_REQUEST,
-                );
+                throw new AppError(ResponseMessage.ACCOUNT_ALREADY_VERIFIED, StatusCodes.BAD_REQUEST);
             }
             // * check confirmation url expired
             const expiresAt = accountConfirmationDetails.expiresAt;
             const currentTimestamp = Quicker.getCurrentTimeStamp();
             if (expiresAt < currentTimestamp) {
                 // * delete the current account confirmation details
-                await this.accountConfirmationService.deleteAccountConfirmation(
-                    accountConfirmationDetails.id!,
-                );
-                throw new AppError(
-                    ResponseMessage.EXPIRED_CONFIRMATION_URL,
-                    StatusCodes.BAD_REQUEST,
-                );
+                await this.accountConfirmationService.deleteAccountConfirmation(accountConfirmationDetails.id!);
+                throw new AppError(ResponseMessage.EXPIRED_CONFIRMATION_URL, StatusCodes.BAD_REQUEST);
             }
             // * verify the account
             const verifiedAt = Quicker.getCurrentDateAndTime();
-            const accountVerified =
-                await this.accountConfirmationService.updateAccountConfirmation(
-                    accountConfirmationDetails.id!,
-                    { status: true, verifiedAt },
-                );
+            const accountVerified = await this.accountConfirmationService.updateAccountConfirmation(
+                accountConfirmationDetails.id!,
+                { status: true, verifiedAt },
+            );
 
             // * create email body
             const to = [accountConfirmationDetails.user.email];
@@ -205,21 +175,16 @@ class UserService {
             const text = `Hey ${accountConfirmationDetails.user.firstName}, Your account ahs been successfully verified.`;
 
             // * send verified account email
-            await this.mailService
-                .sendEmail(to, subject, text)
-                .catch((error) => {
-                    Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, {
-                        meta: error,
-                    });
+            await this.mailService.sendEmail(to, subject, text).catch((error) => {
+                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, {
+                    meta: error,
                 });
+            });
 
             return accountVerified;
         } catch (error) {
             if (error instanceof AppError) throw error;
-            throw new AppError(
-                ResponseMessage.SOMETHING_WENT_WRONG,
-                StatusCodes.INTERNAL_SERVER_ERROR,
-            );
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -229,25 +194,15 @@ class UserService {
             const { email, password } = data;
 
             // * check if user exists with this email
-            const user =
-                await this.userRepository.findByEmailWithPassword(email);
+            const user = await this.userRepository.findByEmailWithPassword(email);
             if (!user) {
-                throw new AppError(
-                    ResponseMessage.INVALID_CREDENTIALS,
-                    StatusCodes.UNAUTHORIZED,
-                );
+                throw new AppError(ResponseMessage.INVALID_CREDENTIALS, StatusCodes.UNAUTHORIZED);
             }
 
             // * check isPasswordMatched
-            const isPasswordMatched = await Quicker.comparePassword(
-                password,
-                user.password,
-            );
+            const isPasswordMatched = await Quicker.comparePassword(password, user.password);
             if (!isPasswordMatched) {
-                throw new AppError(
-                    ResponseMessage.INVALID_CREDENTIALS,
-                    StatusCodes.UNAUTHORIZED,
-                );
+                throw new AppError(ResponseMessage.INVALID_CREDENTIALS, StatusCodes.UNAUTHORIZED);
             }
 
             // * create accessToken and refreshToken
@@ -270,35 +225,65 @@ class UserService {
             const refreshTokenPayload: IRefreshTokenAttributes = {
                 token: refreshToken,
                 userId: user.id,
-                expiresAt: Quicker.generateRefreshTokenExpiry(
-                    ServerConfig.REFRESH_TOKEN.EXPIRY,
-                ),
+                expiresAt: Quicker.generateRefreshTokenExpiry(ServerConfig.REFRESH_TOKEN.EXPIRY),
                 revoked: false,
             };
 
             // * store refreshToken in DB
-            const rftDetails =
-                await this.refreshTokenService.findRefreshTokenByUserId(
-                    user.id,
-                );
+            const rftDetails = await this.refreshTokenService.findRefreshTokenByUserId(user.id);
             if (rftDetails && rftDetails.token) {
-                await this.refreshTokenService.updateRefreshToken(
-                    rftDetails.id,
-                    refreshTokenPayload,
-                );
+                await this.refreshTokenService.updateRefreshToken(rftDetails.id, refreshTokenPayload);
             } else {
-                await this.refreshTokenService.createRefreshToken(
-                    refreshTokenPayload,
-                );
+                await this.refreshTokenService.createRefreshToken(refreshTokenPayload);
             }
             // * return accessToken and refreshToken
             return { accessToken, refreshToken };
         } catch (error) {
             if (error instanceof AppError) throw error;
-            throw new AppError(
-                ResponseMessage.SOMETHING_WENT_WRONG,
-                StatusCodes.INTERNAL_SERVER_ERROR,
-            );
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async profile(id: number) {
+        try {
+            const userWithAssociations = await this.userRepository.getUserWithAssociationsById(id);
+
+            if (
+                !userWithAssociations ||
+                !userWithAssociations.accountConfirmation ||
+                userWithAssociations.accountConfirmation.status === false
+            ) {
+                const profileResponse: IProfileResponse = {
+                    user: userWithAssociations!,
+                    warning: ResponseMessage.ACCOUNT_NOT_VERIFIED,
+                };
+                return profileResponse;
+            }
+
+            return userWithAssociations;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async isAuthenticated(token: string) {
+        try {
+            if (!token) {
+                throw new AppError(ResponseMessage.AUTHORIZATION_TOKEN_MISSING, StatusCodes.UNAUTHORIZED);
+            }
+
+            const { userId } = Quicker.verifyToken(token, ServerConfig.ACCESS_TOKEN.SECRET as string) as IDecryptedJWT;
+
+            // check if user exists with userId
+            const user = await this.userRepository.getOneById(userId);
+            if (!user) {
+                throw new AppError(ResponseMessage.AUTHORIZATION_REQUIRED, StatusCodes.UNAUTHORIZED);
+            }
+            return user.id;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 }

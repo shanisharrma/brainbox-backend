@@ -10,14 +10,9 @@ export default tseslint.config({
         },
     },
     files: ['**/*.ts'],
-    extends: [
-        eslint.configs.recommended,
-        ...tseslint.configs.recommended,
-        eslintConfigPrettier,
-    ],
+    extends: [eslint.configs.recommended, ...tseslint.configs.recommended, eslintConfigPrettier],
     rules: {
-        'no-console':
-            'error' /* while pushing to github there shouldn't be any console log statements */,
+        'no-console': 'error' /* while pushing to github there shouldn't be any console log statements */,
         quotes: ['error', 'single', { allowTemplateLiterals: true }],
     },
 });
