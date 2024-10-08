@@ -37,4 +37,13 @@ router
     .route('/reset-password/:token')
     .put(ValidationMiddleware.validateRequest(schema.resetPasswordSchema), AuthController.resetPassword);
 
+// Change Password
+router
+    .route('/change-password')
+    .put(
+        AuthMiddleware.checkAuth,
+        ValidationMiddleware.validateRequest(schema.changePasswordSchema),
+        AuthController.changePassword,
+    );
+
 export default router;

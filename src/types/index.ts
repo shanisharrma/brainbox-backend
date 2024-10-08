@@ -20,6 +20,7 @@ import {
     ILoginRequestBody,
     IForgotRequestBody,
     IResetPasswordRequestBody,
+    IChangePasswordRequestBody,
 } from './user-types';
 
 export {
@@ -42,4 +43,5 @@ export {
     TUserWithAccountConfirmationAndResetPassword,
     IResetPasswordRequestBody,
     TResetPasswordWithUser,
+    IChangePasswordRequestBody,
 };

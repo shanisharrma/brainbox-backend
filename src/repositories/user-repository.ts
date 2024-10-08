@@ -41,5 +41,10 @@ class UserRepository extends CrudRepository<User> {
         });
         return response;
     }
+
+    public async getWithPasswordById(id: number) {
+        const response = await User.scope('withPassword').findOne({ where: { id: id } });
+        return response;
+    }
 }
 export default UserRepository;

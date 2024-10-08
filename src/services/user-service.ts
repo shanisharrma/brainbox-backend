@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import { RoleRepository, UserRepository } from '../repositories';
 import {
     IAccountConfirmationAttributes,
+    IChangePasswordRequestBody,
     IForgotRequestBody,
     ILoginRequestBody,
     IRefreshTokenAttributes,
@@ -487,6 +488,47 @@ class UserService {
             const to = [resetPasswordDetails.user!.email];
             const subject = `Password Reset Successfully.`;
             const text = `Hey ${resetPasswordDetails.user!.firstName + ' ' + resetPasswordDetails.user!.firstName}, your password has been reset successfully. Please try login with new password.`;
+
+            // * send email
+            await this.mailService.sendEmail(to, subject, text);
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async changePassword(id: number, data: IChangePasswordRequestBody) {
+        try {
+            // * destructure data
+            const { oldPassword, newPassword } = data;
+
+            // * check user with given id
+            const userWithPassword = await this.userRepository.getWithPasswordById(id);
+            if (!userWithPassword) {
+                throw new AppError(ResponseMessage.NOT_FOUND('User'), StatusCodes.NOT_FOUND);
+            }
+
+            // * check oldPassword matched with stored password
+            const isPasswordMatched = await Quicker.comparePassword(oldPassword, userWithPassword.password);
+            if (!isPasswordMatched) {
+                throw new AppError(ResponseMessage.INCORRECT_CURRENT_PASSWORD, StatusCodes.BAD_REQUEST);
+            }
+
+            // * check newPassword and oldPassword are same
+            if (oldPassword === newPassword) {
+                throw new AppError(ResponseMessage.SIMILAR_CURRENT_PASSWORD_AND_NEW_PASSWORD, StatusCodes.BAD_REQUEST);
+            }
+
+            // * hash newPassword
+            const hashedPassword = await Quicker.hashPassword(newPassword);
+
+            // * update user with new password
+            await this.userRepository.update(userWithPassword.id, { password: hashedPassword });
+
+            // * prepare email body
+            const to = [userWithPassword.email];
+            const subject = `Password changed successfully.`;
+            const text = `Hey ${userWithPassword.firstName + ' ' + userWithPassword.lastName}, your password has been changed successfully.`;
 
             // * send email
             await this.mailService.sendEmail(to, subject, text);

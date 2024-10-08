@@ -27,6 +27,9 @@ export default {
     RESET_PASSWORD_SUCCESS: `Password reset successful.`, //200
     EXPIRED_RESET_PASSWORD_URL: `Reset password link has expired. Please request a new one.`, //400
     RESET_PASSWORD_URL_USED: `Reset password url already used. Please request new one.`, //400
+    CHANGE_PASSWORD_SUCCESS: `Password successfully changed.`, //200
+    INCORRECT_CURRENT_PASSWORD: `Current password is incorrect.`, //400
+    SIMILAR_CURRENT_PASSWORD_AND_NEW_PASSWORD: `New password cannot be the same as the old password. Please choose a different password.`, //400
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
 };

@@ -3,7 +3,13 @@ import { AppError } from '../utils/error';
 import { HttpError, HttpResponse } from '../utils/common';
 import { StatusCodes } from 'http-status-codes';
 import { Enums, ResponseMessage } from '../utils/constants';
-import { IForgotRequestBody, ILoginRequestBody, IRegisterRequestBody } from '../types';
+import {
+    IChangePasswordRequestBody,
+    IForgotRequestBody,
+    ILoginRequestBody,
+    IRegisterRequestBody,
+    IResetPasswordRequestBody,
+} from '../types';
 import { UserService } from '../services';
 import { ServerConfig } from '../config';
 import { Quicker } from '../utils/helper';
@@ -34,10 +40,15 @@ interface IForgotRequest extends Request {
 }
 
 interface IResetPasswordRequest extends Request {
-    body: IRegisterRequestBody;
+    body: IResetPasswordRequestBody;
     params: {
         token: string;
     };
+}
+
+interface IChangePasswordRequest extends Request {
+    body: IChangePasswordRequestBody;
+    id: number;
 }
 
 class AuthController {
@@ -256,6 +267,24 @@ class AuthController {
             await AuthController.userService.resetPassword(token, password);
 
             HttpResponse(req, res, StatusCodes.OK, ResponseMessage.RESET_PASSWORD_SUCCESS);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async changePassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            // * get params and body from req
+            const { body, id } = req as IChangePasswordRequest;
+
+            await AuthController.userService.changePassword(id, body);
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.CHANGE_PASSWORD_SUCCESS);
         } catch (error) {
             HttpError(
                 next,
