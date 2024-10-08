@@ -97,7 +97,7 @@ class UserService {
             }
 
             // * create Phone number entry
-            const newPhoneNumber = await this.phoneNumberService.createPhoneNumber({
+            const newPhoneNumber = await this.phoneNumberService.create({
                 isoCode,
                 internationalNumber,
                 countryCode,
@@ -109,7 +109,7 @@ class UserService {
             const token = Quicker.generateRandomTokenId();
             const expiresAt = Quicker.generateAccountConfirmationExpiry(10);
 
-            const accountConfirmation = await this.accountConfirmationService.createAccountConfirmation({
+            const accountConfirmation = await this.accountConfirmationService.create({
                 code,
                 token,
                 userId: user.id,
@@ -125,7 +125,7 @@ class UserService {
 
             // * send email
             await this.mailService.sendEmail(to, subject, text).catch((error) => {
-                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, {
+                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE_ERROR, {
                     meta: error,
                 });
             });
@@ -150,10 +150,7 @@ class UserService {
             // * destructure data
             const { token, code } = data;
             // * find the account confirmation details based on token and code
-            const accountConfirmationDetails = await this.accountConfirmationService.findAccountConfirmationWithUser(
-                token,
-                code,
-            );
+            const accountConfirmationDetails = await this.accountConfirmationService.findWithUser(token, code);
             // * check user exist with given userId in account confirmation details
             if (!accountConfirmationDetails || !accountConfirmationDetails.user) {
                 throw new AppError(ResponseMessage.INVALID_VERIFICATION_CODE_TOKEN, StatusCodes.BAD_REQUEST);
@@ -167,15 +164,15 @@ class UserService {
             const currentTimestamp = Quicker.getCurrentTimeStamp();
             if (expiresAt < currentTimestamp) {
                 // * delete the current account confirmation details
-                await this.accountConfirmationService.deleteAccountConfirmation(accountConfirmationDetails.id!);
+                await this.accountConfirmationService.delete(accountConfirmationDetails.id!);
                 throw new AppError(ResponseMessage.EXPIRED_CONFIRMATION_URL, StatusCodes.BAD_REQUEST);
             }
             // * verify the account
             const verifiedAt = Quicker.getCurrentDateAndTime();
-            const accountVerified = await this.accountConfirmationService.updateAccountConfirmation(
-                accountConfirmationDetails.id!,
-                { status: true, verifiedAt },
-            );
+            const accountVerified = await this.accountConfirmationService.update(accountConfirmationDetails.id!, {
+                status: true,
+                verifiedAt,
+            });
 
             // * create email body
             const to = [accountConfirmationDetails.user.email];
@@ -184,7 +181,7 @@ class UserService {
 
             // * send verified account email
             await this.mailService.sendEmail(to, subject, text).catch((error) => {
-                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, {
+                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE_ERROR, {
                     meta: error,
                 });
             });
@@ -238,11 +235,11 @@ class UserService {
             };
 
             // * store refreshToken in DB
-            const rftDetails = await this.refreshTokenService.findRefreshTokenByUserId(user.id);
+            const rftDetails = await this.refreshTokenService.findByUserId(user.id);
             if (rftDetails && rftDetails.token) {
-                await this.refreshTokenService.updateRefreshToken(rftDetails.id, refreshTokenPayload);
+                await this.refreshTokenService.update(rftDetails.id, refreshTokenPayload);
             } else {
-                await this.refreshTokenService.createRefreshToken(refreshTokenPayload);
+                await this.refreshTokenService.create(refreshTokenPayload);
             }
             // * return accessToken and refreshToken
             return { accessToken, refreshToken };
@@ -254,7 +251,7 @@ class UserService {
 
     public async profile(id: number) {
         try {
-            const userWithAssociations = await this.userRepository.getUserWithAssociationsById(id);
+            const userWithAssociations = await this.userRepository.getWithAssociationsById(id);
 
             if (
                 !userWithAssociations ||
@@ -304,7 +301,7 @@ class UserService {
     public async requestConfirmation(id: number) {
         try {
             // * get the user using the received id
-            const userWithAssociations = await this.userRepository.getUserWithAssociationsById(id);
+            const userWithAssociations = await this.userRepository.getWithAssociationsById(id);
 
             // * check uer exists
             if (!userWithAssociations) {
@@ -330,8 +327,7 @@ class UserService {
             };
 
             // * create new account confirmation in db
-            const accountConfirmationDetails =
-                await this.accountConfirmationService.createAccountConfirmation(accountConfirmationPayload);
+            const accountConfirmationDetails = await this.accountConfirmationService.create(accountConfirmationPayload);
 
             // * prepare email payload
             const confirmationUrl = `${ServerConfig.FRONTEND_URL}/${accountConfirmationDetails.token}?code=${accountConfirmationDetails.code}`;
@@ -341,7 +337,7 @@ class UserService {
 
             // * send new verification link
             await this.mailService.sendEmail(to, subject, text).catch((error) => {
-                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, { meta: error });
+                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE_ERROR, { meta: error });
             });
         } catch (error) {
             if (error instanceof AppError) throw error;
@@ -357,7 +353,7 @@ class UserService {
             }
 
             // * delete token from database
-            await this.refreshTokenService.deleteRefreshTokenByToken(token);
+            await this.refreshTokenService.deleteByToken(token);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -372,7 +368,7 @@ class UserService {
             }
 
             // * find refresh token details with token
-            const rftDetails = await this.refreshTokenService.findRefreshTokenByToken(token);
+            const rftDetails = await this.refreshTokenService.findByToken(token);
 
             // * check details exists
             if (!rftDetails) {
@@ -382,7 +378,7 @@ class UserService {
             // * check expiry date of refresh token
             const currentTimestamp = Quicker.getCurrentTimeStamp();
             if (rftDetails.expiresAt < currentTimestamp) {
-                await this.refreshTokenService.deleteRefreshTokenByToken(token);
+                await this.refreshTokenService.deleteByToken(token);
                 throw new AppError(ResponseMessage.SESSION_EXPIRED, StatusCodes.UNAUTHORIZED);
             }
 
@@ -410,7 +406,7 @@ class UserService {
             const { email } = data;
 
             // * check user exists with this email
-            const user = await this.userRepository.getUserWithAccountConfirmationAndResetPasswordByEmail(email);
+            const user = await this.userRepository.getWithAccountConfirmationAndResetPasswordByEmail(email);
             if (!user) {
                 throw new AppError(ResponseMessage.INVALID_CREDENTIALS, StatusCodes.BAD_REQUEST);
             }
@@ -427,10 +423,10 @@ class UserService {
             // * check if user has already applied for forgot password
             if (user.resetPassword && (user.resetPassword.used || user.resetPassword.token)) {
                 // * update the existing record
-                await this.resetPasswordService.updateResetPassword(user.resetPassword.id!, { token, expiresAt });
+                await this.resetPasswordService.update(user.resetPassword.id!, { token, expiresAt });
             } else {
                 // * create new record
-                await this.resetPasswordService.createResetPassword({ token, expiresAt, userId: user.id! });
+                await this.resetPasswordService.create({ token, expiresAt, userId: user.id! });
             }
 
             // * create mail payload
@@ -440,7 +436,7 @@ class UserService {
             const text = `Hey ${user.firstName + ' ' + user.lastName}, Please reset your account password by clicking on the line below.\n\n${resetPasswordURL}\n\nLink will expire within 15 minutes.`;
 
             await this.mailService.sendEmail(to, subject, text).catch((error) => {
-                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, { meta: error });
+                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE_ERROR, { meta: error });
             });
         } catch (error) {
             if (error instanceof AppError) throw error;
@@ -482,7 +478,7 @@ class UserService {
                 used: true,
                 lastResetAt: Quicker.getCurrentDateAndTime(),
             };
-            await this.resetPasswordService.updateResetPassword(resetPasswordDetails.id, updateResetPassword);
+            await this.resetPasswordService.update(resetPasswordDetails.id, updateResetPassword);
 
             // * prepare email body
             const to = [resetPasswordDetails.user!.email];

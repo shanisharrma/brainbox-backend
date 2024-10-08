@@ -6,13 +6,7 @@ import { AppError } from '../utils/error';
 import { ResponseMessage } from '../utils/constants';
 
 class ErrorMiddleware {
-    public static global(
-        err: THttpError,
-        _: Request,
-        res: Response,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        __: NextFunction,
-    ) {
+    public static global(err: THttpError, _: Request, res: Response) {
         res.status(err.statusCode).json(err);
     }
 

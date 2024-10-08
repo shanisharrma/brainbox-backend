@@ -11,7 +11,7 @@ class RefreshTokenService {
         this.refreshTokenRepository = new RefreshTokenRepository();
     }
 
-    public async createRefreshToken(payload: IRefreshTokenAttributes) {
+    public async create(payload: IRefreshTokenAttributes) {
         try {
             return await this.refreshTokenRepository.create(payload);
         } catch (error) {
@@ -20,16 +20,16 @@ class RefreshTokenService {
         }
     }
 
-    public async findRefreshTokenByUserId(userId: number) {
+    public async findByUserId(userId: number) {
         try {
-            return await this.refreshTokenRepository.findRefreshTokenByUserId(userId);
+            return await this.refreshTokenRepository.findByUserId(userId);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public async updateRefreshToken(id: number, data: Partial<IRefreshTokenAttributes>) {
+    public async update(id: number, data: Partial<IRefreshTokenAttributes>) {
         try {
             return await this.refreshTokenRepository.update(id, data);
         } catch (error) {
@@ -38,18 +38,18 @@ class RefreshTokenService {
         }
     }
 
-    public async deleteRefreshTokenByToken(token: string) {
+    public async deleteByToken(token: string) {
         try {
-            return this.refreshTokenRepository.deleteRefreshTokenByToken(token);
+            return this.refreshTokenRepository.deleteByToken(token);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public async findRefreshTokenByToken(token: string) {
+    public async findByToken(token: string) {
         try {
-            return await this.refreshTokenRepository.findRefreshTokenByToken(token);
+            return await this.refreshTokenRepository.findByToken(token);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

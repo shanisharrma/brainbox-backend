@@ -6,19 +6,19 @@ class RefreshTokenRepository extends CrudRepository<Refresh_Token> {
         super(Refresh_Token);
     }
 
-    public async findRefreshTokenByUserId(userId: number) {
+    public async findByUserId(userId: number) {
         const response = await Refresh_Token.findOne({
             where: { userId: userId },
         });
         return response;
     }
 
-    public async deleteRefreshTokenByToken(token: string) {
+    public async deleteByToken(token: string) {
         const refreshToken = await this.getOne({ where: { token: token } });
         return await refreshToken.destroy();
     }
 
-    public async findRefreshTokenByToken(token: string) {
+    public async findByToken(token: string) {
         const refreshToken = await this.getOne({ where: { token: token } });
         return refreshToken;
     }

@@ -11,7 +11,7 @@ class PhoneNumberService {
         this.phoneRepository = new PhoneNumberRepository();
     }
 
-    public async createPhoneNumber(data: IPhoneNumberAttributes) {
+    public async create(data: IPhoneNumberAttributes) {
         try {
             const { countryCode, internationalNumber, isoCode, userId } = data;
 

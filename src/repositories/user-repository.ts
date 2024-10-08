@@ -19,7 +19,7 @@ class UserRepository extends CrudRepository<User> {
         return response;
     }
 
-    public async getUserWithAssociationsById(id: number): Promise<TUserWithAssociations | null> {
+    public async getWithAssociationsById(id: number): Promise<TUserWithAssociations | null> {
         const response: TUserWithAssociations = await this.getOne({
             where: { id: id },
             include: [
@@ -31,7 +31,7 @@ class UserRepository extends CrudRepository<User> {
         return response;
     }
 
-    public async getUserWithAccountConfirmationAndResetPasswordByEmail(email: string) {
+    public async getWithAccountConfirmationAndResetPasswordByEmail(email: string) {
         const response: TUserWithAccountConfirmationAndResetPassword = await this.getOne({
             where: { email: email },
             include: [

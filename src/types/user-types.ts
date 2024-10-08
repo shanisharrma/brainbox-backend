@@ -1,3 +1,5 @@
+import { TWithAssociations } from './types';
+
 export interface IUserAttributes {
     id?: number;
     firstName: string;
@@ -116,3 +118,17 @@ export interface IChangePasswordRequestBody {
     newPassword: string;
     confirmNewPassword: string;
 }
+
+export type TAccountConfirmationWithUser = TWithAssociations<IAccountConfirmationAttributes, { user: IUserAttributes }>;
+
+export type TUserWithAssociations = TWithAssociations<
+    IUserAttributes,
+    { accountConfirmation: IAccountConfirmationAttributes; phoneNumber: IPhoneNumberAttributes; role: IRoleAttributes }
+>;
+
+export type TUserWithAccountConfirmationAndResetPassword = TWithAssociations<
+    IUserAttributes,
+    { accountConfirmation: IAccountConfirmationAttributes; resetPassword: IResetPasswordAttributes }
+>;
+
+export type TResetPasswordWithUser = TWithAssociations<IResetPasswordAttributes, { user: IUserAttributes }>;

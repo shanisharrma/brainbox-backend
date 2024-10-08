@@ -11,7 +11,7 @@ class ResetPasswordService {
         this.resetPasswordRepository = new ResetPasswordRepository();
     }
 
-    public async createResetPassword(data: IResetPasswordAttributes) {
+    public async create(data: IResetPasswordAttributes) {
         try {
             const { expiresAt, token, userId } = data;
             return await this.resetPasswordRepository.create({ expiresAt, token, userId });
@@ -21,7 +21,7 @@ class ResetPasswordService {
         }
     }
 
-    public async updateResetPassword(id: number, data: Partial<IResetPasswordAttributes>) {
+    public async update(id: number, data: Partial<IResetPasswordAttributes>) {
         try {
             return await this.resetPasswordRepository.update(id, data);
         } catch (error) {
@@ -35,7 +35,7 @@ class ResetPasswordService {
             if (!token) {
                 throw new AppError(ResponseMessage.RESET_PASSWORD_TOKEN_MISSING, StatusCodes.BAD_REQUEST);
             }
-            return await this.resetPasswordRepository.findResetPasswordWithUserByToken(token);
+            return await this.resetPasswordRepository.findWithUserByToken(token);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

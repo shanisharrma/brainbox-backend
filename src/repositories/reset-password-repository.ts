@@ -6,7 +6,7 @@ class ResetPasswordRepository extends CrudRepository<Reset_Password> {
         super(Reset_Password);
     }
 
-    public async findResetPasswordWithUserByToken(token: string) {
+    public async findWithUserByToken(token: string) {
         const response = await this.getOne({
             where: { token: token },
             include: [{ model: User, required: true, as: 'user' }],

@@ -1,11 +1,3 @@
-import {
-    IAccountConfirmationAttributes,
-    IPhoneNumberAttributes,
-    IResetPasswordAttributes,
-    IRoleAttributes,
-    IUserAttributes,
-} from './user-types';
-
 export type THttpResponse = {
     success: boolean;
     statusCode: number;
@@ -43,17 +35,3 @@ export interface ILogAttributes {
 }
 
 export type TWithAssociations<T, Associations> = T & Partial<Associations>;
-
-export type TAccountConfirmationWithUser = TWithAssociations<IAccountConfirmationAttributes, { user: IUserAttributes }>;
-
-export type TUserWithAssociations = TWithAssociations<
-    IUserAttributes,
-    { accountConfirmation: IAccountConfirmationAttributes; phoneNumber: IPhoneNumberAttributes; role: IRoleAttributes }
->;
-
-export type TUserWithAccountConfirmationAndResetPassword = TWithAssociations<
-    IUserAttributes,
-    { accountConfirmation: IAccountConfirmationAttributes; resetPassword: IResetPasswordAttributes }
->;
-
-export type TResetPasswordWithUser = TWithAssociations<IResetPasswordAttributes, { user: IUserAttributes }>;

@@ -1,13 +1,4 @@
-import {
-    THttpResponse,
-    THttpError,
-    ILogAttributes,
-    TWithAssociations,
-    TAccountConfirmationWithUser,
-    TUserWithAssociations,
-    TUserWithAccountConfirmationAndResetPassword,
-    TResetPasswordWithUser,
-} from './types';
+import { THttpResponse, THttpError, ILogAttributes, TWithAssociations } from './types';
 import {
     IUserAttributes,
     IRoleAttributes,
@@ -21,6 +12,10 @@ import {
     IForgotRequestBody,
     IResetPasswordRequestBody,
     IChangePasswordRequestBody,
+    TAccountConfirmationWithUser,
+    TResetPasswordWithUser,
+    TUserWithAccountConfirmationAndResetPassword,
+    TUserWithAssociations,
 } from './user-types';
 
 export {

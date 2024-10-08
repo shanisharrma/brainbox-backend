@@ -12,7 +12,7 @@ class AccountConfirmationService {
         this.accountConfirmationRepository = new AccountConfirmationRepository();
     }
 
-    public async createAccountConfirmation(data: IAccountConfirmationAttributes) {
+    public async create(data: IAccountConfirmationAttributes) {
         try {
             const { code, status, token, userId, expiresAt } = data;
 
@@ -32,10 +32,9 @@ class AccountConfirmationService {
         }
     }
 
-    public async findAccountConfirmationWithUser(token: string, code: string) {
+    public async findWithUser(token: string, code: string) {
         try {
-            const accountConfirmationWithUser =
-                await this.accountConfirmationRepository.findAccountConfirmationWithUser(token, code);
+            const accountConfirmationWithUser = await this.accountConfirmationRepository.findWithUser(token, code);
 
             return accountConfirmationWithUser;
         } catch (error) {
@@ -44,7 +43,7 @@ class AccountConfirmationService {
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
-    public async deleteAccountConfirmation(id: number) {
+    public async delete(id: number) {
         try {
             return await this.accountConfirmationRepository.destroyById(id);
         } catch (error) {
@@ -54,7 +53,7 @@ class AccountConfirmationService {
         }
     }
 
-    public async updateAccountConfirmation(id: number, data: Partial<Account_Confirmation>) {
+    public async update(id: number, data: Partial<Account_Confirmation>) {
         try {
             return await this.accountConfirmationRepository.update(id, data);
         } catch (error) {
