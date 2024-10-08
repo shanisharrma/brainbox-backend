@@ -63,6 +63,16 @@ class AccountConfirmationService {
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public async getByUserId(userId: number) {
+        try {
+            return await this.accountConfirmationRepository.getOne({ where: { userId: userId } });
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
 export default AccountConfirmationService;

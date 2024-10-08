@@ -6,6 +6,7 @@ import {
     TAccountConfirmationWithUser,
     TUserWithAssociations,
     TUserWithAccountConfirmationAndResetPassword,
+    TResetPasswordWithUser,
 } from './types';
 import {
     IUserAttributes,
@@ -18,6 +19,7 @@ import {
     IRegisterRequestBody,
     ILoginRequestBody,
     IForgotRequestBody,
+    IResetPasswordRequestBody,
 } from './user-types';
 
 export {
@@ -38,4 +40,6 @@ export {
     TUserWithAssociations,
     IForgotRequestBody,
     TUserWithAccountConfirmationAndResetPassword,
+    IResetPasswordRequestBody,
+    TResetPasswordWithUser,
 };

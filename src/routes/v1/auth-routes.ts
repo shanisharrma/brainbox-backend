@@ -32,4 +32,9 @@ router
     .route('/forgot-password')
     .post(ValidationMiddleware.validateRequest(schema.forgotPasswordSchema), AuthController.forgotPassword);
 
+// Reset Password : PUT /api/v1/reset-password/:token
+router
+    .route('/reset-password/:token')
+    .put(ValidationMiddleware.validateRequest(schema.resetPasswordSchema), AuthController.resetPassword);
+
 export default router;

@@ -23,7 +23,28 @@ class ResetPasswordService {
 
     public async updateResetPassword(id: number, data: Partial<IResetPasswordAttributes>) {
         try {
-            return this.resetPasswordRepository.update(id, data);
+            return await this.resetPasswordRepository.update(id, data);
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async findWithUserByToken(token: string) {
+        try {
+            if (!token) {
+                throw new AppError(ResponseMessage.RESET_PASSWORD_TOKEN_MISSING, StatusCodes.BAD_REQUEST);
+            }
+            return await this.resetPasswordRepository.findResetPasswordWithUserByToken(token);
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async delete(id: number) {
+        try {
+            return await this.resetPasswordRepository.destroyById(id);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

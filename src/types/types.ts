@@ -55,3 +55,5 @@ export type TUserWithAccountConfirmationAndResetPassword = TWithAssociations<
     IUserAttributes,
     { accountConfirmation: IAccountConfirmationAttributes; resetPassword: IResetPasswordAttributes }
 >;
+
+export type TResetPasswordWithUser = TWithAssociations<IResetPasswordAttributes, { user: IUserAttributes }>;

@@ -80,7 +80,7 @@ class Quicker {
     }
 
     public static generateResetPasswordExpiry(minutes: number) {
-        return dayjs().valueOf() + minutes * 1000;
+        return dayjs().valueOf() + minutes * 60 * 1000;
     }
 
     public static getCurrentTimeStamp() {

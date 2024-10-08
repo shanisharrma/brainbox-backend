@@ -6,6 +6,7 @@ import {
     ILoginRequestBody,
     IRefreshTokenAttributes,
     IRegisterRequestBody,
+    IResetPasswordAttributes,
     IUserAttributes,
     TUserWithAssociations,
 } from '../types';
@@ -440,6 +441,55 @@ class UserService {
             await this.mailService.sendEmail(to, subject, text).catch((error) => {
                 Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE, { meta: error });
             });
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async resetPassword(token: string, password: string) {
+        try {
+            // * fetch reset password details by token with user
+            const resetPasswordDetails = await this.resetPasswordService.findWithUserByToken(token);
+            if (!resetPasswordDetails || (resetPasswordDetails && !resetPasswordDetails.user)) {
+                throw new AppError(ResponseMessage.NOT_FOUND('User'), StatusCodes.NOT_FOUND);
+            }
+
+            // * check if user is already verified
+            const accountConfirmation = await this.accountConfirmationService.getByUserId(resetPasswordDetails.userId);
+            if (accountConfirmation && accountConfirmation.status === false) {
+                throw new AppError(ResponseMessage.ACCOUNT_NOT_VERIFIED, StatusCodes.FORBIDDEN);
+            }
+
+            // * check if url is expired or not
+            const currentTimestamp = Quicker.getCurrentTimeStamp();
+            if (currentTimestamp > resetPasswordDetails.expiresAt) {
+                await this.resetPasswordService.delete(resetPasswordDetails.id);
+                throw new AppError(ResponseMessage.EXPIRED_RESET_PASSWORD_URL, StatusCodes.BAD_REQUEST);
+            }
+
+            // * hash new password
+            const hashedPassword = await Quicker.hashPassword(password);
+
+            // * Update user with new password
+            await this.userRepository.update(resetPasswordDetails.userId, { password: hashedPassword });
+
+            // * update the reset password record
+            const updateResetPassword: Partial<IResetPasswordAttributes> = {
+                expiresAt: 0,
+                token: '',
+                used: true,
+                lastResetAt: Quicker.getCurrentDateAndTime(),
+            };
+            await this.resetPasswordService.updateResetPassword(resetPasswordDetails.id, updateResetPassword);
+
+            // * prepare email body
+            const to = [resetPasswordDetails.user!.email];
+            const subject = `Password Reset Successfully.`;
+            const text = `Hey ${resetPasswordDetails.user!.firstName + ' ' + resetPasswordDetails.user!.firstName}, your password has been reset successfully. Please try login with new password.`;
+
+            // * send email
+            await this.mailService.sendEmail(to, subject, text);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

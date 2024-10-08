@@ -105,3 +105,8 @@ export interface ILoginRequestBody {
 export interface IForgotRequestBody {
     email: string;
 }
+
+export interface IResetPasswordRequestBody {
+    password: string;
+    confirmPassword: string;
+}

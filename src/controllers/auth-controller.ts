@@ -33,6 +33,13 @@ interface IForgotRequest extends Request {
     body: IForgotRequestBody;
 }
 
+interface IResetPasswordRequest extends Request {
+    body: IRegisterRequestBody;
+    params: {
+        token: string;
+    };
+}
+
 class AuthController {
     private static userService: UserService = new UserService();
 
@@ -229,6 +236,26 @@ class AuthController {
 
             const response = await AuthController.userService.forgotPassword(body);
             HttpResponse(req, res, StatusCodes.OK, ResponseMessage.FORGOT_PASSWORD_SENT_SUCCESS, response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async resetPassword(req: Request, res: Response, next: NextFunction) {
+        try {
+            // * get params and body from req
+            const { body, params } = req as IResetPasswordRequest;
+            const { token } = params;
+            const { password } = body;
+
+            await AuthController.userService.resetPassword(token, password);
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.RESET_PASSWORD_SUCCESS);
         } catch (error) {
             HttpError(
                 next,

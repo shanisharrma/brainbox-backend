@@ -23,6 +23,10 @@ export default {
     TOKEN_REFRESH_SUCCESS: `Token refreshed successfully.`, //200
     SESSION_EXPIRED: `Session expired. Please log in again.`, //401
     FORGOT_PASSWORD_SENT_SUCCESS: `Password reset instructions sent to your email.`, //200
+    RESET_PASSWORD_TOKEN_MISSING: `Reset password token missing`, //400
+    RESET_PASSWORD_SUCCESS: `Password reset successful.`, //200
+    EXPIRED_RESET_PASSWORD_URL: `Reset password link has expired. Please request a new one.`, //400
+    RESET_PASSWORD_URL_USED: `Reset password url already used. Please request new one.`, //400
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
 };
