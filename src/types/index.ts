@@ -16,7 +16,18 @@ import {
     TResetPasswordWithUser,
     TUserWithAccountConfirmationAndResetPassword,
     TUserWithAssociations,
+    IProfileAttributes,
 } from './user-types';
+import {
+    ICourseAttributes,
+    IEnrollmentAttributes,
+    ICategoryAttributes,
+    ICourseCategoryAttributes,
+    IRatingAttributes,
+    ISectionAttributes,
+    ISubSectionAttributes,
+    ICourseProgressAttributes,
+} from './course-types';
 
 export {
     THttpResponse,
@@ -39,4 +50,13 @@ export {
     IResetPasswordRequestBody,
     TResetPasswordWithUser,
     IChangePasswordRequestBody,
+    IProfileAttributes,
+    ICourseAttributes,
+    IEnrollmentAttributes,
+    ICategoryAttributes,
+    ICourseCategoryAttributes,
+    IRatingAttributes,
+    ISectionAttributes,
+    ISubSectionAttributes,
+    ICourseProgressAttributes,
 };

@@ -1,3 +1,4 @@
+import { IRatingAttributes } from './course-types';
 import { TWithAssociations } from './types';
 
 export interface IUserAttributes {
@@ -17,6 +18,7 @@ export interface IUserAttributes {
     accountConfirmation?: IAccountConfirmationAttributes;
     refreshToken?: IRefreshTokenAttributes;
     resetPassword?: IResetPasswordAttributes;
+    ratings?: IRatingAttributes;
 }
 
 export interface IRoleAttributes {
@@ -83,6 +85,19 @@ export interface IResetPasswordAttributes {
     expiresAt: number;
     used?: boolean;
     lastResetAt?: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
+    user?: IUserAttributes;
+}
+
+export interface IProfileAttributes {
+    id?: number;
+    userId: number;
+    gender: string;
+    dateOfBirth: string;
+    about: string;
+    imageUrl: string;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
