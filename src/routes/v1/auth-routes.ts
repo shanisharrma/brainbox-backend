@@ -10,7 +10,9 @@ const router = express.Router();
 router.route('/register').post(ValidationMiddleware.validateRequest(schema.registerSchema), AuthController.register);
 
 // Account Confirmation : PUT /api/v1/account-confirmation/:token?code=123456
-router.route('/account-confirmation/:token').put(AuthController.confirmation);
+router
+    .route('/account-confirmation/:token')
+    .put(ValidationMiddleware.validateRequest(schema.accountVerificationSchema), AuthController.confirmation);
 
 // Login : POST /api/v1/login
 router.route('/login').post(ValidationMiddleware.validateRequest(schema.loginSchema), AuthController.login);

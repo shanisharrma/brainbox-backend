@@ -118,10 +118,10 @@ class UserService {
             });
 
             // create mail payload
-            const confirmationUrl = `${ServerConfig.FRONTEND_URL}/account-confirmation/${token}?code=${code}`;
+            const confirmationUrl = `${ServerConfig.FRONTEND_URL}/account-confirmation/${token}`;
             const to = [user.email];
             const subject = `Account Verification`;
-            const text = `Hey ${user.firstName + ' ' + user.lastName}, Please click the below link to verify you email for the account creation at Learnovous.\n\nThe confirmation email valid for 10 minutes only.\n\n\n${confirmationUrl}`;
+            const text = `Hey ${user.firstName + ' ' + user.lastName}, Please click the below link and enter the below one time password to verify you email for the account creation at BrainBox.\n\n${code}\n\nThe confirmation email valid for 10 minutes only.\n\n${confirmationUrl}`;
 
             // * send email
             await this.mailService.sendEmail(to, subject, text).catch((error) => {
@@ -330,10 +330,10 @@ class UserService {
             const accountConfirmationDetails = await this.accountConfirmationService.create(accountConfirmationPayload);
 
             // * prepare email payload
-            const confirmationUrl = `${ServerConfig.FRONTEND_URL}/${accountConfirmationDetails.token}?code=${accountConfirmationDetails.code}`;
+            const confirmationUrl = `${ServerConfig.FRONTEND_URL}/${accountConfirmationDetails.token}`;
             const to = [userWithAssociations.email];
             const subject = `Account Verification`;
-            const text = `Hey ${userWithAssociations.firstName + ' ' + userWithAssociations.lastName}, Please click the below link to verify you email for the account creation at Learnovous.\n\nThe confirmation email valid for 10 minutes only.\n\n\n${confirmationUrl}`;
+            const text = `Hey ${userWithAssociations.firstName + ' ' + userWithAssociations.lastName}, Please click the below link and enter the below one time password to verify you email for the account creation at BrainBox.\n\n${accountConfirmationDetails.code}\n\nThe confirmation email valid for 10 minutes only.\n\n\n${confirmationUrl}`;
 
             // * send new verification link
             await this.mailService.sendEmail(to, subject, text).catch((error) => {

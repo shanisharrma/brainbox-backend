@@ -5,6 +5,7 @@ import {
     ILoginRequestBody,
     IRegisterRequestBody,
     IResetPasswordRequestBody,
+    IVerificationRequestBody,
 } from '../types';
 
 export const registerSchema = Joi.object<IRegisterRequestBody, true>({
@@ -15,6 +16,10 @@ export const registerSchema = Joi.object<IRegisterRequestBody, true>({
     phoneNumber: Joi.string().min(4).max(20).trim().required(),
     role: Joi.string().valid('student', 'admin', 'instructor').trim().required(),
     consent: Joi.boolean().valid(true).required(),
+});
+
+export const accountVerificationSchema = Joi.object<IVerificationRequestBody, true>({
+    code: Joi.string().max(6).trim().required(),
 });
 
 export const loginSchema = Joi.object<ILoginRequestBody, true>({

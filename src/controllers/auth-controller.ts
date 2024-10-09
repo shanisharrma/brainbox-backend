@@ -9,6 +9,7 @@ import {
     ILoginRequestBody,
     IRegisterRequestBody,
     IResetPasswordRequestBody,
+    IVerificationRequestBody,
 } from '../types';
 import { UserService } from '../services';
 import { ServerConfig } from '../config';
@@ -22,9 +23,7 @@ interface IConfirmRequest extends Request {
     params: {
         token: string;
     };
-    query: {
-        code: string;
-    };
+    body: IVerificationRequestBody;
 }
 
 interface ILoginRequest extends Request {
@@ -74,9 +73,9 @@ class AuthController {
 
     public static async confirmation(req: Request, res: Response, next: NextFunction) {
         try {
-            const { params, query } = req as IConfirmRequest;
+            const { params, body } = req as IConfirmRequest;
             const { token } = params;
-            const { code } = query;
+            const { code } = body;
 
             const response = await AuthController.userService.confirmation({
                 token,

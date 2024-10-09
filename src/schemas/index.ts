@@ -1,5 +1,6 @@
 import {
     registerSchema,
+    accountVerificationSchema,
     loginSchema,
     forgotPasswordSchema,
     resetPasswordSchema,
@@ -8,6 +9,7 @@ import {
 
 export default {
     registerSchema,
+    accountVerificationSchema,
     loginSchema,
     forgotPasswordSchema,
     resetPasswordSchema,

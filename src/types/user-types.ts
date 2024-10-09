@@ -114,6 +114,10 @@ export interface IRegisterRequestBody {
     consent: boolean;
 }
 
+export interface IVerificationRequestBody {
+    code: string;
+}
+
 export interface ILoginRequestBody {
     email: string;
     password: string;
