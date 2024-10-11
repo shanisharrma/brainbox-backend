@@ -18,6 +18,7 @@ import {
     TUserWithAccountConfirmationAndResetPassword,
     TUserWithAssociations,
     IProfileAttributes,
+    TProfileWithUserAssociations,
 } from './user-types';
 import {
     ICourseAttributes,
@@ -61,4 +62,5 @@ export {
     ISectionAttributes,
     ISubSectionAttributes,
     ICourseProgressAttributes,
+    TProfileWithUserAssociations,
 };

@@ -1,4 +1,4 @@
-import { Account_Confirmation, Phone_Number, Reset_Password, Role, User } from '../database/models';
+import { Account_Confirmation, Phone_Number, Profile, Reset_Password, Role, User } from '../database/models';
 import { TUserWithAccountConfirmationAndResetPassword, TUserWithAssociations } from '../types';
 import CrudRepository from './crud-repository';
 
@@ -26,6 +26,7 @@ class UserRepository extends CrudRepository<User> {
                 { model: Phone_Number, required: true, as: 'phoneNumber' },
                 { model: Role, required: true, as: 'roles' },
                 { model: Account_Confirmation, as: 'accountConfirmation' },
+                { model: Profile, as: 'profileDetails' },
             ],
         });
         return response;

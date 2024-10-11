@@ -16,7 +16,8 @@ export default {
     AUTHORIZATION_TOKEN_MISSING: `Authorization token doesn't exists`, //401
     AUTHORIZATION_TOKEN_EXPIRED: `Authorization token expired.`, //401
     INVALID_AUTHORIZATION_TOKEN: `Invalid authorization token.`, //401
-    AUTHORIZATION_REQUIRED: `Authentication required.`, //401
+    AUTHORIZATION_REQUIRED: `Authorization required.`, //401
+    NOT_AUTHORIZATION: `You are not authorized to access.`, //403
     VERIFICATION_LINK_SENT: `Verification link sent to your email.`, //200
     LOGOUT_SUCCESS: `Logout successful.`, //200
     NOT_LOGGED_IN: `You are not logged in.`, //401

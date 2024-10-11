@@ -17,9 +17,6 @@ router
 // Login : POST /api/v1/login
 router.route('/login').post(ValidationMiddleware.validateRequest(schema.loginSchema), AuthController.login);
 
-// Profile : GET /api/v1/profile
-router.route('/profile').get(AuthMiddleware.checkAuth, AuthController.profile);
-
 // Request Email Verification : POST /api/v1/account-confirmation
 router.route('/account-confirmation').post(AuthMiddleware.checkAuth, AuthController.requestConfirmation);
 

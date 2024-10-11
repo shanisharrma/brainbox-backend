@@ -36,4 +36,13 @@ export default {
         SECRET: process.env.REFRESH_TOKEN_SECRET,
         EXPIRY: 15 * 24 * 60 * 60,
     },
+
+    // Nodemailer Service
+    SMTP: {
+        MAIL_SERVICE: process.env.MAIL_SERVICE,
+        MAIL_HOST: process.env.SMTP_MAIL_HOST,
+        MAIL_USERNAME: process.env.SMTP_MAIL_USERNAME,
+        MAIL_PASSWORD: process.env.SMTP_MAIL_PASSWORD,
+        MAIL_PORT: process.env.MAIL_PORT,
+    },
 };

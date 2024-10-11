@@ -142,7 +142,12 @@ export type TAccountConfirmationWithUser = TWithAssociations<IAccountConfirmatio
 
 export type TUserWithAssociations = TWithAssociations<
     IUserAttributes,
-    { accountConfirmation: IAccountConfirmationAttributes; phoneNumber: IPhoneNumberAttributes; role: IRoleAttributes }
+    {
+        accountConfirmation: IAccountConfirmationAttributes;
+        phoneNumber: IPhoneNumberAttributes;
+        role: IRoleAttributes;
+        profile: IProfileAttributes;
+    }
 >;
 
 export type TUserWithAccountConfirmationAndResetPassword = TWithAssociations<
@@ -151,3 +156,12 @@ export type TUserWithAccountConfirmationAndResetPassword = TWithAssociations<
 >;
 
 export type TResetPasswordWithUser = TWithAssociations<IResetPasswordAttributes, { user: IUserAttributes }>;
+
+export type TProfileWithUserAssociations = TWithAssociations<
+    IProfileAttributes,
+    {
+        user: IUserAttributes;
+        phoneNumber: IPhoneNumberAttributes;
+        accountConfirmation: IAccountConfirmationAttributes;
+    }
+>;

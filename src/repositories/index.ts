@@ -4,6 +4,7 @@ import PhoneNumberRepository from './phone-number-repository';
 import AccountConfirmationRepository from './account-confirmation-repository';
 import RefreshTokenRepository from './refresh-token-repository';
 import ResetPasswordRepository from './reset-password-repository';
+import ProfileRepository from './profile-repository';
 
 export {
     UserRepository,
@@ -12,4 +13,5 @@ export {
     AccountConfirmationRepository,
     RefreshTokenRepository,
     ResetPasswordRepository,
+    ProfileRepository,
 };

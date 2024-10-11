@@ -9,7 +9,6 @@ import {
     IRegisterRequestBody,
     IResetPasswordAttributes,
     IUserAttributes,
-    TUserWithAssociations,
 } from '../types';
 import { Enums, ResponseMessage } from '../utils/constants';
 import { AppError } from '../utils/error';
@@ -25,11 +24,6 @@ import ResetPasswordService from './reset-password-service';
 
 interface IDecryptedJWT {
     userId: number;
-}
-
-interface IProfileResponse {
-    user: TUserWithAssociations;
-    warning?: string;
 }
 
 class UserService {
@@ -119,12 +113,12 @@ class UserService {
 
             // create mail payload
             const confirmationUrl = `${ServerConfig.FRONTEND_URL}/account-confirmation/${token}`;
-            const to = [user.email];
+            const to = user.email;
             const subject = `Account Verification`;
             const text = `Hey ${user.firstName + ' ' + user.lastName}, Please click the below link and enter the below one time password to verify you email for the account creation at BrainBox.\n\n${code}\n\nThe confirmation email valid for 10 minutes only.\n\n${confirmationUrl}`;
 
             // * send email
-            await this.mailService.sendEmail(to, subject, text).catch((error) => {
+            await this.mailService.sendEmailByNodeMailer(to, subject, text).catch((error) => {
                 Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE_ERROR, {
                     meta: error,
                 });
@@ -175,12 +169,12 @@ class UserService {
             });
 
             // * create email body
-            const to = [accountConfirmationDetails.user.email];
+            const to = accountConfirmationDetails.user.email;
             const subject = `Account Verified Successfully`;
             const text = `Hey ${accountConfirmationDetails.user.firstName}, Your account ahs been successfully verified.`;
 
             // * send verified account email
-            await this.mailService.sendEmail(to, subject, text).catch((error) => {
+            await this.mailService.sendEmailByNodeMailer(to, subject, text).catch((error) => {
                 Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE_ERROR, {
                     meta: error,
                 });
@@ -249,29 +243,6 @@ class UserService {
         }
     }
 
-    public async profile(id: number) {
-        try {
-            const userWithAssociations = await this.userRepository.getWithAssociationsById(id);
-
-            if (
-                !userWithAssociations ||
-                !userWithAssociations.accountConfirmation ||
-                userWithAssociations.accountConfirmation.status === false
-            ) {
-                const profileResponse: IProfileResponse = {
-                    user: userWithAssociations!,
-                    warning: ResponseMessage.ACCOUNT_NOT_VERIFIED,
-                };
-                return profileResponse;
-            }
-
-            return userWithAssociations;
-        } catch (error) {
-            if (error instanceof AppError) throw error;
-            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     public async isAuthenticated(token: string) {
         try {
             if (!token) {
@@ -285,6 +256,45 @@ class UserService {
             if (!user) {
                 throw new AppError(ResponseMessage.AUTHORIZATION_REQUIRED, StatusCodes.UNAUTHORIZED);
             }
+            return user.id;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            if (error instanceof JsonWebTokenError) {
+                if (error instanceof TokenExpiredError) {
+                    throw new AppError(ResponseMessage.AUTHORIZATION_TOKEN_EXPIRED, StatusCodes.UNAUTHORIZED);
+                }
+                throw new AppError(ResponseMessage.INVALID_AUTHORIZATION_TOKEN, StatusCodes.UNAUTHORIZED);
+            }
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async isAuthorized(token: string, userRole: string) {
+        try {
+            if (!token) {
+                throw new AppError(ResponseMessage.AUTHORIZATION_TOKEN_MISSING, StatusCodes.UNAUTHORIZED);
+            }
+
+            const { userId } = Quicker.verifyToken(token, ServerConfig.ACCESS_TOKEN.SECRET as string) as IDecryptedJWT;
+
+            // check if user exists with userId
+            const user = await this.userRepository.getOneById(userId);
+            if (!user) {
+                throw new AppError(ResponseMessage.AUTHORIZATION_REQUIRED, StatusCodes.UNAUTHORIZED);
+            }
+
+            // get student role from db
+            const studentRole = await this.roleRepository.findByRole(userRole);
+            if (!studentRole) {
+                throw new AppError(ResponseMessage.NOT_FOUND(`User with role ${userRole}`), StatusCodes.NOT_FOUND);
+            }
+
+            // check if role is student of user
+            const hasRole = await user.hasRole(studentRole);
+            if (!hasRole) {
+                throw new AppError(ResponseMessage.NOT_AUTHORIZATION, StatusCodes.FORBIDDEN);
+            }
+
             return user.id;
         } catch (error) {
             if (error instanceof AppError) throw error;
@@ -331,14 +341,12 @@ class UserService {
 
             // * prepare email payload
             const confirmationUrl = `${ServerConfig.FRONTEND_URL}/${accountConfirmationDetails.token}`;
-            const to = [userWithAssociations.email];
+            const to = userWithAssociations.email;
             const subject = `Account Verification`;
             const text = `Hey ${userWithAssociations.firstName + ' ' + userWithAssociations.lastName}, Please click the below link and enter the below one time password to verify you email for the account creation at BrainBox.\n\n${accountConfirmationDetails.code}\n\nThe confirmation email valid for 10 minutes only.\n\n\n${confirmationUrl}`;
 
             // * send new verification link
-            await this.mailService.sendEmail(to, subject, text).catch((error) => {
-                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE_ERROR, { meta: error });
-            });
+            await this.mailService.sendEmailByNodeMailer(to, subject, text);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -431,13 +439,11 @@ class UserService {
 
             // * create mail payload
             const resetPasswordURL = `${ServerConfig.FRONTEND_URL}/reset-password/${token}`;
-            const to = [user.email];
+            const to = user.email;
             const subject = `Account Password Reset Requested`;
             const text = `Hey ${user.firstName + ' ' + user.lastName}, Please reset your account password by clicking on the line below.\n\n${resetPasswordURL}\n\nLink will expire within 15 minutes.`;
 
-            await this.mailService.sendEmail(to, subject, text).catch((error) => {
-                Logger.error(Enums.EApplicationEvent.EMAIL_SERVICE_ERROR, { meta: error });
-            });
+            await this.mailService.sendEmailByNodeMailer(to, subject, text);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -481,12 +487,12 @@ class UserService {
             await this.resetPasswordService.update(resetPasswordDetails.id, updateResetPassword);
 
             // * prepare email body
-            const to = [resetPasswordDetails.user!.email];
+            const to = resetPasswordDetails.user!.email;
             const subject = `Password Reset Successfully.`;
             const text = `Hey ${resetPasswordDetails.user!.firstName + ' ' + resetPasswordDetails.user!.firstName}, your password has been reset successfully. Please try login with new password.`;
 
             // * send email
-            await this.mailService.sendEmail(to, subject, text);
+            await this.mailService.sendEmailByNodeMailer(to, subject, text);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -522,12 +528,12 @@ class UserService {
             await this.userRepository.update(userWithPassword.id, { password: hashedPassword });
 
             // * prepare email body
-            const to = [userWithPassword.email];
+            const to = userWithPassword.email;
             const subject = `Password changed successfully.`;
             const text = `Hey ${userWithPassword.firstName + ' ' + userWithPassword.lastName}, your password has been changed successfully.`;
 
             // * send email
-            await this.mailService.sendEmail(to, subject, text);
+            await this.mailService.sendEmailByNodeMailer(to, subject, text);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

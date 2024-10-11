@@ -30,7 +30,7 @@ interface ILoginRequest extends Request {
     body: ILoginRequestBody;
 }
 
-interface IProfileRequest extends Request {
+interface IRequestConfirmationRequest extends Request {
     id: number;
 }
 
@@ -137,25 +137,9 @@ class AuthController {
         }
     }
 
-    public static async profile(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { id } = req as IProfileRequest;
-            const response = await AuthController.userService.profile(id);
-
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.PROFILE_SUCCESS, response);
-        } catch (error) {
-            HttpError(
-                next,
-                error,
-                req,
-                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
-            );
-        }
-    }
-
     public static async requestConfirmation(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id } = req as IProfileRequest;
+            const { id } = req as IRequestConfirmationRequest;
             await AuthController.userService.requestConfirmation(id);
             HttpResponse(req, res, StatusCodes.OK, ResponseMessage.VERIFICATION_LINK_SENT, StatusCodes.OK);
         } catch (error) {
