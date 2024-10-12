@@ -9,6 +9,8 @@ import {
 
 import { createCategorySchema } from './category-schema';
 
+import { courseSchema } from './course-schema';
+
 export default {
     registerSchema,
     accountVerificationSchema,
@@ -17,4 +19,5 @@ export default {
     resetPasswordSchema,
     changePasswordSchema,
     createCategorySchema,
+    courseSchema,
 };

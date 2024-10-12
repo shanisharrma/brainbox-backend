@@ -5,6 +5,7 @@ import MailService from './mail-service';
 import RefreshTokenService from './refresh-token-service';
 import ProfileService from './profile-service';
 import CategoryService from './category-service';
+import CourseService from './course-service';
 
 export {
     PhoneNumberService,
@@ -14,4 +15,5 @@ export {
     RefreshTokenService,
     ProfileService,
     CategoryService,
+    CourseService,
 };

@@ -6,6 +6,7 @@ import RefreshTokenRepository from './refresh-token-repository';
 import ResetPasswordRepository from './reset-password-repository';
 import ProfileRepository from './profile-repository';
 import CategoryRepository from './category-repository';
+import CourseRepository from './course-repository';
 
 export {
     UserRepository,
@@ -16,4 +17,5 @@ export {
     ResetPasswordRepository,
     ProfileRepository,
     CategoryRepository,
+    CourseRepository,
 };

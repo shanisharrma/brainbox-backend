@@ -73,3 +73,11 @@ export interface ICourseProgressAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
 }
+
+export interface ICourseRequestBody {
+    name: string;
+    description: string;
+    whatYouWillLearn: string;
+    price: number;
+    category: string;
+}

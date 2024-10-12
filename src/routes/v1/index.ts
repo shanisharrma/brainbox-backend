@@ -3,6 +3,7 @@ import ApiController from '../../controllers/api-controller';
 import authRoutes from './auth-routes';
 import profileRoutes from './profile-routes';
 import categoryRoutes from './category-routes';
+import courseRoutes from './course-routes';
 
 const router = express.Router();
 
@@ -17,5 +18,8 @@ router.use(profileRoutes);
 
 // Category Routes
 router.use(categoryRoutes);
+
+// Course Routes
+router.use(courseRoutes);
 
 export default router;

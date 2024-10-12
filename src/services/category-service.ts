@@ -36,6 +36,16 @@ class CategoryService {
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public async getByName(name: string) {
+        try {
+            // * get all the categories
+            return await this.categoryRepository.getByName(name);
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
 export default CategoryService;

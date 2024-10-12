@@ -1,8 +1,10 @@
 'use strict';
 
-import { DataTypes, Model, Optional } from 'sequelize';
+import { BelongsToManyAddAssociationMixin, DataTypes, Model, Optional } from 'sequelize';
 import connection from '../sequelize';
 import { ICategoryAttributes, ICourseAttributes, IRatingAttributes, IUserAttributes } from '../../types';
+import Category from './category';
+import { BelongsToManyHasAssociationMixin } from 'sequelize';
 
 type TCourseCreationAttributes = Optional<ICourseAttributes, 'id'>;
 
@@ -21,6 +23,10 @@ class Course extends Model<ICourseAttributes, TCourseCreationAttributes> impleme
     public categories?: ICategoryAttributes[] | undefined;
     public ratings?: IRatingAttributes[] | undefined;
     public sections?: ICourseAttributes[] | undefined;
+
+    // hooks
+    declare addCategory: BelongsToManyAddAssociationMixin<Category, Category['id']>;
+    declare hasCategory: BelongsToManyHasAssociationMixin<Category, Category['id']>;
 }
 
 Course.init(
