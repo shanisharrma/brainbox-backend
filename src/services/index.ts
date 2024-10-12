@@ -4,6 +4,7 @@ import AccountConfirmationService from './account-confirmation-service';
 import MailService from './mail-service';
 import RefreshTokenService from './refresh-token-service';
 import ProfileService from './profile-service';
+import CategoryService from './category-service';
 
 export {
     PhoneNumberService,
@@ -12,4 +13,5 @@ export {
     MailService,
     RefreshTokenService,
     ProfileService,
+    CategoryService,
 };

@@ -5,6 +5,7 @@ import AccountConfirmationRepository from './account-confirmation-repository';
 import RefreshTokenRepository from './refresh-token-repository';
 import ResetPasswordRepository from './reset-password-repository';
 import ProfileRepository from './profile-repository';
+import CategoryRepository from './category-repository';
 
 export {
     UserRepository,
@@ -14,4 +15,5 @@ export {
     RefreshTokenRepository,
     ResetPasswordRepository,
     ProfileRepository,
+    CategoryRepository,
 };

@@ -2,7 +2,7 @@
 
 import { DataTypes, Model, Optional } from 'sequelize';
 import connection from '../sequelize';
-import { ICategoryAttributes, IRatingAttributes } from '../../types';
+import { ICourseAttributes, IRatingAttributes } from '../../types';
 
 type TRatingCreationAttributes = Optional<IRatingAttributes, 'id'>;
 
@@ -15,7 +15,7 @@ class Rating extends Model<IRatingAttributes, TRatingCreationAttributes> impleme
     public readonly createdAt?: Date | undefined;
     public readonly updatedAt?: Date | undefined;
 
-    public course?: ICategoryAttributes | undefined;
+    public course?: ICourseAttributes | undefined;
 }
 Rating.init(
     {

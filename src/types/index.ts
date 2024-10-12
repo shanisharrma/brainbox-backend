@@ -23,13 +23,13 @@ import {
 import {
     ICourseAttributes,
     IEnrollmentAttributes,
-    ICategoryAttributes,
-    ICourseCategoryAttributes,
     IRatingAttributes,
     ISectionAttributes,
     ISubSectionAttributes,
     ICourseProgressAttributes,
 } from './course-types';
+
+import { ICategoryAttributes, ICourseCategoryAttributes, ICategoryRequestBody } from './category-types';
 
 export {
     THttpResponse,
@@ -63,4 +63,5 @@ export {
     ISubSectionAttributes,
     ICourseProgressAttributes,
     TProfileWithUserAssociations,
+    ICategoryRequestBody,
 };

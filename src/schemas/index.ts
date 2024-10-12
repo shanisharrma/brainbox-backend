@@ -7,6 +7,8 @@ import {
     changePasswordSchema,
 } from './auth-schema';
 
+import { createCategorySchema } from './category-schema';
+
 export default {
     registerSchema,
     accountVerificationSchema,
@@ -14,4 +16,5 @@ export default {
     forgotPasswordSchema,
     resetPasswordSchema,
     changePasswordSchema,
+    createCategorySchema,
 };

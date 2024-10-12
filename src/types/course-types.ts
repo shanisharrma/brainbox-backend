@@ -1,3 +1,4 @@
+import { ICategoryAttributes } from './category-types';
 import { IUserAttributes } from './user-types';
 
 export interface ICourseAttributes {
@@ -26,25 +27,6 @@ export interface IEnrollmentAttributes {
     deletedAt?: Date;
 }
 
-export interface ICategoryAttributes {
-    id?: number;
-    name: string;
-    description: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-    deletedAt?: Date;
-    courses?: ICourseAttributes[];
-}
-
-export interface ICourseCategoryAttributes {
-    id?: number;
-    categoryId: number;
-    courseId: number;
-    createdAt?: Date;
-    updatedAt?: Date;
-    deletedAt?: Date;
-}
-
 export interface IRatingAttributes {
     id?: number;
     studentId: number;
@@ -54,7 +36,7 @@ export interface IRatingAttributes {
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
-    course?: ICategoryAttributes;
+    course?: ICourseAttributes;
     student?: IUserAttributes;
 }
 

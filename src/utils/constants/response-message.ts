@@ -31,6 +31,8 @@ export default {
     CHANGE_PASSWORD_SUCCESS: `Password successfully changed.`, //200
     INCORRECT_CURRENT_PASSWORD: `Current password is incorrect.`, //400
     SIMILAR_CURRENT_PASSWORD_AND_NEW_PASSWORD: `New password cannot be the same as the old password. Please choose a different password.`, //400
+    CATEGORY_SUCCESS: `All categories fetched successfully.`, //200
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
+    CREATED: (entity: string) => `${entity} created successfully.`, //201
 };
