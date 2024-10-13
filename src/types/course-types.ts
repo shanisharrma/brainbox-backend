@@ -85,3 +85,8 @@ export interface ICourseRequestBody {
 export interface ISectionRequestBody {
     name: string;
 }
+
+export interface ISubSectionRequestBody {
+    title: string;
+    description: string;
+}

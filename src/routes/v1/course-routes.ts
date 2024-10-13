@@ -1,7 +1,7 @@
 import express from 'express';
 import { AuthMiddleware, upload, ValidationMiddleware } from '../../middlewares';
 import schemas from '../../schemas';
-import { CourseController, SectionController } from '../../controllers';
+import { CourseController, SectionController, SubSectionController } from '../../controllers';
 
 const router = express.Router();
 
@@ -13,10 +13,10 @@ const router = express.Router();
 router
     .route('/courses')
     .post(
-        upload.single('thumbnail'),
-        ValidationMiddleware.validateRequest(schemas.courseSchema),
         AuthMiddleware.checkAuth,
         AuthMiddleware.isInstructor,
+        upload.single('thumbnail'),
+        ValidationMiddleware.validateRequest(schemas.courseSchema),
         CourseController.create,
     );
 
@@ -31,9 +31,9 @@ router.route('/courses').get(CourseController.showAll);
 router
     .route('/courses/:courseId/sections')
     .post(
-        ValidationMiddleware.validateRequest(schemas.sectionSchema),
         AuthMiddleware.checkAuth,
         AuthMiddleware.isInstructor,
+        ValidationMiddleware.validateRequest(schemas.sectionSchema),
         SectionController.create,
     );
 
@@ -41,9 +41,9 @@ router
 router
     .route('/courses/:courseId/sections/:sectionId')
     .put(
-        ValidationMiddleware.validateRequest(schemas.updateSectionSchema),
         AuthMiddleware.checkAuth,
         AuthMiddleware.isInstructor,
+        ValidationMiddleware.validateRequest(schemas.updateSectionSchema),
         SectionController.update,
     );
 
@@ -51,5 +51,20 @@ router
 router
     .route('/courses/:courseId/sections/:sectionId')
     .delete(AuthMiddleware.checkAuth, AuthMiddleware.isInstructor, SectionController.delete);
+
+// ========================================================================================================= //
+// ======================================= Sub Section Routes ==============================================
+// ========================================================================================================= //
+
+// Create Course Sub Section : POST /api/v1/sections/:sectionId/subsections
+router
+    .route('/sections/:sectionId/subsections')
+    .post(
+        AuthMiddleware.checkAuth,
+        AuthMiddleware.isInstructor,
+        upload.single('lecture'),
+        ValidationMiddleware.validateRequest(schemas.subSectionSchema),
+        SubSectionController.create,
+    );
 
 export default router;

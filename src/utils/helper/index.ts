@@ -1,4 +1,4 @@
 import Quicker from './quicker';
-import ImageUploader from './image-uploader';
+import FileUploader from './file-uploader';
 
-export { Quicker, ImageUploader };
+export { Quicker, FileUploader };

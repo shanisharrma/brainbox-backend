@@ -32,10 +32,12 @@ export default {
     INCORRECT_CURRENT_PASSWORD: `Current password is incorrect.`, //400
     SIMILAR_CURRENT_PASSWORD_AND_NEW_PASSWORD: `New password cannot be the same as the old password. Please choose a different password.`, //400
     CATEGORY_SUCCESS: `All categories fetched successfully.`, //200
-    THUMBNAIL_REQUIRED: `Thumbnail is required.`, //400
+    FILE_TOO_LARGE: `File is too large`, //413
+    TOO_MANY_FILES: `Too many files uploaded`, //400
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
     CREATED: (entity: string) => `${entity} created successfully.`, //201
     UPDATED: (entity: string) => `${entity} updated successfully.`, //200
     DELETED: (entity: string) => `${entity} deleted successfully.`, //200
+    ENTITY_REQUIRED: (entity: string) => `${entity} is required.`, //200
 };

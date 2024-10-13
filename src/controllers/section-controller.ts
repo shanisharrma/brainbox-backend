@@ -12,6 +12,7 @@ interface ISectionRequest extends Request {
         sectionId: string;
     };
     body: ISectionRequestBody;
+    id: number;
 }
 
 class SectionController {
@@ -20,14 +21,14 @@ class SectionController {
     public static async create(req: Request, res: Response, next: NextFunction) {
         try {
             // * destructure the req
-            const { body, params } = req as ISectionRequest;
+            const { body, params, id } = req as ISectionRequest;
 
             // * destructure the params and body
             const { name } = body;
             const { courseId } = params;
 
             // * call the create service
-            const response = await SectionController.sectionService.create(Number(courseId), { name });
+            const response = await SectionController.sectionService.create(Number(courseId), id, { name });
 
             HttpResponse(req, res, StatusCodes.CREATED, ResponseMessage.CREATED('Section'), response);
         } catch (error) {

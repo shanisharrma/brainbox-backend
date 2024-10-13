@@ -8,6 +8,7 @@ import ProfileRepository from './profile-repository';
 import CategoryRepository from './category-repository';
 import CourseRepository from './course-repository';
 import SectionRepository from './section-repository';
+import SubSectionRepository from './sub-section-repository';
 
 export {
     UserRepository,
@@ -20,4 +21,5 @@ export {
     CategoryRepository,
     CourseRepository,
     SectionRepository,
+    SubSectionRepository,
 };

@@ -5,7 +5,7 @@ import { ResponseMessage } from '../utils/constants';
 import { HttpError, HttpResponse } from '../utils/common';
 import { AppError } from '../utils/error';
 import { ICourseRequestBody } from '../types';
-import { ImageUploader } from '../utils/helper';
+import { FileUploader } from '../utils/helper';
 
 interface ICourseRequest extends Request {
     body: ICourseRequestBody;
@@ -21,8 +21,13 @@ class CourseController {
             // * destruct the request
             const { body, file, id } = req as ICourseRequest;
 
+            // * check file is uploaded or not
+            if (!file) {
+                throw new AppError(ResponseMessage.ENTITY_REQUIRED('Thumbnail'), StatusCodes.BAD_REQUEST);
+            }
+
             // * check file validation
-            const validatedFile = ImageUploader.validateFile(req, {
+            const validatedFile = FileUploader.validateFile(file, {
                 fieldName: file.fieldname,
                 allowedMimeTypes: ['image/jpeg', 'image/jpg', 'image/png'],
                 maxSize: 1024 * 1024 * 5,

@@ -29,6 +29,7 @@ import {
     ICourseProgressAttributes,
     ICourseRequestBody,
     ISectionRequestBody,
+    ISubSectionRequestBody,
 } from './course-types';
 
 import { ICategoryAttributes, ICourseCategoryAttributes, ICategoryRequestBody } from './category-types';
@@ -68,4 +69,5 @@ export {
     ICategoryRequestBody,
     ICourseRequestBody,
     ISectionRequestBody,
+    ISubSectionRequestBody,
 };

@@ -25,6 +25,7 @@ app.use(express.static(path.join(__dirname, '../', 'public')));
 app.use('/api', apiRoutes);
 
 // Error Middlewares
+app.use(ErrorMiddleware.interceptError); // Intercepting errors at an early stage
 app.use(ErrorMiddleware.notFound); //Not Found Error Handler
 app.use(ErrorMiddleware.global); //Global Error Handler
 

@@ -4,7 +4,7 @@ import { ICourseRequestBody } from '../types';
 import { ResponseMessage } from '../utils/constants';
 import { AppError } from '../utils/error';
 import CategoryService from './category-service';
-import { ImageUploader } from '../utils/helper';
+import { FileUploader } from '../utils/helper';
 
 class CourseService {
     private courseRepository: CourseRepository;
@@ -21,10 +21,10 @@ class CourseService {
             const { name, description, price, whatYouWillLearn, category } = data;
 
             // * upload the image to cloudinary
-            const thumbnailUrl = (await ImageUploader.uploadImageToCloudinary(file.buffer, {
+            const thumbnailUrl = await FileUploader.uploadImageToCloudinary(file.buffer, {
                 folder: 'courses',
                 public_id: `${name}-${Date.now()}`,
-            })) as string;
+            });
 
             // * get the instructor ID
             const instructorId = id;
@@ -41,7 +41,7 @@ class CourseService {
                 description,
                 price,
                 whatYouWillLearn,
-                thumbnail: thumbnailUrl,
+                thumbnail: thumbnailUrl!.secure_url,
                 instructorId,
             });
 

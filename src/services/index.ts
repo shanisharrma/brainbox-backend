@@ -7,6 +7,7 @@ import ProfileService from './profile-service';
 import CategoryService from './category-service';
 import CourseService from './course-service';
 import SectionService from './section-service';
+import SubSectionService from './sub-section-service';
 
 export {
     PhoneNumberService,
@@ -18,4 +19,5 @@ export {
     CategoryService,
     CourseService,
     SectionService,
+    SubSectionService,
 };

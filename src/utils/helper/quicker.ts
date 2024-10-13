@@ -105,6 +105,13 @@ class Quicker {
         const parsedUrl = new URL(url);
         return parsedUrl.hostname;
     }
+
+    public static prepareFileName(str: string) {
+        return str
+            .replace(/[^a-zA-Z0-9]/g, ' ')
+            .split(' ')
+            .join('_');
+    }
 }
 
 export default Quicker;

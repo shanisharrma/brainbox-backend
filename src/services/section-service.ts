@@ -14,7 +14,7 @@ class SectionService {
         this.courseService = new CourseService();
     }
 
-    public async create(courseId: number, data: ISectionRequestBody) {
+    public async create(courseId: number, instructorId: number, data: ISectionRequestBody) {
         try {
             // * destructure the data
             const { name } = data;
@@ -25,6 +25,9 @@ class SectionService {
                 throw new AppError(ResponseMessage.NOT_FOUND('Course'), StatusCodes.NOT_FOUND);
             }
 
+            if (course.instructorId !== instructorId) {
+                throw new AppError(ResponseMessage.NOT_AUTHORIZATION, StatusCodes.UNAUTHORIZED);
+            }
             // * create section record
             const section = await this.sectionRepository.create({ name, courseId: course.id });
 
@@ -47,6 +50,8 @@ class SectionService {
                 throw new AppError(ResponseMessage.NOT_FOUND('Section'), StatusCodes.NOT_FOUND);
             }
 
+            // * Check the instructor of the course
+
             // * update the
             return await section.update({ name });
         } catch (error) {
@@ -65,6 +70,15 @@ class SectionService {
 
             // * update the
             return await section.destroy();
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async getOneWithCourseById(id: number) {
+        try {
+            return await this.sectionRepository.getOneWithCourseById(id);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
