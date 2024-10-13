@@ -6,6 +6,7 @@ import RefreshTokenService from './refresh-token-service';
 import ProfileService from './profile-service';
 import CategoryService from './category-service';
 import CourseService from './course-service';
+import SectionService from './section-service';
 
 export {
     PhoneNumberService,
@@ -16,4 +17,5 @@ export {
     ProfileService,
     CategoryService,
     CourseService,
+    SectionService,
 };

@@ -9,7 +9,7 @@ import {
 
 import { createCategorySchema } from './category-schema';
 
-import { courseSchema } from './course-schema';
+import { courseSchema, sectionSchema, updateSectionSchema } from './course-schema';
 
 export default {
     registerSchema,
@@ -20,4 +20,6 @@ export default {
     changePasswordSchema,
     createCategorySchema,
     courseSchema,
+    sectionSchema,
+    updateSectionSchema,
 };

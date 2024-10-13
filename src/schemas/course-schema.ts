@@ -1,5 +1,5 @@
 import Joi, { ObjectSchema } from 'joi';
-import { ICourseRequestBody } from '../types';
+import { ICourseRequestBody, ISectionRequestBody } from '../types';
 
 export const courseSchema: ObjectSchema = Joi.object<ICourseRequestBody, true>({
     name: Joi.string().trim().required().messages({
@@ -22,5 +22,18 @@ export const courseSchema: ObjectSchema = Joi.object<ICourseRequestBody, true>({
     category: Joi.string().trim().required().messages({
         'any.required': 'Category is required.',
         'string.empty': 'Category cannot be empty.',
+    }),
+}).required();
+
+export const sectionSchema: ObjectSchema = Joi.object<ISectionRequestBody, true>({
+    name: Joi.string().trim().required().messages({
+        'any.required': 'Section name is required.',
+        'string.empty': 'Section name cannot be empty.',
+    }),
+}).required();
+
+export const updateSectionSchema: ObjectSchema = Joi.object<Partial<ISectionRequestBody>, true>({
+    name: Joi.string().trim().optional().messages({
+        'string.empty': 'Section name cannot be empty.',
     }),
 }).required();

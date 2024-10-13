@@ -36,4 +36,6 @@ export default {
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
     CREATED: (entity: string) => `${entity} created successfully.`, //201
+    UPDATED: (entity: string) => `${entity} updated successfully.`, //200
+    DELETED: (entity: string) => `${entity} deleted successfully.`, //200
 };

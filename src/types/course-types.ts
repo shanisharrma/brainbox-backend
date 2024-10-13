@@ -81,3 +81,7 @@ export interface ICourseRequestBody {
     price: number;
     category: string;
 }
+
+export interface ISectionRequestBody {
+    name: string;
+}

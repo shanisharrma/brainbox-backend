@@ -7,6 +7,7 @@ import ResetPasswordRepository from './reset-password-repository';
 import ProfileRepository from './profile-repository';
 import CategoryRepository from './category-repository';
 import CourseRepository from './course-repository';
+import SectionRepository from './section-repository';
 
 export {
     UserRepository,
@@ -18,4 +19,5 @@ export {
     ProfileRepository,
     CategoryRepository,
     CourseRepository,
+    SectionRepository,
 };
