@@ -16,6 +16,7 @@ export interface IUserAttributes {
     roles?: IRoleAttributes[];
     phoneNumber?: IPhoneNumberAttributes;
     accountConfirmation?: IAccountConfirmationAttributes;
+    profileDetails?: IProfileAttributes;
     refreshToken?: IRefreshTokenAttributes;
     resetPassword?: IResetPasswordAttributes;
     ratings?: IRatingAttributes;
@@ -94,10 +95,10 @@ export interface IResetPasswordAttributes {
 export interface IProfileAttributes {
     id?: number;
     userId: number;
-    gender: string;
-    dateOfBirth: string;
-    about: string;
-    imageUrl: string;
+    gender: string | null;
+    dateOfBirth: string | null;
+    about: string | null;
+    imageUrl: string | null;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -138,6 +139,16 @@ export interface IChangePasswordRequestBody {
     confirmNewPassword: string;
 }
 
+export interface IProfileRequestBody {
+    about: string;
+    dateOfBirth: string;
+    gender: string;
+}
+
+export interface IProfileUpdateParams extends IProfileAttributes {
+    file: Express.Multer.File | undefined;
+}
+
 export type TAccountConfirmationWithUser = TWithAssociations<IAccountConfirmationAttributes, { user: IUserAttributes }>;
 
 export type TUserWithAssociations = TWithAssociations<
@@ -165,3 +176,5 @@ export type TProfileWithUserAssociations = TWithAssociations<
         accountConfirmation: IAccountConfirmationAttributes;
     }
 >;
+
+export type TUserWithProfileAssociations = TWithAssociations<IUserAttributes, { profileDetails: IProfileAttributes }>;

@@ -21,6 +21,7 @@ import { Logger } from '../utils/common';
 import RefreshTokenService from './refresh-token-service';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import ResetPasswordService from './reset-password-service';
+import ProfileService from './profile-service';
 
 interface IDecryptedJWT {
     userId: number;
@@ -34,6 +35,7 @@ class UserService {
     private mailService: MailService;
     private refreshTokenService: RefreshTokenService;
     private resetPasswordService: ResetPasswordService;
+    private profileService: ProfileService;
 
     constructor() {
         this.userRepository = new UserRepository();
@@ -43,6 +45,7 @@ class UserService {
         this.mailService = new MailService();
         this.refreshTokenService = new RefreshTokenService();
         this.resetPasswordService = new ResetPasswordService();
+        this.profileService = new ProfileService();
     }
 
     public async registerUser(data: IRegisterRequestBody) {
@@ -90,6 +93,15 @@ class UserService {
                 throw new AppError(ResponseMessage.NOT_FOUND('Role'), StatusCodes.NOT_FOUND);
             }
 
+            // * create Profile for user
+            const profileDetails = await this.profileService.create({
+                about: null,
+                dateOfBirth: null,
+                gender: null,
+                imageUrl: null,
+                userId: user.id,
+            });
+
             // * create Phone number entry
             const newPhoneNumber = await this.phoneNumberService.create({
                 isoCode,
@@ -128,6 +140,7 @@ class UserService {
             const userDetails: IUserAttributes = {
                 ...user,
                 accountConfirmation,
+                profileDetails,
                 phoneNumber: newPhoneNumber,
             };
 

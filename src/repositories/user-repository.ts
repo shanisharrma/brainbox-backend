@@ -1,5 +1,9 @@
 import { Account_Confirmation, Phone_Number, Profile, Reset_Password, Role, User } from '../database/models';
-import { TUserWithAccountConfirmationAndResetPassword, TUserWithAssociations } from '../types';
+import {
+    TUserWithAccountConfirmationAndResetPassword,
+    TUserWithAssociations,
+    TUserWithProfileAssociations,
+} from '../types';
 import CrudRepository from './crud-repository';
 
 class UserRepository extends CrudRepository<User> {
@@ -20,11 +24,12 @@ class UserRepository extends CrudRepository<User> {
     }
 
     public async getWithAssociationsById(id: number): Promise<TUserWithAssociations | null> {
-        const response: TUserWithAssociations = await this.getOne({
+        const response: TUserWithAssociations | null = await this.getOne({
             where: { id: id },
             include: [
-                { model: Phone_Number, required: true, as: 'phoneNumber' },
                 { model: Role, required: true, as: 'roles' },
+                { model: Profile, required: true, as: 'profileDetails' },
+                { model: Phone_Number, required: true, as: 'phoneNumber' },
                 { model: Account_Confirmation, as: 'accountConfirmation' },
                 { model: Profile, as: 'profileDetails' },
             ],
@@ -33,7 +38,7 @@ class UserRepository extends CrudRepository<User> {
     }
 
     public async getWithAccountConfirmationAndResetPasswordByEmail(email: string) {
-        const response: TUserWithAccountConfirmationAndResetPassword = await this.getOne({
+        const response: TUserWithAccountConfirmationAndResetPassword | null = await this.getOne({
             where: { email: email },
             include: [
                 { model: Account_Confirmation, as: 'accountConfirmation' },
@@ -45,6 +50,20 @@ class UserRepository extends CrudRepository<User> {
 
     public async getWithPasswordById(id: number) {
         const response = await User.scope('withPassword').findOne({ where: { id: id } });
+        return response;
+    }
+
+    public async getWithProfileById(id: number) {
+        const response: TUserWithProfileAssociations | null = await this.getOne({
+            where: { id },
+            include: [
+                {
+                    model: Profile,
+                    required: true,
+                    as: 'profileDetails',
+                },
+            ],
+        });
         return response;
     }
 }

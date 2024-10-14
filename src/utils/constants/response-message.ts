@@ -34,6 +34,8 @@ export default {
     CATEGORY_SUCCESS: `All categories fetched successfully.`, //200
     FILE_TOO_LARGE: `File is too large`, //413
     TOO_MANY_FILES: `Too many files uploaded`, //400
+    USER_ALREADY_CREATED: `User already exists.`, //400
+    PROFILE_ALREADY_CREATED: `User profile already created.`, //400
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
     CREATED: (entity: string) => `${entity} created successfully.`, //201

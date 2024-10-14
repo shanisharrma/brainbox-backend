@@ -22,19 +22,15 @@ module.exports = {
             },
             gender: {
                 type: Sequelize.STRING,
-                allowNull: false,
             },
             dateOfBirth: {
                 type: Sequelize.STRING,
-                allowNull: false,
             },
             about: {
                 type: Sequelize.STRING,
-                allowNull: false,
             },
             imageUrl: {
                 type: Sequelize.STRING,
-                allowNull: false,
             },
             createdAt: {
                 allowNull: false,

@@ -32,19 +32,15 @@ Profile.init(
         },
         gender: {
             type: DataTypes.STRING,
-            allowNull: false,
         },
         dateOfBirth: {
             type: DataTypes.STRING,
-            allowNull: false,
         },
         about: {
             type: DataTypes.STRING,
-            allowNull: false,
         },
         imageUrl: {
             type: DataTypes.STRING,
-            allowNull: false,
         },
         createdAt: {
             type: DataTypes.DATE,

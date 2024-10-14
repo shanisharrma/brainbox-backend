@@ -19,6 +19,9 @@ import {
     TUserWithAssociations,
     IProfileAttributes,
     TProfileWithUserAssociations,
+    TUserWithProfileAssociations,
+    IProfileRequestBody,
+    IProfileUpdateParams,
 } from './user-types';
 import {
     ICourseAttributes,
@@ -72,4 +75,7 @@ export {
     ISectionRequestBody,
     ISubSectionRequestBody,
     ISubSectionUpdateParams,
+    TUserWithProfileAssociations,
+    IProfileRequestBody,
+    IProfileUpdateParams,
 };

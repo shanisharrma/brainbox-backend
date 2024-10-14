@@ -28,11 +28,8 @@ class CrudRepository<T extends Model> {
         return response;
     }
 
-    public async getOne(options: FindOptions): Promise<T> {
+    public async getOne(options: FindOptions): Promise<T | null> {
         const response = await this.model.findOne(options);
-        if (!response) {
-            throw new AppError(ResponseMessage.NOT_FOUND('Resource'), StatusCodes.NOT_FOUND);
-        }
         return response;
     }
 

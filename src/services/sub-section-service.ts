@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import { SubSectionRepository } from '../repositories';
-import { ISubSectionAttributes, ISubSectionRequestBody, ISubSectionUpdateParams } from '../types';
+import { ISubSectionRequestBody, ISubSectionUpdateParams } from '../types';
 import { ResponseMessage } from '../utils/constants';
 import { AppError } from '../utils/error';
 import SectionService from './section-service';
@@ -95,14 +95,9 @@ class SubSectionService {
                 throw new AppError(ResponseMessage.NOT_AUTHORIZATION, StatusCodes.UNAUTHORIZED);
             }
 
-            // * create subSectionUpdate payload
-            const subSectionUpdatePayload: ISubSectionAttributes = {
-                title: title || subSectionWithSectionWithCourse.title,
-                description: description || subSectionWithSectionWithCourse.description,
-                sectionId: subSectionWithSectionWithCourse.sectionId,
-                videoUrl: subSectionWithSectionWithCourse.videoUrl,
-                duration: subSectionWithSectionWithCourse.duration,
-            };
+            // * set values to subSection
+            subSectionWithSectionWithCourse.title = title || subSectionWithSectionWithCourse.title;
+            subSectionWithSectionWithCourse.description = description || subSectionWithSectionWithCourse.description;
 
             // * check file exists
             if (file) {
@@ -110,22 +105,24 @@ class SubSectionService {
                 // * if no --> then leave then as it is
                 const uploadVideo = await FileUploaderService.uploadVideoToCloudinary(file.buffer, {
                     folder: 'courses/video',
-                    public_id: Quicker.prepareFileName(`${subSectionUpdatePayload.title}-${Date.now()}`),
+                    public_id: Quicker.prepareFileName(`${subSectionWithSectionWithCourse.title}-${Date.now()}`),
                 });
 
                 if (!uploadVideo) {
                     throw new AppError(ResponseMessage.UPLOAD_FAILED('Video'), StatusCodes.INTERNAL_SERVER_ERROR);
                 }
 
-                subSectionUpdatePayload.duration = uploadVideo.duration;
-                subSectionUpdatePayload.videoUrl = uploadVideo.secure_url;
+                subSectionWithSectionWithCourse.duration =
+                    uploadVideo.duration || subSectionWithSectionWithCourse.duration;
+                subSectionWithSectionWithCourse.videoUrl =
+                    uploadVideo.secure_url || subSectionWithSectionWithCourse.videoUrl;
             }
 
             // * update the subSection with subSectionUpdatePayload
-            const subSection = await this.subSectionRepository.update(subSectionId, subSectionUpdatePayload);
+            await subSectionWithSectionWithCourse.save();
 
             // * return seuSection response
-            return subSection;
+            return subSectionWithSectionWithCourse;
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

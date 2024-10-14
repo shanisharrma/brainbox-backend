@@ -8,7 +8,7 @@ class AccountConfirmationRepository extends CrudRepository<Account_Confirmation>
     }
 
     public async findWithUser(token: string, code: string) {
-        const response: TAccountConfirmationWithUser = await this.getOne({
+        const response: TAccountConfirmationWithUser | null = await this.getOne({
             where: { token: token, code: code },
             include: [{ model: User, required: true, as: 'user' }],
         });

@@ -1,8 +1,9 @@
-import Joi from 'joi';
+import Joi, { ObjectSchema } from 'joi';
 import {
     IChangePasswordRequestBody,
     IForgotRequestBody,
     ILoginRequestBody,
+    IProfileRequestBody,
     IRegisterRequestBody,
     IResetPasswordRequestBody,
     IVerificationRequestBody,
@@ -41,3 +42,15 @@ export const changePasswordSchema = Joi.object<IChangePasswordRequestBody, true>
     newPassword: Joi.string().min(8).trim().required(),
     confirmNewPassword: Joi.string().min(8).valid(Joi.ref('newPassword')).trim().required(),
 });
+
+export const updateProfileSchema: ObjectSchema = Joi.object<Partial<IProfileRequestBody>, true>({
+    about: Joi.string().trim().optional().messages({
+        'string.empty': 'About cannot be empty.',
+    }),
+    dateOfBirth: Joi.string().trim().optional().messages({
+        'string.empty': 'Date of Birth cannot be empty.',
+    }),
+    gender: Joi.string().trim().optional().messages({
+        'string.empty': 'Gender cannot be empty.',
+    }),
+}).required();

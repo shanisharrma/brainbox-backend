@@ -5,6 +5,7 @@ import {
     forgotPasswordSchema,
     resetPasswordSchema,
     changePasswordSchema,
+    updateProfileSchema,
 } from './auth-schema';
 
 import { createCategorySchema } from './category-schema';
@@ -30,4 +31,5 @@ export default {
     updateSectionSchema,
     subSectionSchema,
     updateSubSectionSchema,
+    updateProfileSchema,
 };

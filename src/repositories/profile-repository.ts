@@ -1,5 +1,5 @@
 import { Profile, User } from '../database/models';
-import { TProfileWithUserAssociations } from '../types';
+import { IProfileAttributes, TProfileWithUserAssociations } from '../types';
 import CrudRepository from './crud-repository';
 
 class ProfileRepository extends CrudRepository<Profile> {
@@ -8,11 +8,15 @@ class ProfileRepository extends CrudRepository<Profile> {
     }
 
     public async getWithAssociationsByUserId(id: number): Promise<TProfileWithUserAssociations | null> {
-        const response: TProfileWithUserAssociations = await this.getOne({
+        const response: TProfileWithUserAssociations | null = await this.getOne({
             where: { userId: id },
             include: [{ model: User, required: true, as: 'user' }],
         });
         return response;
+    }
+
+    public async getByUserId(userId: number): Promise<IProfileAttributes | null> {
+        return await this.getOne({ where: { userId: userId } });
     }
 }
 

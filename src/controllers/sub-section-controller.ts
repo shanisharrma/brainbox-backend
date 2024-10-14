@@ -63,6 +63,7 @@ class SubSectionController {
             const { description, title } = body;
             const { sectionId, subSectionId } = params;
 
+            // * prepare data params
             const updateData: Partial<ISubSectionUpdateParams> = {
                 title: title,
                 description: description,
@@ -106,14 +107,10 @@ class SubSectionController {
             const { sectionId, subSectionId } = params;
 
             // * call the service
-            const response = await SubSectionController.subSectionService.destroy(
-                Number(subSectionId),
-                Number(sectionId),
-                id,
-            );
+            await SubSectionController.subSectionService.destroy(Number(subSectionId), Number(sectionId), id);
 
             // Return response
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.DELETED('Sub Section'), response);
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.DELETED('Sub Section'));
         } catch (error) {
             HttpError(
                 next,
