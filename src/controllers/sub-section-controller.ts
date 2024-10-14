@@ -3,9 +3,8 @@ import { HttpError, HttpResponse } from '../utils/common';
 import { AppError } from '../utils/error';
 import { ResponseMessage } from '../utils/constants';
 import { NextFunction, Request, Response } from 'express';
-import { ISubSectionRequestBody } from '../types';
-import { SubSectionService } from '../services';
-import { FileUploader } from '../utils/helper';
+import { ISubSectionUpdateParams, ISubSectionRequestBody } from '../types';
+import { FileUploaderService, SubSectionService } from '../services';
 
 interface ISubSectionRequest extends Request {
     params: { sectionId: string; subSectionId: string };
@@ -32,7 +31,7 @@ class SubSectionController {
             }
 
             // * validate the video file
-            const validatedFile = FileUploader.validateFile(file, {
+            const validatedFile = FileUploaderService.validateFile(file, {
                 fieldName: file.fieldname,
                 allowedMimeTypes: ['video/mp4', 'video/mkv', 'video/avi'],
                 maxSize: 1024 * 1024 * 100,
@@ -45,6 +44,49 @@ class SubSectionController {
             });
 
             HttpResponse(req, res, StatusCodes.CREATED, ResponseMessage.CREATED('Section'), response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async update(req: Request, res: Response, next: NextFunction) {
+        try {
+            // * destructure the req
+            const { body, params, file, id } = req as ISubSectionRequest;
+
+            // * destructure the body and params
+            const { description, title } = body;
+            const { sectionId, subSectionId } = params;
+
+            const updateData: Partial<ISubSectionUpdateParams> = {
+                title: title,
+                description: description,
+                file: undefined,
+            };
+
+            // * if file exists then validate and send it to service
+            if (file) {
+                const validatedFile = FileUploaderService.validateFile(file, {
+                    fieldName: file.fieldname,
+                    allowedMimeTypes: ['video/mp4', 'video/mkv', 'video/avi'],
+                    maxSize: 1024 * 1024 * 100,
+                });
+                updateData.file = validatedFile;
+            }
+
+            const response = await SubSectionController.subSectionService.update(
+                Number(subSectionId),
+                Number(sectionId),
+                id,
+                updateData,
+            );
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.UPDATED('Section'), response);
         } catch (error) {
             HttpError(
                 next,

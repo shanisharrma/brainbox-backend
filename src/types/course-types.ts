@@ -90,3 +90,7 @@ export interface ISubSectionRequestBody {
     title: string;
     description: string;
 }
+
+export interface ISubSectionUpdateParams extends ISubSectionAttributes {
+    file: Express.Multer.File | undefined;
+}

@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { CourseService } from '../services';
+import { CourseService, FileUploaderService } from '../services';
 import { ResponseMessage } from '../utils/constants';
 import { HttpError, HttpResponse } from '../utils/common';
 import { AppError } from '../utils/error';
 import { ICourseRequestBody } from '../types';
-import { FileUploader } from '../utils/helper';
 
 interface ICourseRequest extends Request {
     body: ICourseRequestBody;
@@ -27,7 +26,7 @@ class CourseController {
             }
 
             // * check file validation
-            const validatedFile = FileUploader.validateFile(file, {
+            const validatedFile = FileUploaderService.validateFile(file, {
                 fieldName: file.fieldname,
                 allowedMimeTypes: ['image/jpeg', 'image/jpg', 'image/png'],
                 maxSize: 1024 * 1024 * 5,

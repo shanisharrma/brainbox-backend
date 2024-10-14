@@ -40,4 +40,5 @@ export default {
     UPDATED: (entity: string) => `${entity} updated successfully.`, //200
     DELETED: (entity: string) => `${entity} deleted successfully.`, //200
     ENTITY_REQUIRED: (entity: string) => `${entity} is required.`, //200
+    UPLOAD_FAILED: (entity: string) => `Failed to upload ${entity} file. Please try again.`, //500
 };

@@ -67,4 +67,15 @@ router
         SubSectionController.create,
     );
 
+// Update Course Sub Section : PUT /api/v1/sections/:sectionId/subsections/subsectionId
+router
+    .route('/sections/:sectionId/subsections/:subSectionId')
+    .put(
+        AuthMiddleware.checkAuth,
+        AuthMiddleware.isInstructor,
+        upload.single('lecture'),
+        ValidationMiddleware.validateRequest(schemas.updateSubSectionSchema),
+        SubSectionController.update,
+    );
+
 export default router;

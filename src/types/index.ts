@@ -30,6 +30,7 @@ import {
     ICourseRequestBody,
     ISectionRequestBody,
     ISubSectionRequestBody,
+    ISubSectionUpdateParams,
 } from './course-types';
 
 import { ICategoryAttributes, ICourseCategoryAttributes, ICategoryRequestBody } from './category-types';
@@ -70,4 +71,5 @@ export {
     ICourseRequestBody,
     ISectionRequestBody,
     ISubSectionRequestBody,
+    ISubSectionUpdateParams,
 };

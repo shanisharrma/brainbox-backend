@@ -4,7 +4,7 @@ import { ICourseRequestBody } from '../types';
 import { ResponseMessage } from '../utils/constants';
 import { AppError } from '../utils/error';
 import CategoryService from './category-service';
-import { FileUploader } from '../utils/helper';
+import FileUploaderService from './file-uploader-service';
 
 class CourseService {
     private courseRepository: CourseRepository;
@@ -15,19 +15,20 @@ class CourseService {
         this.categoryService = new CategoryService();
     }
 
-    public async create(data: ICourseRequestBody, file: Express.Multer.File, id: number) {
+    public async create(data: ICourseRequestBody, file: Express.Multer.File, instructorId: number) {
         try {
             // * destructure the data
             const { name, description, price, whatYouWillLearn, category } = data;
 
             // * upload the image to cloudinary
-            const thumbnailUrl = await FileUploader.uploadImageToCloudinary(file.buffer, {
+            const thumbnailUrl = await FileUploaderService.uploadImageToCloudinary(file.buffer, {
                 folder: 'courses',
                 public_id: `${name}-${Date.now()}`,
             });
 
-            // * get the instructor ID
-            const instructorId = id;
+            if (!thumbnailUrl) {
+                throw new AppError(ResponseMessage.UPLOAD_FAILED('Image'), StatusCodes.INTERNAL_SERVER_ERROR);
+            }
 
             // * check category exists
             const categoryDetails = await this.categoryService.getByName(category);
@@ -41,7 +42,7 @@ class CourseService {
                 description,
                 price,
                 whatYouWillLearn,
-                thumbnail: thumbnailUrl!.secure_url,
+                thumbnail: thumbnailUrl.secure_url,
                 instructorId,
             });
 

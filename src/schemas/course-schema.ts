@@ -40,11 +40,20 @@ export const updateSectionSchema: ObjectSchema = Joi.object<Partial<ISectionRequ
 
 export const subSectionSchema: ObjectSchema = Joi.object<ISubSectionRequestBody, true>({
     title: Joi.string().trim().required().messages({
-        'any.required': 'Section title is required.',
-        'string.empty': 'Section title cannot be empty.',
+        'any.required': 'Sub Section title is required.',
+        'string.empty': 'Sub Section title cannot be empty.',
     }),
     description: Joi.string().trim().required().messages({
-        'any.required': 'Section description is required.',
-        'string.empty': 'Section description cannot be empty.',
+        'any.required': 'Sub Section description is required.',
+        'string.empty': 'Sub Section description cannot be empty.',
+    }),
+}).required();
+
+export const updateSubSectionSchema: ObjectSchema = Joi.object<Partial<ISubSectionRequestBody>, true>({
+    title: Joi.string().trim().optional().messages({
+        'string.empty': 'Sub Section title cannot be empty.',
+    }),
+    description: Joi.string().trim().optional().messages({
+        'string.empty': 'Sub Section description cannot be empty.',
     }),
 }).required();

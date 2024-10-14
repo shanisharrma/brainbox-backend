@@ -1,5 +1,5 @@
-import { cloudinary } from '../../config';
-import { AppError } from '../error';
+import { cloudinary } from '../config';
+import { AppError } from '../utils/error';
 import { StatusCodes } from 'http-status-codes';
 import { UploadApiResponse } from 'cloudinary';
 
@@ -14,7 +14,7 @@ interface IFileValidationOptions {
     maxSize: number;
 }
 
-class FileUploader {
+class FileUploaderService {
     public static async uploadFileToCloudinary(
         fileBuffer: Buffer,
         fileType: 'image' | 'video',
@@ -70,20 +70,17 @@ class FileUploader {
         if (!allowedMimeTypes.includes(file.mimetype)) {
             throw new AppError(
                 `Only ${allowedMimeTypes.join(', ')} formats are allowed.`,
-                StatusCodes.UNPROCESSABLE_ENTITY,
+                StatusCodes.UNSUPPORTED_MEDIA_TYPE,
             );
         }
 
         // Check for file size
         if (file.size > maxSize) {
-            throw new AppError(
-                `File size must not exceed ${maxSize / (1024 * 1024)}MB.`,
-                StatusCodes.UNPROCESSABLE_ENTITY,
-            );
+            throw new AppError(`File size must not exceed ${maxSize / (1024 * 1024)}MB.`, StatusCodes.REQUEST_TOO_LONG);
         }
 
         // If all validations pass, return the file object
         return file;
     }
 }
-export default FileUploader;
+export default FileUploaderService;
