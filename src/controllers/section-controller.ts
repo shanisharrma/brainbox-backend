@@ -75,9 +75,9 @@ class SectionController {
             const { courseId, sectionId } = params;
 
             // * call the create service
-            const response = await SectionController.sectionService.delete(Number(sectionId), Number(courseId));
+            await SectionController.sectionService.delete(Number(sectionId), Number(courseId));
 
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.DELETED('Section'), response);
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.DELETED('Section'));
         } catch (error) {
             HttpError(
                 next,

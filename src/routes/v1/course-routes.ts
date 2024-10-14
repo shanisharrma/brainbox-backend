@@ -78,4 +78,9 @@ router
         SubSectionController.update,
     );
 
+// Delete Course Sub Section : DELETE /api/v1/sections/:sectionId/subsections/subsectionId
+router
+    .route('/sections/:sectionId/subsections/:subSectionId')
+    .delete(AuthMiddleware.checkAuth, AuthMiddleware.isInstructor, SubSectionController.delete);
+
 export default router;

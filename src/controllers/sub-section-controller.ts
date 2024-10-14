@@ -96,6 +96,33 @@ class SubSectionController {
             );
         }
     }
+
+    public static async delete(req: Request, res: Response, next: NextFunction) {
+        try {
+            // * destructure the req
+            const { params, id } = req as ISubSectionRequest;
+
+            // * destructure params
+            const { sectionId, subSectionId } = params;
+
+            // * call the service
+            const response = await SubSectionController.subSectionService.destroy(
+                Number(subSectionId),
+                Number(sectionId),
+                id,
+            );
+
+            // Return response
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.DELETED('Sub Section'), response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
 }
 
 export default SubSectionController;

@@ -131,6 +131,34 @@ class SubSectionService {
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
+
+    public async destroy(subSectionId: number, sectionId: number, instructorId: number) {
+        try {
+            // * get one by subSectionId and sectionId
+            const subSectionWithSectionWithCourse =
+                await this.subSectionRepository.getWithSectionWithCourseByIdAndSectionId(subSectionId, sectionId);
+
+            // * check subSection with details exists
+            if (!subSectionWithSectionWithCourse) {
+                throw new AppError(ResponseMessage.NOT_FOUND('Sub Section'), StatusCodes.NOT_FOUND);
+            }
+
+            // * check instructor authorized
+            if (
+                !subSectionWithSectionWithCourse.section ||
+                !subSectionWithSectionWithCourse.section.course ||
+                subSectionWithSectionWithCourse.section.course.instructorId !== instructorId
+            ) {
+                throw new AppError(ResponseMessage.NOT_AUTHORIZATION, StatusCodes.UNAUTHORIZED);
+            }
+
+            // * destroy the subsection
+            await subSectionWithSectionWithCourse.destroy();
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
 
 export default SubSectionService;
