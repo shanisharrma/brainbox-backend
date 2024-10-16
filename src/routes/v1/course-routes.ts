@@ -23,6 +23,9 @@ router
 // All Courses : GET /api/v1/courses
 router.route('/courses').get(CourseController.showAll);
 
+// Single Course : GET /api/v1/courses/:courseID
+router.route('/courses/:courseId').get(CourseController.show);
+
 // ========================================================================================================= //
 // ========================================= Section Routes ================================================
 // ========================================================================================================= //

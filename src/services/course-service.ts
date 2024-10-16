@@ -59,7 +59,10 @@ class CourseService {
 
     public async showAll() {
         try {
-            return await this.courseRepository.getAll();
+            const courses = await this.courseRepository.getAllWithAllAssociations();
+            if (courses && !courses.length) {
+                throw new AppError('Courses not found', StatusCodes.NOT_FOUND);
+            }
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -68,7 +71,12 @@ class CourseService {
 
     public async getOneById(id: number) {
         try {
-            return await this.courseRepository.getOneById(id);
+            const courseDetails = await this.courseRepository.getOneWithAllAssociationsById(id);
+            if (!courseDetails) {
+                throw new AppError(ResponseMessage.NOT_FOUND('Course'), StatusCodes.NOT_FOUND);
+            }
+
+            return courseDetails;
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

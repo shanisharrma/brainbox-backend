@@ -10,6 +10,7 @@ interface ICourseRequest extends Request {
     body: ICourseRequestBody;
     file: Express.Multer.File;
     id: number;
+    params: { courseId: string };
 }
 
 class CourseController {
@@ -50,6 +51,26 @@ class CourseController {
         try {
             // * call category service
             const response = await CourseController.courseService.showAll();
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async show(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { params } = req as ICourseRequest;
+
+            const { courseId } = params;
+
+            // * call category service
+            const response = await CourseController.courseService.getOneById(Number(courseId));
 
             HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, response);
         } catch (error) {

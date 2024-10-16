@@ -103,14 +103,14 @@ Profile.belongsTo(User, {
 User.belongsToMany(Course, {
     through: 'Enrollments',
     foreignKey: 'studentId',
-    as: 'students',
+    as: 'enrolledCourses',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
 Course.belongsToMany(User, {
     through: 'Enrollments',
     foreignKey: 'courseId',
-    as: 'courses',
+    as: 'students',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
@@ -118,7 +118,7 @@ Course.belongsToMany(User, {
 // One-to-Many Associations between Instructor (User) and Course
 User.hasMany(Course, {
     foreignKey: 'instructorId',
-    as: 'courses',
+    as: 'taughtCourses',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
