@@ -38,6 +38,8 @@ import {
 
 import { ICategoryAttributes, ICourseCategoryAttributes, ICategoryRequestBody } from './category-types';
 
+import { ICapturePaymentRequestBody, IVerifyPaymentRequestBody } from './payment-types';
+
 export {
     THttpResponse,
     THttpError,
@@ -78,4 +80,6 @@ export {
     TUserWithProfileAssociations,
     IProfileRequestBody,
     IProfileUpdateParams,
+    ICapturePaymentRequestBody,
+    IVerifyPaymentRequestBody,
 };

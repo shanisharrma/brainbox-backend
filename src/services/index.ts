@@ -9,6 +9,7 @@ import CourseService from './course-service';
 import SectionService from './section-service';
 import SubSectionService from './sub-section-service';
 import FileUploaderService from './file-uploader-service';
+import PaymentService from './payments/payment-service';
 
 export {
     PhoneNumberService,
@@ -22,4 +23,5 @@ export {
     SectionService,
     SubSectionService,
     FileUploaderService,
+    PaymentService,
 };

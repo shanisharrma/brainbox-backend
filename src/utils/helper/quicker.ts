@@ -3,7 +3,7 @@ import { ServerConfig } from '../../config';
 import bcrypt from 'bcrypt';
 import { parsePhoneNumber } from 'libphonenumber-js';
 import { getTimezonesForCountry } from 'countries-and-timezones';
-import { randomInt } from 'crypto';
+import { randomInt, randomBytes } from 'crypto';
 import { v4 as uuid } from 'uuid';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -111,6 +111,14 @@ class Quicker {
             .replace(/[^a-zA-Z0-9]/g, ' ')
             .split(' ')
             .join('_');
+    }
+
+    public static getRandomNumber(length: number) {
+        return randomBytes(length).toString('hex');
+    }
+
+    public static validateValue<T extends string>(value: T, regex: RegExp): boolean {
+        return regex.test(value);
     }
 }
 

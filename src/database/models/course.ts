@@ -5,6 +5,7 @@ import connection from '../sequelize';
 import { ICategoryAttributes, ICourseAttributes, IRatingAttributes, IUserAttributes } from '../../types';
 import Category from './category';
 import { BelongsToManyHasAssociationMixin } from 'sequelize';
+import User from './user';
 
 type TCourseCreationAttributes = Optional<ICourseAttributes, 'id'>;
 
@@ -27,6 +28,9 @@ class Course extends Model<ICourseAttributes, TCourseCreationAttributes> impleme
     // hooks
     declare addCategory: BelongsToManyAddAssociationMixin<Category, Category['id']>;
     declare hasCategory: BelongsToManyHasAssociationMixin<Category, Category['id']>;
+
+    declare addUser: BelongsToManyAddAssociationMixin<User, User['id']>;
+    declare hasUser: BelongsToManyHasAssociationMixin<User, User['id']>;
 }
 
 Course.init(
