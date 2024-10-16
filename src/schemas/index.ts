@@ -20,6 +20,8 @@ import {
 
 import { createRatingSchema } from './rating-schema';
 
+import { verifyPaymentSchema, capturePaymentSchema } from './payment-schema';
+
 export default {
     registerSchema,
     accountVerificationSchema,
@@ -35,4 +37,6 @@ export default {
     updateSubSectionSchema,
     updateProfileSchema,
     createRatingSchema,
+    capturePaymentSchema,
+    verifyPaymentSchema,
 };

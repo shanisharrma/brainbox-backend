@@ -31,7 +31,7 @@ class CourseService {
             }
 
             // * check category exists
-            const categoriesDetail = await this.categoryService.getByName(categories);
+            const categoriesDetail = await this.categoryService.getByNames(categories);
             if (!categoriesDetail) {
                 throw new AppError(ResponseMessage.NOT_FOUND('Category'), StatusCodes.NOT_FOUND);
             }

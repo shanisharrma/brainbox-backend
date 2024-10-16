@@ -37,10 +37,26 @@ class CategoryService {
         }
     }
 
-    public async getByName(name: string[]) {
+    public async getByNames(name: string[]) {
         try {
             // * get all the categories
-            return await this.categoryRepository.getByName(name);
+            return await this.categoryRepository.getByNames(name);
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async showAllCourses(categoryName: string) {
+        try {
+            // * get select category courses by category name
+            const selectedCategory = await this.categoryRepository.showAllCoursesByName(categoryName);
+
+            // * get other category courses except given category name
+            const otherCategory = await this.categoryRepository.showAllCoursesByNotName(categoryName);
+
+            // * return response
+            return { selectedCategory, otherCategory };
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

@@ -99,10 +99,10 @@ router
         RatingController.create,
     );
 
-// Create Rating for course : GET /api/v1/courses/:courseId/ratings
+// Get Rating Average for course : GET /api/v1/courses/:courseId/ratings
 router.route('/courses/:courseId/ratings').get(RatingController.getAverage);
 
-// Show all Rating : GET /api/v1/courses/:courseId/ratings
+// Show all Rating : GET /api/v1/ratings
 router.route('/ratings').get(RatingController.showAll);
 
 export default router;

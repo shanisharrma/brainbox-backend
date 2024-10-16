@@ -8,6 +8,7 @@ import { CategoryService } from '../services';
 
 interface ICategoryRequest extends Request {
     body: ICategoryRequestBody;
+    params: { categoryName: string };
 }
 
 class CategoryController {
@@ -36,6 +37,25 @@ class CategoryController {
         try {
             const categories = await CategoryController.categoryService.getAll();
             HttpResponse(req, res, StatusCodes.OK, ResponseMessage.CATEGORY_SUCCESS, categories);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async showAllCourses(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { params } = req as ICategoryRequest;
+
+            const { categoryName } = params;
+
+            const allCourses = await CategoryController.categoryService.showAllCourses(categoryName);
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.CATEGORY_SUCCESS, allCourses);
         } catch (error) {
             HttpError(
                 next,

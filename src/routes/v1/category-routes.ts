@@ -16,6 +16,9 @@ router
     );
 
 // Show all Categories : GET /api/v1/categories
-router.route('/categories').get(AuthMiddleware.checkAuth, CategoryController.showAll);
+router.route('/categories').get(CategoryController.showAll);
+
+// Get All courses of category: GET /api/v1/categories/:categoryId
+router.route('/categories/:categoryName').get(CategoryController.showAllCourses);
 
 export default router;
