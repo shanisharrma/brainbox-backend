@@ -18,7 +18,7 @@ class CourseService {
     public async create(data: ICourseRequestBody, file: Express.Multer.File, instructorId: number) {
         try {
             // * destructure the data
-            const { name, description, price, whatYouWillLearn, category } = data;
+            const { name, description, price, whatYouWillLearn, categories } = data;
 
             // * upload the image to cloudinary
             const thumbnailUrl = await FileUploaderService.uploadImageToCloudinary(file.buffer, {
@@ -31,8 +31,8 @@ class CourseService {
             }
 
             // * check category exists
-            const categoryDetails = await this.categoryService.getByName(category);
-            if (!categoryDetails) {
+            const categoriesDetail = await this.categoryService.getByName(categories);
+            if (!categoriesDetail) {
                 throw new AppError(ResponseMessage.NOT_FOUND('Category'), StatusCodes.NOT_FOUND);
             }
 
@@ -47,7 +47,7 @@ class CourseService {
             });
 
             // * add category to the course
-            course.addCategory(categoryDetails);
+            course.addCategory(categoriesDetail);
 
             // * return course
             return course;

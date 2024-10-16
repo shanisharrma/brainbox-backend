@@ -1,7 +1,7 @@
 import express from 'express';
 import { AuthMiddleware, upload, ValidationMiddleware } from '../../middlewares';
 import schemas from '../../schemas';
-import { CourseController, SectionController, SubSectionController } from '../../controllers';
+import { CourseController, RatingController, SectionController, SubSectionController } from '../../controllers';
 
 const router = express.Router();
 
@@ -85,5 +85,24 @@ router
 router
     .route('/sections/:sectionId/subsections/:subSectionId')
     .delete(AuthMiddleware.checkAuth, AuthMiddleware.isInstructor, SubSectionController.delete);
+
+//========================================================================================================== //
+// ======================================= Rating & Reviews Routes =========================================
+// ========================================================================================================= //
+// Create Rating for course : POST /api/v1/courses/:courseId/ratings
+router
+    .route('/courses/:courseId/ratings')
+    .post(
+        AuthMiddleware.checkAuth,
+        AuthMiddleware.isStudent,
+        ValidationMiddleware.validateRequest(schemas.createRatingSchema),
+        RatingController.create,
+    );
+
+// Create Rating for course : GET /api/v1/courses/:courseId/ratings
+router.route('/courses/:courseId/ratings').get(RatingController.getAverage);
+
+// Show all Rating : GET /api/v1/courses/:courseId/ratings
+router.route('/ratings').get(RatingController.showAll);
 
 export default router;

@@ -1,4 +1,4 @@
-import { IRatingAttributes } from './course-types';
+import { IRatingAttributes } from './rating-types';
 import { TWithAssociations } from './types';
 
 export interface IUserAttributes {

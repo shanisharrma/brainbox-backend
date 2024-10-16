@@ -1,6 +1,12 @@
 'use strict';
 
-import { BelongsToManyAddAssociationMixin, DataTypes, Model, Optional } from 'sequelize';
+import {
+    BelongsToManyAddAssociationMixin,
+    BelongsToManyAddAssociationsMixin,
+    DataTypes,
+    Model,
+    Optional,
+} from 'sequelize';
 import connection from '../sequelize';
 import { ICategoryAttributes, ICourseAttributes, IRatingAttributes, IUserAttributes } from '../../types';
 import Category from './category';
@@ -28,6 +34,7 @@ class Course extends Model<ICourseAttributes, TCourseCreationAttributes> impleme
     // hooks
     declare addCategory: BelongsToManyAddAssociationMixin<Category, Category['id']>;
     declare hasCategory: BelongsToManyHasAssociationMixin<Category, Category['id']>;
+    declare addCategories: BelongsToManyAddAssociationsMixin<Category, Category['id']>;
 
     declare addUser: BelongsToManyAddAssociationMixin<User, User['id']>;
     declare hasUser: BelongsToManyHasAssociationMixin<User, User['id']>;

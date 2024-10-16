@@ -37,7 +37,7 @@ class CategoryService {
         }
     }
 
-    public async getByName(name: string) {
+    public async getByName(name: string[]) {
         try {
             // * get all the categories
             return await this.categoryRepository.getByName(name);

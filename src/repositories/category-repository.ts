@@ -6,7 +6,7 @@ class CategoryRepository extends CrudRepository<Category> {
         super(Category);
     }
 
-    public async getByName(name: string) {
+    public async getByName(name: string[]) {
         return await this.getOne({ where: { name: name } });
     }
 }

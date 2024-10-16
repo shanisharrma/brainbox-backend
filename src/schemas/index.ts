@@ -18,6 +18,8 @@ import {
     updateSubSectionSchema,
 } from './course-schema';
 
+import { createRatingSchema } from './rating-schema';
+
 export default {
     registerSchema,
     accountVerificationSchema,
@@ -32,4 +34,5 @@ export default {
     subSectionSchema,
     updateSubSectionSchema,
     updateProfileSchema,
+    createRatingSchema,
 };

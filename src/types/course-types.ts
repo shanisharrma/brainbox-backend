@@ -1,4 +1,5 @@
 import { ICategoryAttributes } from './category-types';
+import { IRatingAttributes } from './rating-types';
 import { IUserAttributes } from './user-types';
 
 export interface ICourseAttributes {
@@ -25,19 +26,6 @@ export interface IEnrollmentAttributes {
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
-}
-
-export interface IRatingAttributes {
-    id?: number;
-    studentId: number;
-    courseId: number;
-    rating: number;
-    review: string;
-    createdAt?: Date;
-    updatedAt?: Date;
-    deletedAt?: Date;
-    course?: ICourseAttributes;
-    student?: IUserAttributes;
 }
 
 export interface ISectionAttributes {
@@ -79,7 +67,7 @@ export interface ICourseRequestBody {
     description: string;
     whatYouWillLearn: string;
     price: number;
-    category: string;
+    categories: string[];
 }
 
 export interface ISectionRequestBody {

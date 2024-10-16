@@ -19,9 +19,12 @@ export const courseSchema: ObjectSchema = Joi.object<ICourseRequestBody, true>({
         'any.required': 'Price is required.',
         'number.positive': 'Price must be a positive number.',
     }),
-    category: Joi.string().trim().required().messages({
-        'any.required': 'Category is required.',
-        'string.empty': 'Category cannot be empty.',
+    categories: Joi.array().items(Joi.string().trim().required()).messages({
+        'array.base': 'Value must be an array',
+        'array.includes': 'Each item must be a string',
+        'string.empty': 'String cannot be empty',
+        'string.min': 'String must be at least {#limit} characters long',
+        'any.required': 'Array is required',
     }),
 }).required();
 

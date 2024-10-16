@@ -16,6 +16,9 @@ class Rating extends Model<IRatingAttributes, TRatingCreationAttributes> impleme
     public readonly updatedAt?: Date | undefined;
 
     public course?: ICourseAttributes | undefined;
+
+    // Declare averageRating as an optional property
+    public averageRating?: number | null;
 }
 Rating.init(
     {

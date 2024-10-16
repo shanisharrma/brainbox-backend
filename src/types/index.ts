@@ -26,7 +26,6 @@ import {
 import {
     ICourseAttributes,
     IEnrollmentAttributes,
-    IRatingAttributes,
     ISectionAttributes,
     ISubSectionAttributes,
     ICourseProgressAttributes,
@@ -39,6 +38,7 @@ import {
 import { ICategoryAttributes, ICourseCategoryAttributes, ICategoryRequestBody } from './category-types';
 
 import { ICapturePaymentRequestBody, IVerifyPaymentRequestBody } from './payment-types';
+import { IRatingAttributes, IRatingRequestBody } from './rating-types';
 
 export {
     THttpResponse,
@@ -82,4 +82,5 @@ export {
     IProfileUpdateParams,
     ICapturePaymentRequestBody,
     IVerifyPaymentRequestBody,
+    IRatingRequestBody,
 };

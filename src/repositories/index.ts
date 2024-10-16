@@ -9,6 +9,7 @@ import CategoryRepository from './category-repository';
 import CourseRepository from './course-repository';
 import SectionRepository from './section-repository';
 import SubSectionRepository from './sub-section-repository';
+import RatingRepository from './rating-repository';
 
 export {
     UserRepository,
@@ -22,4 +23,5 @@ export {
     CourseRepository,
     SectionRepository,
     SubSectionRepository,
+    RatingRepository,
 };
