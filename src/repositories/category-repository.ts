@@ -8,7 +8,7 @@ class CategoryRepository extends CrudRepository<Category> {
     }
 
     public async getByNames(name: string[]) {
-        return await this.getOne({ where: { name: name } });
+        return await this.getAll({ where: { name: name } });
     }
 
     public async showAllCoursesByName(name: string) {

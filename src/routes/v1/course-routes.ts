@@ -26,6 +26,23 @@ router.route('/courses').get(CourseController.showAll);
 // Single Course : GET /api/v1/courses/:courseID
 router.route('/courses/:courseId').get(CourseController.show);
 
+// Edit Course : PUT /api/v1/courses/:courseId
+router
+    .route('/courses/:courseId')
+    .put(
+        AuthMiddleware.checkAuth,
+        AuthMiddleware.isInstructor,
+        upload.single('thumbnail'),
+        ValidationMiddleware.validateRequest(schemas.updateCourseSchema),
+        CourseController.update,
+    );
+
+// Get Enrolled Courses : GET /api/v1/courses/enrolled
+router.route('/courses/enrolled').get(AuthMiddleware.checkAuth, AuthMiddleware.isStudent);
+
+// Get Instructor Courses : Get /api/v1/courses/taught
+router.route('/courses/taught').get(AuthMiddleware.checkAuth, AuthMiddleware.isInstructor);
+
 // ========================================================================================================= //
 // ========================================= Section Routes ================================================
 // ========================================================================================================= //
@@ -89,6 +106,7 @@ router
 //========================================================================================================== //
 // ======================================= Rating & Reviews Routes =========================================
 // ========================================================================================================= //
+
 // Create Rating for course : POST /api/v1/courses/:courseId/ratings
 router
     .route('/courses/:courseId/ratings')

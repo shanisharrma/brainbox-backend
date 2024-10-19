@@ -54,6 +54,11 @@ class CourseRepository extends CrudRepository<Course> {
         });
         return courses;
     }
+
+    public async getOneByIdAndInstructor(id: number, instructorId: number) {
+        const courses = await this.getOne({ where: { id: id, instructorId: instructorId } });
+        return courses;
+    }
 }
 
 export default CourseRepository;

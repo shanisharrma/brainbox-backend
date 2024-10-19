@@ -82,3 +82,7 @@ export interface ISubSectionRequestBody {
 export interface ISubSectionUpdateParams extends ISubSectionAttributes {
     file: Express.Multer.File | undefined;
 }
+
+export interface ICourseUpdateParams extends ICourseAttributes {
+    file: Express.Multer.File | undefined;
+}

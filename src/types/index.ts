@@ -33,6 +33,7 @@ import {
     ISectionRequestBody,
     ISubSectionRequestBody,
     ISubSectionUpdateParams,
+    ICourseUpdateParams,
 } from './course-types';
 
 import { ICategoryAttributes, ICourseCategoryAttributes, ICategoryRequestBody } from './category-types';
@@ -83,4 +84,5 @@ export {
     ICapturePaymentRequestBody,
     IVerifyPaymentRequestBody,
     IRatingRequestBody,
+    ICourseUpdateParams,
 };

@@ -16,6 +16,7 @@ import {
     updateSectionSchema,
     subSectionSchema,
     updateSubSectionSchema,
+    updateCourseSchema,
 } from './course-schema';
 
 import { createRatingSchema } from './rating-schema';
@@ -39,4 +40,5 @@ export default {
     createRatingSchema,
     capturePaymentSchema,
     verifyPaymentSchema,
+    updateCourseSchema,
 };

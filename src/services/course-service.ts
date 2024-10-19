@@ -47,7 +47,7 @@ class CourseService {
             });
 
             // * add category to the course
-            course.addCategory(categoriesDetail);
+            course.addCategories(categoriesDetail);
 
             // * return course
             return course;
@@ -63,6 +63,21 @@ class CourseService {
             if (courses && !courses.length) {
                 throw new AppError('Courses not found', StatusCodes.NOT_FOUND);
             }
+            return courses;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async getOneWithAssociationsById(id: number) {
+        try {
+            const courseDetails = await this.courseRepository.getOneWithAllAssociationsById(id);
+            if (!courseDetails) {
+                throw new AppError(ResponseMessage.NOT_FOUND('Course'), StatusCodes.NOT_FOUND);
+            }
+
+            return courseDetails;
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -71,12 +86,80 @@ class CourseService {
 
     public async getOneById(id: number) {
         try {
-            const courseDetails = await this.courseRepository.getOneWithAllAssociationsById(id);
+            const courseDetails = await this.courseRepository.getOneById(id);
             if (!courseDetails) {
                 throw new AppError(ResponseMessage.NOT_FOUND('Course'), StatusCodes.NOT_FOUND);
             }
 
             return courseDetails;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async update(
+        courseId: number,
+        instructorId: number,
+        file: Express.Multer.File,
+        data: Partial<ICourseRequestBody>,
+    ) {
+        try {
+            // * destructure data
+            const { categories, description, name, price, whatYouWillLearn } = data;
+
+            // * get the course with courseId and instructorId
+            const courseDetails = await this.courseRepository.getOneByIdAndInstructor(courseId, instructorId);
+
+            // * check course exists
+            if (!courseDetails) {
+                throw new AppError(ResponseMessage.NOT_FOUND('Course'), StatusCodes.NOT_FOUND);
+            }
+
+            // * check file exists
+            if (file) {
+                // * validate the file
+                const validatedFile = FileUploaderService.validateFile(file, {
+                    fieldName: file.filename,
+                    allowedMimeTypes: ['image/jpeg', 'image/jpg', 'image/png'],
+                    maxSize: 1024 * 1024 * 5,
+                });
+
+                // * upload the image to cloudinary
+                const uploadedThumbnail = await FileUploaderService.uploadImageToCloudinary(validatedFile.buffer, {
+                    folder: 'courses',
+                    public_id: `${name}-${Date.now()}`,
+                });
+
+                if (!uploadedThumbnail) {
+                    throw new AppError(ResponseMessage.UPLOAD_FAILED('Thumbnail'), StatusCodes.INTERNAL_SERVER_ERROR);
+                }
+
+                courseDetails.thumbnail = uploadedThumbnail.secure_url;
+            }
+
+            // * check categories exits
+            const newCategories = await this.categoryService.getByNames(categories!);
+            if (newCategories && newCategories.length <= 0) {
+                throw new AppError(ResponseMessage.NOT_FOUND('Categories'), StatusCodes.NOT_FOUND);
+            }
+
+            // get old categories
+            const oldCategories = await courseDetails.getCategories();
+
+            // * remove old categories
+            await courseDetails.removeCategories(oldCategories);
+
+            // * add new categories to course
+            await courseDetails.addCategories(newCategories);
+
+            // * update the course
+            courseDetails.name = name ? name : courseDetails.name;
+            courseDetails.description = description ? description : courseDetails.description;
+            courseDetails.price = price ? price : courseDetails.price;
+            courseDetails.whatYouWillLearn = whatYouWillLearn ? whatYouWillLearn : courseDetails.whatYouWillLearn;
+
+            await courseDetails.save();
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

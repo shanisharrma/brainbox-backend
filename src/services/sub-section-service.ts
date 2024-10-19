@@ -1,6 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import { SubSectionRepository } from '../repositories';
-import { ISubSectionRequestBody, ISubSectionUpdateParams } from '../types';
+import { ISubSectionRequestBody } from '../types';
 import { ResponseMessage } from '../utils/constants';
 import { AppError } from '../utils/error';
 import SectionService from './section-service';
@@ -71,11 +71,12 @@ class SubSectionService {
         subSectionId: number,
         sectionId: number,
         instructorId: number,
-        data: Partial<ISubSectionUpdateParams>,
+        file: Express.Multer.File,
+        data: Partial<ISubSectionRequestBody>,
     ) {
         try {
             // * destructure the data
-            const { title, description, file } = data;
+            const { title, description } = data;
 
             // * get subSection with section with course
             const subSectionWithSectionWithCourse =
@@ -101,9 +102,15 @@ class SubSectionService {
 
             // * check file exists
             if (file) {
+                // * validate file
+                const validatedFile = FileUploaderService.validateFile(file, {
+                    fieldName: file.fieldname,
+                    allowedMimeTypes: ['video/mp4', 'video/mkv', 'video/avi'],
+                    maxSize: 1024 * 1024 * 100,
+                });
                 // * if yes --> then add it to the subSectionUpdate payload
                 // * if no --> then leave then as it is
-                const uploadVideo = await FileUploaderService.uploadVideoToCloudinary(file.buffer, {
+                const uploadVideo = await FileUploaderService.uploadVideoToCloudinary(validatedFile.buffer, {
                     folder: 'courses/video',
                     public_id: Quicker.prepareFileName(`${subSectionWithSectionWithCourse.title}-${Date.now()}`),
                 });

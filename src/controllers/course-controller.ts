@@ -70,9 +70,28 @@ class CourseController {
             const { courseId } = params;
 
             // * call category service
-            const response = await CourseController.courseService.getOneById(Number(courseId));
+            const response = await CourseController.courseService.getOneWithAssociationsById(Number(courseId));
 
             HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async update(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { body, params, id, file } = req as ICourseRequest;
+
+            const { courseId } = params;
+
+            const response = await CourseController.courseService.update(Number(courseId), id, file, body);
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.UPDATED('Course'), response);
         } catch (error) {
             HttpError(
                 next,

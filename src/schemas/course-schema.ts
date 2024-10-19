@@ -28,6 +28,28 @@ export const courseSchema: ObjectSchema = Joi.object<ICourseRequestBody, true>({
     }),
 }).required();
 
+export const updateCourseSchema: ObjectSchema = Joi.object<ICourseRequestBody, true>({
+    name: Joi.string().trim().optional().messages({
+        'string.empty': 'Course name cannot be empty.',
+    }),
+    description: Joi.string().max(120).trim().optional().messages({
+        'string.empty': 'Description cannot be empty.',
+        'string.max': 'Description must be at most 120 characters long.',
+    }),
+    whatYouWillLearn: Joi.string().trim().optional().messages({
+        'string.empty': 'What you will learn cannot be empty.',
+    }),
+    price: Joi.number().positive().optional().messages({
+        'number.positive': 'Price must be a positive number.',
+    }),
+    categories: Joi.array().items(Joi.string().trim().optional()).messages({
+        'array.base': 'Value must be an array',
+        'array.includes': 'Each item must be a string',
+        'string.empty': 'String cannot be empty',
+        'string.min': 'String must be at least {#limit} characters long',
+    }),
+}).required();
+
 export const sectionSchema: ObjectSchema = Joi.object<ISectionRequestBody, true>({
     name: Joi.string().trim().required().messages({
         'any.required': 'Section name is required.',

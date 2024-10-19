@@ -3,6 +3,7 @@
 import {
     BelongsToManyAddAssociationMixin,
     BelongsToManyAddAssociationsMixin,
+    BelongsToManyHasAssociationsMixin,
     DataTypes,
     Model,
     Optional,
@@ -12,6 +13,8 @@ import { ICategoryAttributes, ICourseAttributes, IRatingAttributes, IUserAttribu
 import Category from './category';
 import { BelongsToManyHasAssociationMixin } from 'sequelize';
 import User from './user';
+import { BelongsToManyGetAssociationsMixin } from 'sequelize';
+import { BelongsToManyRemoveAssociationsMixin } from 'sequelize';
 
 type TCourseCreationAttributes = Optional<ICourseAttributes, 'id'>;
 
@@ -35,6 +38,9 @@ class Course extends Model<ICourseAttributes, TCourseCreationAttributes> impleme
     declare addCategory: BelongsToManyAddAssociationMixin<Category, Category['id']>;
     declare hasCategory: BelongsToManyHasAssociationMixin<Category, Category['id']>;
     declare addCategories: BelongsToManyAddAssociationsMixin<Category, Category['id']>;
+    declare hasCategories: BelongsToManyHasAssociationsMixin<Category, Category['id']>;
+    declare getCategories: BelongsToManyGetAssociationsMixin<Category>;
+    declare removeCategories: BelongsToManyRemoveAssociationsMixin<Category, Category['id']>;
 
     declare addUser: BelongsToManyAddAssociationMixin<User, User['id']>;
     declare hasUser: BelongsToManyHasAssociationMixin<User, User['id']>;
