@@ -83,6 +83,42 @@ class CourseController {
         }
     }
 
+    public static async enrolledCourses(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req as ICourseRequest;
+
+            // * call category service
+            const response = await CourseController.courseService.enrolledCourses(id);
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async taughtCourses(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req as ICourseRequest;
+
+            // * call category service
+            const response = await CourseController.courseService.taughtCourses(id);
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
     public static async update(req: Request, res: Response, next: NextFunction) {
         try {
             const { body, params, id, file } = req as ICourseRequest;
@@ -92,6 +128,25 @@ class CourseController {
             const response = await CourseController.courseService.update(Number(courseId), id, file, body);
 
             HttpResponse(req, res, StatusCodes.OK, ResponseMessage.UPDATED('Course'), response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async delete(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { params, id } = req as ICourseRequest;
+
+            const { courseId } = params;
+
+            const response = await CourseController.courseService.destroy(Number(courseId), id);
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.DELETED('Course'), response);
         } catch (error) {
             HttpError(
                 next,

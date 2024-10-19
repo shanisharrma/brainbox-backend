@@ -23,6 +23,16 @@ router
 // All Courses : GET /api/v1/courses
 router.route('/courses').get(CourseController.showAll);
 
+// Get Enrolled Courses : GET /api/v1/courses/enrolled
+router
+    .route('/courses/enrolled')
+    .get(AuthMiddleware.checkAuth, AuthMiddleware.isStudent, CourseController.enrolledCourses);
+
+// Get Instructor Courses : Get /api/v1/courses/taught
+router
+    .route('/courses/taught')
+    .get(AuthMiddleware.checkAuth, AuthMiddleware.isInstructor, CourseController.taughtCourses);
+
 // Single Course : GET /api/v1/courses/:courseID
 router.route('/courses/:courseId').get(CourseController.show);
 
@@ -37,11 +47,10 @@ router
         CourseController.update,
     );
 
-// Get Enrolled Courses : GET /api/v1/courses/enrolled
-router.route('/courses/enrolled').get(AuthMiddleware.checkAuth, AuthMiddleware.isStudent);
-
-// Get Instructor Courses : Get /api/v1/courses/taught
-router.route('/courses/taught').get(AuthMiddleware.checkAuth, AuthMiddleware.isInstructor);
+// Delete Course : DELETE /api/v1/courses/:courseId
+router
+    .route('/courses/:courseId')
+    .delete(AuthMiddleware.checkAuth, AuthMiddleware.isInstructor, CourseController.delete);
 
 // ========================================================================================================= //
 // ========================================= Section Routes ================================================

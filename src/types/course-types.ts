@@ -13,7 +13,7 @@ export interface ICourseAttributes {
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
-    users?: IUserAttributes[];
+    students?: IUserAttributes[];
     categories?: ICategoryAttributes[];
     ratings?: IRatingAttributes[];
     sections?: ICourseAttributes[];

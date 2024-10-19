@@ -1,4 +1,4 @@
-import { CreationAttributes, FindOptions, Model, ModelStatic } from 'sequelize';
+import { CreationAttributes, DestroyOptions, FindOptions, Model, ModelStatic } from 'sequelize';
 import { AppError } from '../utils/error';
 import { ResponseMessage } from '../utils/constants';
 import { StatusCodes } from 'http-status-codes';
@@ -37,6 +37,10 @@ class CrudRepository<T extends Model> {
         const response = await this.getOneById(id);
         await response.destroy();
         return true;
+    }
+
+    public async destroyAll(options: DestroyOptions) {
+        await this.model.destroy(options);
     }
 
     public async update(id: number, data: Partial<T['_attributes']>): Promise<T> {

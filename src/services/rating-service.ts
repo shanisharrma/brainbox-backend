@@ -31,7 +31,7 @@ class RatingService {
                 throw new AppError(ResponseMessage.NOT_AUTHORIZATION, StatusCodes.UNAUTHORIZED);
             }
             // * check user enrolled in course
-            const userEnrolled = course.hasUser(user);
+            const userEnrolled = course.hasStudent(user);
             if (!userEnrolled) {
                 throw new AppError('User not enrolled to the course.', StatusCodes.UNAUTHORIZED);
             }

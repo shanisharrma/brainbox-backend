@@ -29,21 +29,22 @@ class Course extends Model<ICourseAttributes, TCourseCreationAttributes> impleme
     public readonly createdAt?: Date | undefined;
     public readonly updatedAt?: Date | undefined;
 
-    public users?: IUserAttributes[] | undefined;
+    public students?: IUserAttributes[] | undefined;
     public categories?: ICategoryAttributes[] | undefined;
     public ratings?: IRatingAttributes[] | undefined;
     public sections?: ICourseAttributes[] | undefined;
 
     // hooks
-    declare addCategory: BelongsToManyAddAssociationMixin<Category, Category['id']>;
     declare hasCategory: BelongsToManyHasAssociationMixin<Category, Category['id']>;
     declare addCategories: BelongsToManyAddAssociationsMixin<Category, Category['id']>;
     declare hasCategories: BelongsToManyHasAssociationsMixin<Category, Category['id']>;
     declare getCategories: BelongsToManyGetAssociationsMixin<Category>;
     declare removeCategories: BelongsToManyRemoveAssociationsMixin<Category, Category['id']>;
 
-    declare addUser: BelongsToManyAddAssociationMixin<User, User['id']>;
-    declare hasUser: BelongsToManyHasAssociationMixin<User, User['id']>;
+    declare addStudent: BelongsToManyAddAssociationMixin<User, User['id']>;
+    declare hasStudent: BelongsToManyHasAssociationMixin<User, User['id']>;
+    declare getStudents: BelongsToManyGetAssociationsMixin<User>;
+    declare removeStudents: BelongsToManyRemoveAssociationsMixin<User, User['id']>;
 }
 
 Course.init(

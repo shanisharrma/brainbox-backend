@@ -11,6 +11,8 @@ import connection from '../sequelize';
 import { IRoleAttributes, IUserAttributes } from '../../types';
 import { Quicker } from '../../utils/helper';
 import Role from './role';
+import { BelongsToManyGetAssociationsMixin } from 'sequelize';
+import Course from './course';
 
 type TUserCreationAttributes = Optional<IUserAttributes, 'id'>;
 
@@ -32,6 +34,9 @@ class User extends Model<IUserAttributes, TUserCreationAttributes> implements IU
     //
     declare addRole: BelongsToManyAddAssociationMixin<Role, Role['id']>;
     declare hasRole: BelongsToManyHasAssociationMixin<Role, Role['id']>;
+
+    declare addEnrolledCourses: BelongsToManyAddAssociationMixin<Course, Course['id']>;
+    declare getEnrolledCourses: BelongsToManyGetAssociationsMixin<Course>;
 }
 User.init(
     {

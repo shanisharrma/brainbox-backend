@@ -35,7 +35,7 @@ class PaymentService {
             }
 
             // * Check user already enrolled
-            const userEnrolled = await course.hasUser(user);
+            const userEnrolled = await course.hasStudent(user);
             if (userEnrolled) {
                 throw new AppError('User already enrolled to this course.', StatusCodes.BAD_REQUEST);
             }
@@ -89,13 +89,13 @@ class PaymentService {
             }
 
             // * check if user already enrolled
-            const hasEnrolled = await course.hasUser(user);
+            const hasEnrolled = await course.hasStudent(user);
             if (hasEnrolled) {
                 throw new AppError('User already enrolled in this course', StatusCodes.BAD_REQUEST);
             }
 
             // * enroll the user
-            await course.addUser(user);
+            await course.addStudent(user);
 
             // * send payment successful email
         } catch (error) {
