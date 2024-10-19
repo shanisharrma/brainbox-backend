@@ -7,6 +7,7 @@ import SectionController from './section-controller';
 import SubSectionController from './sub-section-controller';
 import PaymentController from './payment-controller';
 import RatingController from './rating-controller';
+import CourseProgressController from './course-progress-controller';
 
 export {
     ApiController,
@@ -18,4 +19,5 @@ export {
     SubSectionController,
     PaymentController,
     RatingController,
+    CourseProgressController,
 };

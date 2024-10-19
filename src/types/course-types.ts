@@ -16,7 +16,7 @@ export interface ICourseAttributes {
     students?: IUserAttributes[];
     categories?: ICategoryAttributes[];
     ratings?: IRatingAttributes[];
-    sections?: ICourseAttributes[];
+    sections?: ISectionAttributes[];
 }
 
 export interface IEnrollmentAttributes {

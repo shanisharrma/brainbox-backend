@@ -1,7 +1,13 @@
 import express from 'express';
 import { AuthMiddleware, upload, ValidationMiddleware } from '../../middlewares';
 import schemas from '../../schemas';
-import { CourseController, RatingController, SectionController, SubSectionController } from '../../controllers';
+import {
+    CourseController,
+    CourseProgressController,
+    RatingController,
+    SectionController,
+    SubSectionController,
+} from '../../controllers';
 
 const router = express.Router();
 
@@ -131,5 +137,19 @@ router.route('/courses/:courseId/ratings').get(RatingController.getAverage);
 
 // Show all Rating : GET /api/v1/ratings
 router.route('/ratings').get(RatingController.showAll);
+
+//========================================================================================================== //
+// ======================================= Course Progress Routes =========================================
+// ========================================================================================================= //
+
+// Add Course Progress : POST /api/v1/courses/:courseId/subsections/:subSectionId
+router
+    .route('/courses/:courseId/subsections/:subSectionId')
+    .post(AuthMiddleware.checkAuth, AuthMiddleware.isStudent, CourseProgressController.create);
+
+// Get Course Progress Percentage : GET /api/v1/course-progress/:courseId
+router
+    .route('/course-progress/:courseId')
+    .get(AuthMiddleware.checkAuth, AuthMiddleware.isStudent, CourseProgressController.getCourseProgressPercentage);
 
 export default router;

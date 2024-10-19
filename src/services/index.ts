@@ -11,6 +11,7 @@ import SubSectionService from './sub-section-service';
 import FileUploaderService from './file-uploader-service';
 import PaymentService from './payments/payment-service';
 import RatingService from './rating-service';
+import CourseProgressService from './course-progress-service';
 
 export {
     PhoneNumberService,
@@ -26,4 +27,5 @@ export {
     FileUploaderService,
     PaymentService,
     RatingService,
+    CourseProgressService,
 };

@@ -10,6 +10,7 @@ import CourseRepository from './course-repository';
 import SectionRepository from './section-repository';
 import SubSectionRepository from './sub-section-repository';
 import RatingRepository from './rating-repository';
+import CourseProgressRepository from './course-progress-repository';
 
 export {
     UserRepository,
@@ -24,4 +25,5 @@ export {
     SectionRepository,
     SubSectionRepository,
     RatingRepository,
+    CourseProgressRepository,
 };

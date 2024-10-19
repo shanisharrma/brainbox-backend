@@ -9,7 +9,13 @@ import {
     Optional,
 } from 'sequelize';
 import connection from '../sequelize';
-import { ICategoryAttributes, ICourseAttributes, IRatingAttributes, IUserAttributes } from '../../types';
+import {
+    ICategoryAttributes,
+    ICourseAttributes,
+    IRatingAttributes,
+    ISectionAttributes,
+    IUserAttributes,
+} from '../../types';
 import Category from './category';
 import { BelongsToManyHasAssociationMixin } from 'sequelize';
 import User from './user';
@@ -32,7 +38,7 @@ class Course extends Model<ICourseAttributes, TCourseCreationAttributes> impleme
     public students?: IUserAttributes[] | undefined;
     public categories?: ICategoryAttributes[] | undefined;
     public ratings?: IRatingAttributes[] | undefined;
-    public sections?: ICourseAttributes[] | undefined;
+    public sections?: ISectionAttributes[] | undefined;
 
     // hooks
     declare hasCategory: BelongsToManyHasAssociationMixin<Category, Category['id']>;
