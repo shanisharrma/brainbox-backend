@@ -72,7 +72,7 @@ class UserService {
             // * check if user already exists
             const isUserExists = await this.userRepository.findByEmail(email);
             if (isUserExists) {
-                throw new AppError(ResponseMessage.EMAIL_ALREADY_IN_USE, StatusCodes.BAD_REQUEST);
+                throw new AppError(ResponseMessage.EMAIL_ALREADY_IN_USE, StatusCodes.CONFLICT);
             }
 
             // * create new user

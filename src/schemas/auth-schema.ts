@@ -9,6 +9,62 @@ import {
     IVerificationRequestBody,
 } from '../types';
 
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *      RegisterUserInput:
+ *          type: object
+ *          required:
+ *              - firstName
+ *              - lastName
+ *              - email
+ *              - password
+ *              - phoneNumber
+ *              - role
+ *              - consent
+ *          properties:
+ *              firstName:
+ *                  type: string
+ *                  default: Jane
+ *              lastName:
+ *                  type: string
+ *                  default: Doe
+ *              email:
+ *                  type: string
+ *                  default: jane.doe@example.com
+ *              password:
+ *                  type: string
+ *                  default: strongPassword@123
+ *              phoneNumber:
+ *                  type: string
+ *                  default: 91999999999
+ *              role:
+ *                  type: string
+ *                  default: student
+ *              consent:
+ *                  type: boolean
+ *                  default: true
+ *      RegisterUserResponse:
+ *          type: object
+ *          properties:
+ *              firstName:
+ *                  type: string
+ *              lastName:
+ *                  type: string
+ *              email:
+ *                  type: string
+ *              createdAt:
+ *                  type: string
+ *              updatedAt:
+ *                  type: string
+ *              phoneNumber:
+ *                  type: string
+ *              role:
+ *                  type: string
+ *              consent:
+ *                  type: boolean
+ */
 export const registerSchema = Joi.object<IRegisterRequestBody, true>({
     firstName: Joi.string().trim().required(),
     lastName: Joi.string().trim().required(),

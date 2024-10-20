@@ -5,8 +5,35 @@ import { AuthController } from '../../controllers';
 
 const router = express.Router();
 
-// from here we will write all the routes for authentication and authorization
-// Register : POST /api/v1/register
+/**
+ * @openapi
+ * /api/v1/register:
+ *  post:
+ *      tags:
+ *          - User
+ *      summary: Register a User
+ *      requestBody:
+ *          required: true
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      $ref: '#/components/schemas/RegisterUserInput'
+ *      responses:
+ *          201:
+ *              description: Created
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/RegisterUserResponse'
+ *          422:
+ *              description: Unprocessable Entity
+ *          409:
+ *              description: Conflict
+ *          404:
+ *              description: Not Found
+ *          500:
+ *              description: Internal Server Error
+ */
 router.route('/register').post(ValidationMiddleware.validateRequest(schema.registerSchema), AuthController.register);
 
 // Account Confirmation : PUT /api/v1/account-confirmation/:token?code=123456

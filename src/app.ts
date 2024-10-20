@@ -5,6 +5,7 @@ import { ErrorMiddleware } from './middlewares';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { swaggerDocs } from './config';
 
 const app = express();
 
@@ -23,6 +24,9 @@ app.use(express.static(path.join(__dirname, '../', 'public')));
 
 // Routes
 app.use('/api', apiRoutes);
+
+// * swagger api documentation
+swaggerDocs(app);
 
 // Error Middlewares
 app.use(ErrorMiddleware.interceptError); // Intercepting errors at an early stage
