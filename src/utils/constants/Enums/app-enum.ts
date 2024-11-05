@@ -3,7 +3,7 @@ export enum EApplicationEnvironment {
     DEVELOPMENT = 'development',
 }
 
-export enum EApplicationEvents {
+export enum EApplicationEvent {
     APPLICATION_STARTED = 'APPLICATION_STARTED',
     APPLICATION_ERROR = 'APPLICATION_ERROR',
     CONTROLLER_ERROR_RESPONSE = `CONTROLLER_ERROR_RESPONSE`,
