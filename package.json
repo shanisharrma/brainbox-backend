@@ -4,7 +4,7 @@
     "description": "Learn new skill everyday",
     "main": "dist/server.js",
     "scripts": {
-        "dist": "npx tsc",
+        "dist": "npm install && npx tsc",
         "dev": "cross-env NODE_ENV=development nodemon src/server.ts",
         "start": "cross-env NODE_ENV=production node dist/server.js",
         "db:create:dev": "cross-env NODE_ENV=development sequelize-cli db:create",
