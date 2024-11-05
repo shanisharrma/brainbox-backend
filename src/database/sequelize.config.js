@@ -24,8 +24,5 @@ module.exports = {
         host: ServerConfig.DB_HOST,
         port: ServerConfig.DB_PORT,
         dialect: 'mysql',
-        dialectOptions: {
-            ssl: true, // This can be required for secure connections
-        },
     },
 };

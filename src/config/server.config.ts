@@ -1,6 +1,8 @@
 import DotenvFlow from 'dotenv-flow';
 
-DotenvFlow.config();
+if (process.env.ENV !== 'production') {
+    DotenvFlow.config();
+}
 
 export default {
     ENV: process.env.ENV,
