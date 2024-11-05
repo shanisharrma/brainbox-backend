@@ -1,11 +1,11 @@
-import { RateLimiterMySQL } from 'rate-limiter-flexible';
+import { RateLimiterPostgres } from 'rate-limiter-flexible';
 import { Sequelize } from 'sequelize';
 import { ServerConfig } from '.';
 
-export let rateLimiterMySQL: RateLimiterMySQL | null = null;
+export let rateLimiterPostgreSQL: RateLimiterPostgres | null = null;
 
 export const initRateLimiter = (sequelizeConnection: Sequelize) => {
-    rateLimiterMySQL = new RateLimiterMySQL({
+    rateLimiterPostgreSQL = new RateLimiterPostgres({
         storeClient: sequelizeConnection,
         dbName: ServerConfig.DB_NAME,
         tableName: 'rate_limiter',

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { rateLimiterMySQL, ServerConfig } from '../config';
+import { rateLimiterPostgreSQL, ServerConfig } from '../config';
 import { Enums, ResponseMessage } from '../utils/constants';
 import { HttpError } from '../utils/common';
 import { AppError } from '../utils/error';
@@ -10,8 +10,8 @@ export default (req: Request, _: Response, next: NextFunction) => {
         return next();
     }
 
-    if (rateLimiterMySQL) {
-        rateLimiterMySQL
+    if (rateLimiterPostgreSQL) {
+        rateLimiterPostgreSQL
             .consume(req.ip as string, 1)
             .then(() => {
                 next();

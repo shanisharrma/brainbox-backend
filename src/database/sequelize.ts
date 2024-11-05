@@ -7,7 +7,7 @@ const connection: Sequelize = new Sequelize(
     {
         host: ServerConfig.DB_HOST ?? '',
         port: Number(ServerConfig.DB_PORT) || 3306,
-        dialect: 'mysql',
+        dialect: 'postgres',
     },
 );
 export default connection;

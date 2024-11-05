@@ -8,14 +8,14 @@ module.exports = {
         database: ServerConfig.DB_NAME,
         host: ServerConfig.DB_HOST,
         port: ServerConfig.DB_PORT,
-        dialect: 'mysql',
+        dialect: 'postgres',
     },
     test: {
         username: 'root',
         password: null,
         database: 'database_test',
         host: '127.0.0.1',
-        dialect: 'mysql',
+        dialect: 'postgres',
     },
     production: {
         username: ServerConfig.DB_USER,
@@ -23,6 +23,6 @@ module.exports = {
         database: ServerConfig.DB_NAME,
         host: ServerConfig.DB_HOST,
         port: ServerConfig.DB_PORT,
-        dialect: 'mysql',
+        dialect: 'postgres',
     },
 };
