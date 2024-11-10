@@ -31,7 +31,7 @@ class CategoryRepository extends CrudRepository<Category> {
                 {
                     model: Course,
                     as: 'courses',
-                    include: [{ model: User, required: true, as: 'instructor', attributes: ['fistName', 'lastName'] }],
+                    include: [{ model: User, required: true, as: 'instructor', attributes: ['firstName', 'lastName'] }],
                 },
             ],
         });

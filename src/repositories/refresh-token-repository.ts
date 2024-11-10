@@ -13,8 +13,8 @@ class RefreshTokenRepository extends CrudRepository<Refresh_Token> {
         return response;
     }
 
-    public async deleteByToken(token: string) {
-        const refreshToken = await this.getOne({ where: { token: token } });
+    public async deleteByUserId(userId: number) {
+        const refreshToken = await this.getOne({ where: { userId: userId } });
         return await refreshToken!.destroy();
     }
 

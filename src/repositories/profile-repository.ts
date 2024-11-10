@@ -8,15 +8,18 @@ class ProfileRepository extends CrudRepository<Profile> {
     }
 
     public async getWithAssociationsByUserId(id: number): Promise<TProfileWithUserAssociations | null> {
-        const response: TProfileWithUserAssociations | null = await this.getOne({
+        const response = await this.getOne({
             where: { userId: id },
             include: [{ model: User, required: true, as: 'user' }],
         });
-        return response;
+        // Return only the dataValues if the response is not null
+        return response ? response.get({ plain: true }) : null;
     }
 
     public async getByUserId(userId: number): Promise<IProfileAttributes | null> {
-        return await this.getOne({ where: { userId: userId } });
+        const response = await this.getOne({ where: { userId: userId } });
+        // Return only the dataValues if the response is not null
+        return response ? response.get({ plain: true }) : null;
     }
 }
 

@@ -48,7 +48,7 @@ class RatingService {
             const ratingReview = await this.ratingRepository.create({ courseId, studentId, rating, review });
 
             // * return response
-            return ratingReview;
+            return ratingReview.get({ plain: true });
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

@@ -36,7 +36,7 @@ export default {
 
     REFRESH_TOKEN: {
         SECRET: process.env.REFRESH_TOKEN_SECRET,
-        EXPIRY: 15 * 24 * 60 * 60,
+        EXPIRY: 30 * 24 * 60 * 60,
     },
 
     // Nodemailer Service
@@ -60,4 +60,7 @@ export default {
         KEY_ID: process.env.RAZORPAY_KEY_ID,
         KEY_SECRET: process.env.RAZORPAY_SECRET_ID,
     },
+
+    // Defualt DP Setup
+    DEFAULT_DP_API: process.env.DEFAULT_DP_API,
 };

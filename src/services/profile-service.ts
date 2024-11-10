@@ -8,7 +8,7 @@ import { Quicker } from '../utils/helper';
 
 interface IProfileResponse {
     user: TUserWithAssociations;
-    warning?: string;
+    warning?: string | null;
 }
 
 class ProfileService {
@@ -24,19 +24,23 @@ class ProfileService {
         try {
             const userWithAssociations = await this.userRepository.getWithAssociationsById(id);
 
+            if (!userWithAssociations) {
+                throw new AppError(ResponseMessage.NOT_FOUND('User'), StatusCodes.NOT_FOUND);
+            }
+
+            const profileResponse: IProfileResponse = {
+                user: userWithAssociations,
+                warning: null,
+            };
+
             if (
-                !userWithAssociations ||
                 !userWithAssociations.accountConfirmation ||
                 userWithAssociations.accountConfirmation.status === false
             ) {
-                const profileResponse: IProfileResponse = {
-                    user: userWithAssociations!,
-                    warning: ResponseMessage.ACCOUNT_NOT_VERIFIED,
-                };
-                return profileResponse;
+                profileResponse.warning = ResponseMessage.ACCOUNT_NOT_VERIFIED;
             }
 
-            return userWithAssociations;
+            return profileResponse;
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

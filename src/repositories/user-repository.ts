@@ -13,18 +13,20 @@ class UserRepository extends CrudRepository<User> {
 
     public async findByEmail(email: string): Promise<User | null> {
         const response = await User.findOne({ where: { email: email } });
-        return response;
+        return response ? (response?.get({ plain: true }) as User) : null;
     }
 
-    public async findByEmailWithPassword(email: string): Promise<User | null> {
+    public async findByEmailWithPasswordAndRoles(email: string): Promise<User | null> {
         const response = await User.scope('withPassword').findOne({
             where: { email: email },
+            include: [{ model: Role, required: true, as: 'roles' }],
         });
-        return response;
+        // Return only the dataValues if the response is not null
+        return response ? (response.get({ plain: true }) as User) : null;
     }
 
     public async getWithAssociationsById(id: number): Promise<TUserWithAssociations | null> {
-        const response: TUserWithAssociations | null = await this.getOne({
+        const response = await this.getOne({
             where: { id: id },
             include: [
                 { model: Role, required: true, as: 'roles' },
@@ -34,27 +36,43 @@ class UserRepository extends CrudRepository<User> {
                 { model: Profile, as: 'profileDetails' },
             ],
         });
-        return response;
+
+        // Return only the dataValues if the response is not null
+        return response ? (response.get({ plain: true }) as User) : null;
     }
 
-    public async getWithAccountConfirmationAndResetPasswordByEmail(email: string) {
-        const response: TUserWithAccountConfirmationAndResetPassword | null = await this.getOne({
+    public async getWithAccountConfirmationAndResetPasswordByEmail(
+        email: string,
+    ): Promise<TUserWithAccountConfirmationAndResetPassword | null> {
+        const response = await this.getOne({
             where: { email: email },
             include: [
                 { model: Account_Confirmation, as: 'accountConfirmation' },
                 { model: Reset_Password, as: 'resetPassword' },
             ],
         });
-        return response;
+        // Return only the dataValues if the response is not null
+        return response ? (response.get({ plain: true }) as User) : null;
+    }
+
+    public async getUserRolesById(userId: number) {
+        const response = await this.getOne({
+            where: { id: userId },
+            include: [{ model: Role, required: true, as: 'roles' }],
+        });
+
+        // Return only the dataValues if the response is not null
+        return response ? (response.get({ plain: true }) as User) : null;
     }
 
     public async getWithPasswordById(id: number) {
         const response = await User.scope('withPassword').findOne({ where: { id: id } });
-        return response;
+        // Return only the dataValues if the response is not null
+        return response ? (response.get({ plain: true }) as User) : null;
     }
 
-    public async getWithProfileById(id: number) {
-        const response: TUserWithProfileAssociations | null = await this.getOne({
+    public async getWithProfileById(id: number): Promise<TUserWithProfileAssociations | null> {
+        const response = await this.getOne({
             where: { id },
             include: [
                 {
@@ -64,7 +82,8 @@ class UserRepository extends CrudRepository<User> {
                 },
             ],
         });
-        return response;
+        // Return only the dataValues if the response is not null
+        return response ? (response.get({ plain: true }) as User) : null;
     }
 }
 export default UserRepository;

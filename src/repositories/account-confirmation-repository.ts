@@ -7,13 +7,14 @@ class AccountConfirmationRepository extends CrudRepository<Account_Confirmation>
         super(Account_Confirmation);
     }
 
-    public async findWithUser(token: string, code: string) {
-        const response: TAccountConfirmationWithUser | null = await this.getOne({
+    public async findWithUser(token: string, code: string): Promise<TAccountConfirmationWithUser | null> {
+        const response = await this.getOne({
             where: { token: token, code: code },
             include: [{ model: User, required: true, as: 'user' }],
         });
 
-        return response;
+        // Return only the dataValues if the response is not null
+        return response ? response.get({ plain: true }) : null;
     }
 }
 

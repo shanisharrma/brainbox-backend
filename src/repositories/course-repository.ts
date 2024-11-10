@@ -52,12 +52,14 @@ class CourseRepository extends CrudRepository<Course> {
                 { model: Rating, as: 'ratings' },
             ],
         });
-        return courses;
+        // Return only the dataValues if the response is not null
+        return courses ? (courses.get({ plain: true }) as Course) : null;
     }
 
     public async getOneByIdAndInstructor(id: number, instructorId: number) {
         const courses = await this.getOne({ where: { id: id, instructorId: instructorId } });
-        return courses;
+        // Return only the dataValues if the response is not null
+        return courses ? (courses.get({ plain: true }) as Course) : null;
     }
 }
 

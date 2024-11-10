@@ -11,7 +11,8 @@ class ResetPasswordRepository extends CrudRepository<Reset_Password> {
             where: { token: token },
             include: [{ model: User, required: true, as: 'user' }],
         });
-        return response;
+        // Return only the dataValues if the response is not null
+        return response ? response.get({ plain: true }) : null;
     }
 }
 

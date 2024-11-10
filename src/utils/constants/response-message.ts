@@ -9,7 +9,7 @@ export default {
     INVALID_VERIFICATION_CODE_TOKEN: `Invalid verification code or token.`, //400
     ACCOUNT_ALREADY_VERIFIED: `Account already verified.`, //400
     ACCOUNT_NOT_VERIFIED: `"Email not verified. Please verify your email to access all features."`, //403
-    EXPIRED_CONFIRMATION_URL: `Account verification url expired. Please request another.`, //400
+    EXPIRED_CONFIRMATION_URL: `Account verification url expired. Please request another after login.`, //400
     LOGIN_SUCCESS: `Login successful.`, //200
     INVALID_CREDENTIALS: `Invalid credentials.`, //401
     PROFILE_SUCCESS: `Profile retrieved successfully.`, //200

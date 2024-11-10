@@ -24,7 +24,7 @@ class AccountConfirmationService {
                 expiresAt,
             });
 
-            return accountConfirmation;
+            return accountConfirmation.get({ plain: true });
         } catch (error) {
             if (error instanceof AppError) throw error;
 

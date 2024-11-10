@@ -29,6 +29,9 @@ interface IConfirmRequest extends Request {
 interface ILoginRequest extends Request {
     body: ILoginRequestBody;
 }
+interface ILogoutRequest extends Request {
+    id: number;
+}
 
 interface IRequestConfirmationRequest extends Request {
     id: number;
@@ -50,6 +53,10 @@ interface IChangePasswordRequest extends Request {
     id: number;
 }
 
+interface IDecodedJWT {
+    userId: number;
+}
+
 class AuthController {
     private static userService: UserService = new UserService();
 
@@ -60,7 +67,25 @@ class AuthController {
             // call the user register service
             const response = await AuthController.userService.registerUser(body);
 
-            HttpResponse(req, res, StatusCodes.CREATED, ResponseMessage.REGISTRATION_SUCCESS, response);
+            const responseData = {
+                id: response.id,
+                firstName: response.firstName,
+                lastName: response.lastName,
+                email: response.email,
+                consent: response.consent,
+                timezone: response.timezone,
+                createdAt: response.createdAt,
+                profileImage: response.profileDetails?.imageUrl,
+                phoneNumber: response.phoneNumber
+                    ? {
+                          countryCode: response.phoneNumber.countryCode,
+                          internationalNumber: response.phoneNumber.internationalNumber,
+                      }
+                    : null,
+                accountConfirmation: { status: response.accountConfirmation?.status },
+            };
+
+            HttpResponse(req, res, StatusCodes.CREATED, ResponseMessage.REGISTRATION_SUCCESS, responseData);
         } catch (error) {
             HttpError(
                 next,
@@ -104,7 +129,7 @@ class AuthController {
             });
 
             // get domain
-            const DOMAIN = Quicker.getDomainFromUrl(ServerConfig.SERVER_URL as string);
+            const DOMAIN = Quicker.getDomainFromUrl(ServerConfig.FRONTEND_URL as string);
 
             // * destructure access token and refresh token
             const { accessToken, refreshToken } = response;
@@ -126,7 +151,7 @@ class AuthController {
                 secure: !(ServerConfig.ENV === Enums.EApplicationEnvironment.DEVELOPMENT),
             });
 
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.LOGIN_SUCCESS);
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.LOGIN_SUCCESS, { accessToken });
         } catch (error) {
             HttpError(
                 next,
@@ -140,8 +165,8 @@ class AuthController {
     public static async requestConfirmation(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req as IRequestConfirmationRequest;
-            await AuthController.userService.requestConfirmation(id);
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.VERIFICATION_LINK_SENT, StatusCodes.OK);
+            const response = await AuthController.userService.requestConfirmation(id);
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.VERIFICATION_LINK_SENT, response);
         } catch (error) {
             HttpError(
                 next,
@@ -155,16 +180,18 @@ class AuthController {
     public static async logout(req: Request, res: Response, next: NextFunction) {
         try {
             // * get cookies
-            const { cookies } = req;
+            const { id } = req as ILogoutRequest;
 
             // * get refresh token
-            const { refreshToken } = cookies;
+            // const { refreshToken } = cookies;
+
+            // console.log(first)
 
             // * delete refresh token from DB
-            await AuthController.userService.logout(refreshToken);
+            await AuthController.userService.logout(id);
 
             // get domain
-            const DOMAIN = Quicker.getDomainFromUrl(ServerConfig.SERVER_URL as string);
+            const DOMAIN = Quicker.getDomainFromUrl(ServerConfig.FRONTEND_URL as string);
 
             // * clear cookies
             res.clearCookie('accessToken', {
@@ -193,16 +220,17 @@ class AuthController {
 
     public static async refreshToken(req: Request, res: Response, next: NextFunction) {
         try {
-            // * get cookies
-            const { cookies } = req;
-            // * get refresh token
-            const { refreshToken } = cookies;
+            const { headers } = req;
+            const oldAccessToken = headers.authorization!.replace('Bearer ', '');
+
+            // * decode the oldAccessToken
+            const { userId } = Quicker.decodeJWT(oldAccessToken) as IDecodedJWT;
 
             // * generate access token from refresh token
-            const accessToken = await AuthController.userService.refreshToken(refreshToken);
+            const accessToken = await AuthController.userService.refreshToken(userId);
 
             // * generate domain url path
-            const DOMAIN = Quicker.getDomainFromUrl(ServerConfig.SERVER_URL as string);
+            const DOMAIN = Quicker.getDomainFromUrl(ServerConfig.FRONTEND_URL as string);
 
             res.cookie('accessToken', accessToken, {
                 path: '/api/v1',
@@ -213,7 +241,7 @@ class AuthController {
                 secure: !(ServerConfig.ENV === Enums.EApplicationEnvironment.DEVELOPMENT),
             });
 
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.TOKEN_REFRESH_SUCCESS, accessToken);
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.TOKEN_REFRESH_SUCCESS, { accessToken });
         } catch (error) {
             HttpError(
                 next,
@@ -228,8 +256,8 @@ class AuthController {
         try {
             const { body } = req as IForgotRequest;
 
-            const response = await AuthController.userService.forgotPassword(body);
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.FORGOT_PASSWORD_SENT_SUCCESS, response);
+            await AuthController.userService.forgotPassword(body);
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.FORGOT_PASSWORD_SENT_SUCCESS);
         } catch (error) {
             HttpError(
                 next,

@@ -20,7 +20,7 @@ class CategoryService {
             const category = await this.categoryRepository.create({ name, description });
 
             // * return response
-            return category;
+            return category.get({ plain: true });
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

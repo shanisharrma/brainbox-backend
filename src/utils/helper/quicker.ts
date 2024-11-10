@@ -97,6 +97,10 @@ class Quicker {
         });
     }
 
+    public static decodeJWT(token: string) {
+        return jwt.decode(token);
+    }
+
     public static verifyToken(token: string, secret: string) {
         return jwt.verify(token, secret);
     }
@@ -119,6 +123,10 @@ class Quicker {
 
     public static validateValue<T extends string>(value: T, regex: RegExp): boolean {
         return regex.test(value);
+    }
+
+    public static getDefaultDP(firstName: string, lastName: string) {
+        return `${ServerConfig.DEFAULT_DP_API}${firstName} ${lastName}`;
     }
 }
 

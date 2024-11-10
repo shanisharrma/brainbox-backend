@@ -53,14 +53,14 @@ class SubSectionService {
                 description,
                 duration: uploadedVideo.duration,
                 videoUrl: uploadedVideo.secure_url,
-                sectionId: sectionWithCourse.id,
+                sectionId: sectionWithCourse.id!,
             };
 
             // * create subsection record inside db
             const subSection = await this.subSectionRepository.create(subSectionPayload);
 
             // * return subsection response
-            return subSection;
+            return subSection.get({ plain: true });
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

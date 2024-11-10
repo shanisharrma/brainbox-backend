@@ -54,7 +54,7 @@ class CourseProgressService {
             const courseProgress = await this.courseProgressRepository.create({ courseId, studentId, subSectionId });
 
             // * return response
-            return courseProgress;
+            return courseProgress.get({ plain: true });
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

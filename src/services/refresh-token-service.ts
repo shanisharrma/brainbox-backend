@@ -38,9 +38,9 @@ class RefreshTokenService {
         }
     }
 
-    public async deleteByToken(token: string) {
+    public async deleteByUserId(userId: number) {
         try {
-            return this.refreshTokenRepository.deleteByToken(token);
+            return this.refreshTokenRepository.deleteByUserId(userId);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

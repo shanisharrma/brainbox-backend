@@ -18,12 +18,8 @@ class AuthMiddleware {
 
     public static async checkAuth(req: Request, _: Response, next: NextFunction) {
         try {
-            const { cookies } = req as IAuthenticatedRequest;
-            const { accessToken } = cookies;
-
-            if (!accessToken) {
-                throw new AppError(ResponseMessage.AUTHORIZATION_TOKEN_MISSING, StatusCodes.UNAUTHORIZED);
-            }
+            const { headers } = req as IAuthenticatedRequest;
+            const accessToken = headers.authorization!.replace('Bearer ', '');
 
             const response = await AuthMiddleware.userService.isAuthenticated(accessToken);
 

@@ -93,12 +93,13 @@ class UserService {
                 throw new AppError(ResponseMessage.NOT_FOUND('Role'), StatusCodes.NOT_FOUND);
             }
 
+            const defaultImageUrl = Quicker.getDefaultDP(firstName, lastName);
             // * create Profile for user
             const profileDetails = await this.profileService.create({
                 about: null,
                 dateOfBirth: null,
                 gender: null,
-                imageUrl: null,
+                imageUrl: defaultImageUrl,
                 userId: user.id,
             });
 
@@ -137,8 +138,9 @@ class UserService {
             });
 
             // * return the complete user
+            const plainUser = user.get({ plain: true });
             const userDetails: IUserAttributes = {
-                ...user,
+                ...plainUser,
                 accountConfirmation,
                 profileDetails,
                 phoneNumber: newPhoneNumber,
@@ -148,7 +150,7 @@ class UserService {
         } catch (error) {
             if (error instanceof AppError) throw error;
 
-            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR, error);
         }
     }
 
@@ -206,7 +208,7 @@ class UserService {
             const { email, password } = data;
 
             // * check if user exists with this email
-            const user = await this.userRepository.findByEmailWithPassword(email);
+            const user = await this.userRepository.findByEmailWithPasswordAndRoles(email);
             if (!user) {
                 throw new AppError(ResponseMessage.INVALID_CREDENTIALS, StatusCodes.UNAUTHORIZED);
             }
@@ -217,9 +219,11 @@ class UserService {
                 throw new AppError(ResponseMessage.INVALID_CREDENTIALS, StatusCodes.UNAUTHORIZED);
             }
 
+            const roles = user.roles?.map((role) => role.role);
+
             // * create accessToken and refreshToken
             const accessToken = Quicker.generateToken(
-                { userId: user.id },
+                { userId: user.id, roles },
                 ServerConfig.ACCESS_TOKEN.SECRET as string,
                 ServerConfig.ACCESS_TOKEN.EXPIRY,
             );
@@ -360,36 +364,38 @@ class UserService {
 
             // * send new verification link
             await this.mailService.sendEmailByNodeMailer(to, subject, text);
+
+            return accountConfirmationDetails;
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public async logout(token: string) {
+    public async logout(userId: number) {
         try {
             // * check token exists
-            if (!token) {
-                throw new AppError(ResponseMessage.AUTHORIZATION_TOKEN_MISSING, StatusCodes.UNAUTHORIZED);
+            if (!userId) {
+                throw new AppError(ResponseMessage.AUTHORIZATION_REQUIRED, StatusCodes.UNAUTHORIZED);
             }
 
             // * delete token from database
-            await this.refreshTokenService.deleteByToken(token);
+            await this.refreshTokenService.deleteByUserId(userId);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public async refreshToken(token: string) {
+    public async refreshToken(userId: number) {
         try {
             // * check domain exists
-            if (!token) {
+            if (!userId) {
                 throw new AppError(ResponseMessage.NOT_FOUND('Refresh Token'), StatusCodes.NOT_FOUND);
             }
 
             // * find refresh token details with token
-            const rftDetails = await this.refreshTokenService.findByToken(token);
+            const rftDetails = await this.refreshTokenService.findByUserId(userId);
 
             // * check details exists
             if (!rftDetails) {
@@ -399,16 +405,20 @@ class UserService {
             // * check expiry date of refresh token
             const currentTimestamp = Quicker.getCurrentTimeStamp();
             if (rftDetails.expiresAt < currentTimestamp) {
-                await this.refreshTokenService.deleteByToken(token);
+                await this.refreshTokenService.deleteByUserId(userId);
                 throw new AppError(ResponseMessage.SESSION_EXPIRED, StatusCodes.UNAUTHORIZED);
             }
 
-            // * get payload of refresh token
-            const { userId } = rftDetails;
+            // * getting the roles of user by userId
+            const userWithRoles = await this.userRepository.getUserRolesById(userId);
+            if (!userWithRoles) {
+                throw new AppError(ResponseMessage.SESSION_EXPIRED, StatusCodes.UNAUTHORIZED);
+            }
+            const roles = userWithRoles.roles?.map((role) => role.role);
 
             // * generate new access token with payload
             const accessToken = Quicker.generateToken(
-                { userId: userId },
+                { userId: userId, roles },
                 ServerConfig.ACCESS_TOKEN.SECRET as string,
                 ServerConfig.ACCESS_TOKEN.EXPIRY,
             );
@@ -480,7 +490,7 @@ class UserService {
             // * check if url is expired or not
             const currentTimestamp = Quicker.getCurrentTimeStamp();
             if (currentTimestamp > resetPasswordDetails.expiresAt) {
-                await this.resetPasswordService.delete(resetPasswordDetails.id);
+                await this.resetPasswordService.delete(resetPasswordDetails.id!);
                 throw new AppError(ResponseMessage.EXPIRED_RESET_PASSWORD_URL, StatusCodes.BAD_REQUEST);
             }
 
@@ -497,7 +507,7 @@ class UserService {
                 used: true,
                 lastResetAt: Quicker.getCurrentDateAndTime(),
             };
-            await this.resetPasswordService.update(resetPasswordDetails.id, updateResetPassword);
+            await this.resetPasswordService.update(resetPasswordDetails.id!, updateResetPassword);
 
             // * prepare email body
             const to = resetPasswordDetails.user!.email;

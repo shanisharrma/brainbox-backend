@@ -7,7 +7,12 @@ class SectionRepository extends CrudRepository<Section> {
     }
 
     public async getOneWithCourseById(id: number) {
-        return await this.getOne({ where: { id: id }, include: [{ model: Course, required: true, as: 'course' }] });
+        const response = await this.getOne({
+            where: { id: id },
+            include: [{ model: Course, required: true, as: 'course' }],
+        });
+        // Return only the dataValues if the response is not null
+        return response ? response.get({ plain: true }) : null;
     }
 }
 

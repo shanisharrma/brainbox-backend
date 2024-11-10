@@ -7,7 +7,7 @@ class SubSectionRepository extends CrudRepository<Sub_Section> {
     }
 
     public async getWithSectionWithCourseByIdAndSectionId(id: number, sectionId: number) {
-        return await this.getOne({
+        const response = await this.getOne({
             where: { id: id, sectionId: sectionId },
             include: [
                 {
@@ -18,6 +18,9 @@ class SubSectionRepository extends CrudRepository<Sub_Section> {
                 },
             ],
         });
+
+        // Return only the dataValues if the response is not null
+        return response ? (response.get({ plain: true }) as Sub_Section) : null;
     }
 }
 

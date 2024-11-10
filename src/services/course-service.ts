@@ -57,7 +57,7 @@ class CourseService {
             course.addCategories(categoriesDetail);
 
             // * return course
-            return course;
+            return course.get({ plain: true });
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

@@ -32,7 +32,7 @@ class SectionService {
             const section = await this.sectionRepository.create({ name, courseId: course.id });
 
             // * return section
-            return section;
+            return section.get({ plain: true });
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
