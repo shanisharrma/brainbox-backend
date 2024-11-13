@@ -1,7 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import { RoleRepository, UserRepository } from '../repositories';
 import {
-    IAccountConfirmationAttributes,
     IChangePasswordRequestBody,
     IForgotRequestBody,
     ILoginRequestBody,
@@ -22,6 +21,7 @@ import RefreshTokenService from './refresh-token-service';
 import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import ResetPasswordService from './reset-password-service';
 import ProfileService from './profile-service';
+import { ParseError } from 'libphonenumber-js';
 
 interface IDecryptedJWT {
     userId: number;
@@ -54,7 +54,7 @@ class UserService {
             const { consent, email, firstName, lastName, password, phoneNumber, role } = data;
 
             // * Parsing the phone number
-            const { countryCode, internationalNumber, isoCode } = Quicker.parsePhoneNumber('+' + phoneNumber);
+            const { countryCode, internationalNumber, isoCode } = Quicker.parsePhoneNumber(phoneNumber);
 
             // ----> check if any key is empty
             if (!countryCode || !isoCode || !internationalNumber) {
@@ -95,7 +95,7 @@ class UserService {
 
             const defaultImageUrl = Quicker.getDefaultDP(firstName, lastName);
             // * create Profile for user
-            const profileDetails = await this.profileService.create({
+            await this.profileService.create({
                 about: null,
                 dateOfBirth: null,
                 gender: null,
@@ -104,7 +104,7 @@ class UserService {
             });
 
             // * create Phone number entry
-            const newPhoneNumber = await this.phoneNumberService.create({
+            await this.phoneNumberService.create({
                 isoCode,
                 internationalNumber,
                 countryCode,
@@ -142,13 +142,14 @@ class UserService {
             const userDetails: IUserAttributes = {
                 ...plainUser,
                 accountConfirmation,
-                profileDetails,
-                phoneNumber: newPhoneNumber,
             };
 
             return userDetails;
         } catch (error) {
             if (error instanceof AppError) throw error;
+            if (error instanceof ParseError) {
+                throw new AppError(error.message, StatusCodes.UNPROCESSABLE_ENTITY);
+            }
 
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR, error);
         }
@@ -183,6 +184,10 @@ class UserService {
                 verifiedAt,
             });
 
+            if (!accountVerified) {
+                throw new AppError(ResponseMessage.ACCOUNT_CANNOT_VERIFIED, StatusCodes.BAD_REQUEST);
+            }
+
             // * create email body
             const to = accountConfirmationDetails.user.email;
             const subject = `Account Verified Successfully`;
@@ -194,8 +199,6 @@ class UserService {
                     meta: error,
                 });
             });
-
-            return accountVerified;
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -325,47 +328,47 @@ class UserService {
         }
     }
 
-    public async requestConfirmation(id: number) {
+    public async requestConfirmation(userId: number) {
         try {
             // * get the user using the received id
-            const userWithAssociations = await this.userRepository.getWithAssociationsById(id);
+            const userWithAssociations = await this.userRepository.getWithAssociationsById(userId);
 
             // * check uer exists
-            if (!userWithAssociations) {
+            if (!userWithAssociations || !userWithAssociations.accountConfirmation) {
                 throw new AppError(ResponseMessage.AUTHORIZATION_REQUIRED, StatusCodes.UNAUTHORIZED);
             }
 
-            // * check account verified
-            if (
-                userWithAssociations &&
-                userWithAssociations.accountConfirmation &&
-                userWithAssociations.accountConfirmation.status === true
-            ) {
+            // * get the accountConfirmation details by userId
+            const accountConfirmationDetails = await this.accountConfirmationService.getOneById(
+                userWithAssociations.accountConfirmation.id!,
+            );
+
+            if (!accountConfirmationDetails) {
+                throw new AppError(ResponseMessage.AUTHORIZATION_REQUIRED, StatusCodes.UNAUTHORIZED);
+            }
+
+            if (accountConfirmationDetails.status) {
                 throw new AppError(ResponseMessage.ACCOUNT_ALREADY_VERIFIED, StatusCodes.BAD_REQUEST);
             }
 
-            // * prepare payload
-            const accountConfirmationPayload: IAccountConfirmationAttributes = {
-                code: Quicker.generateRandomOTP(6),
-                token: Quicker.generateRandomTokenId(),
-                expiresAt: Quicker.generateAccountConfirmationExpiry(10),
-                status: false,
-                userId: userWithAssociations.id!,
-            };
+            const code = Quicker.generateRandomOTP(6);
+            const token = Quicker.generateRandomTokenId();
+            const expiresAt = Quicker.generateAccountConfirmationExpiry(10);
 
-            // * create new account confirmation in db
-            const accountConfirmationDetails = await this.accountConfirmationService.create(accountConfirmationPayload);
+            const updatedAccountConfirmationDetails = await accountConfirmationDetails.update({
+                code,
+                token,
+                expiresAt,
+            });
 
             // * prepare email payload
-            const confirmationUrl = `${ServerConfig.FRONTEND_URL}/${accountConfirmationDetails.token}`;
+            const confirmationUrl = `${ServerConfig.FRONTEND_URL}/${updatedAccountConfirmationDetails.token}`;
             const to = userWithAssociations.email;
             const subject = `Account Verification`;
-            const text = `Hey ${userWithAssociations.firstName + ' ' + userWithAssociations.lastName}, Please click the below link and enter the below one time password to verify you email for the account creation at BrainBox.\n\n${accountConfirmationDetails.code}\n\nThe confirmation email valid for 10 minutes only.\n\n\n${confirmationUrl}`;
+            const text = `Hey ${userWithAssociations.firstName + ' ' + userWithAssociations.lastName}, Please click the below link and enter the below one time password to verify you email for the account creation at BrainBox.\n\n${updatedAccountConfirmationDetails.code}\n\nThe confirmation email valid for 10 minutes only.\n\n\n${confirmationUrl}`;
 
             // * send new verification link
             await this.mailService.sendEmailByNodeMailer(to, subject, text);
-
-            return accountConfirmationDetails;
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
@@ -481,6 +484,10 @@ class UserService {
                 throw new AppError(ResponseMessage.NOT_FOUND('User'), StatusCodes.NOT_FOUND);
             }
 
+            if (resetPasswordDetails.used) {
+                throw new AppError(ResponseMessage.RESET_PASSWORD_URL_USED, StatusCodes.BAD_REQUEST);
+            }
+
             // * check if user is already verified
             const accountConfirmation = await this.accountConfirmationService.getByUserId(resetPasswordDetails.userId);
             if (accountConfirmation && accountConfirmation.status === false) {
@@ -503,7 +510,6 @@ class UserService {
             // * update the reset password record
             const updateResetPassword: Partial<IResetPasswordAttributes> = {
                 expiresAt: 0,
-                token: '',
                 used: true,
                 lastResetAt: Quicker.getCurrentDateAndTime(),
             };

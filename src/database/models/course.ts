@@ -12,6 +12,7 @@ import connection from '../sequelize';
 import {
     ICategoryAttributes,
     ICourseAttributes,
+    ICourseProgressAttributes,
     IRatingAttributes,
     ISectionAttributes,
     IUserAttributes,
@@ -39,6 +40,8 @@ class Course extends Model<ICourseAttributes, TCourseCreationAttributes> impleme
     public categories?: ICategoryAttributes[] | undefined;
     public ratings?: IRatingAttributes[] | undefined;
     public sections?: ISectionAttributes[] | undefined;
+    public instructor?: IUserAttributes | undefined;
+    public progressRecords?: ICourseProgressAttributes[] | undefined;
 
     // hooks
     declare hasCategory: BelongsToManyHasAssociationMixin<Category, Category['id']>;

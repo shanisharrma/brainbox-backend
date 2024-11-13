@@ -2,7 +2,7 @@
 
 import { DataTypes, Model, Optional } from 'sequelize';
 import connection from '../sequelize';
-import { IAccountConfirmationAttributes } from '../../types';
+import { IAccountConfirmationAttributes, IUserAttributes } from '../../types';
 
 type TAccountConfirmationCreationAttributes = Optional<IAccountConfirmationAttributes, 'id'>;
 
@@ -19,6 +19,8 @@ class Account_Confirmation
     public verifiedAt!: Date;
     public readonly createdAt?: Date | undefined;
     public readonly updatedAt?: Date | undefined;
+
+    public user?: IUserAttributes | undefined;
 }
 Account_Confirmation.init(
     {

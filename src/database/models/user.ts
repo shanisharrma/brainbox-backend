@@ -8,7 +8,18 @@ import {
     Optional,
 } from 'sequelize';
 import connection from '../sequelize';
-import { IRoleAttributes, IUserAttributes } from '../../types';
+import {
+    IAccountConfirmationAttributes,
+    ICourseAttributes,
+    ICourseProgressAttributes,
+    IPhoneNumberAttributes,
+    IProfileAttributes,
+    IRatingAttributes,
+    IRefreshTokenAttributes,
+    IResetPasswordAttributes,
+    IRoleAttributes,
+    IUserAttributes,
+} from '../../types';
 import { Quicker } from '../../utils/helper';
 import Role from './role';
 import { BelongsToManyGetAssociationsMixin } from 'sequelize';
@@ -30,6 +41,15 @@ class User extends Model<IUserAttributes, TUserCreationAttributes> implements IU
 
     // Associations
     public roles?: IRoleAttributes[] | undefined;
+    public profileDetails?: IProfileAttributes | undefined;
+    public phoneNumber?: IPhoneNumberAttributes | undefined;
+    public accountConfirmation?: IAccountConfirmationAttributes | undefined;
+    public refreshToken?: IRefreshTokenAttributes | undefined;
+    public resetPassword?: IResetPasswordAttributes | undefined;
+    public ratings?: IRatingAttributes | undefined;
+    public enrolledCourses?: ICourseAttributes | undefined;
+    public taughtCourses?: ICourseAttributes[] | undefined;
+    public progressRecords?: ICourseProgressAttributes[] | undefined;
 
     //
     declare addRole: BelongsToManyAddAssociationMixin<Role, Role['id']>;

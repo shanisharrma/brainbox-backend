@@ -45,7 +45,7 @@ router
 router.route('/login').post(ValidationMiddleware.validateRequest(schema.loginSchema), AuthController.login);
 
 // Request Email Verification : POST /api/v1/account-confirmation
-router.route('/account-confirmation').post(AuthMiddleware.checkAuth, AuthController.requestConfirmation);
+router.route('/account-confirmation').put(AuthMiddleware.checkAuth, AuthController.requestConfirmation);
 
 // Logout : POST /api/v1/logout
 router.route('/logout').post(AuthMiddleware.checkAuth, AuthController.logout);

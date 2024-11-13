@@ -19,7 +19,10 @@ class AuthMiddleware {
     public static async checkAuth(req: Request, _: Response, next: NextFunction) {
         try {
             const { headers } = req as IAuthenticatedRequest;
-            const accessToken = headers.authorization!.replace('Bearer ', '');
+            if (!headers.authorization) {
+                throw new AppError(ResponseMessage.INVALID_AUTHORIZATION_TOKEN, StatusCodes.UNAUTHORIZED);
+            }
+            const accessToken = headers.authorization.replace('Bearer ', '');
 
             const response = await AuthMiddleware.userService.isAuthenticated(accessToken);
 

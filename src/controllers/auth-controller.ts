@@ -69,20 +69,10 @@ class AuthController {
 
             const responseData = {
                 id: response.id,
-                firstName: response.firstName,
-                lastName: response.lastName,
-                email: response.email,
-                consent: response.consent,
-                timezone: response.timezone,
-                createdAt: response.createdAt,
-                profileImage: response.profileDetails?.imageUrl,
-                phoneNumber: response.phoneNumber
-                    ? {
-                          countryCode: response.phoneNumber.countryCode,
-                          internationalNumber: response.phoneNumber.internationalNumber,
-                      }
-                    : null,
-                accountConfirmation: { status: response.accountConfirmation?.status },
+                accountConfirmation: {
+                    token: response.accountConfirmation?.token,
+                    status: response.accountConfirmation?.status,
+                },
             };
 
             HttpResponse(req, res, StatusCodes.CREATED, ResponseMessage.REGISTRATION_SUCCESS, responseData);
@@ -102,12 +92,12 @@ class AuthController {
             const { token } = params;
             const { code } = body;
 
-            const response = await AuthController.userService.confirmation({
+            await AuthController.userService.confirmation({
                 token,
                 code,
             });
 
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.ACCOUNT_VERIFIED, response);
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.ACCOUNT_VERIFIED);
         } catch (error) {
             HttpError(
                 next,
@@ -181,11 +171,6 @@ class AuthController {
         try {
             // * get cookies
             const { id } = req as ILogoutRequest;
-
-            // * get refresh token
-            // const { refreshToken } = cookies;
-
-            // console.log(first)
 
             // * delete refresh token from DB
             await AuthController.userService.logout(id);

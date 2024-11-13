@@ -30,7 +30,9 @@ class CategoryService {
     public async getAll() {
         try {
             // * get all the categories
-            return await this.categoryRepository.getAll();
+            const categories = await this.categoryRepository.getAll();
+
+            return categories.map((category) => ({ name: category.name, description: category.description }));
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

@@ -100,6 +100,12 @@ export const changePasswordSchema = Joi.object<IChangePasswordRequestBody, true>
 });
 
 export const updateProfileSchema: ObjectSchema = Joi.object<Partial<IProfileRequestBody>, true>({
+    firstName: Joi.string().trim().optional().messages({
+        'string.empty': 'First Name cannot be empty.',
+    }),
+    lastName: Joi.string().trim().optional().messages({
+        'string.empty': 'Last Name cannot be empty.',
+    }),
     about: Joi.string().trim().optional().messages({
         'string.empty': 'About cannot be empty.',
     }),
@@ -108,5 +114,8 @@ export const updateProfileSchema: ObjectSchema = Joi.object<Partial<IProfileRequ
     }),
     gender: Joi.string().trim().optional().messages({
         'string.empty': 'Gender cannot be empty.',
+    }),
+    phoneNumber: Joi.string().min(4).max(20).trim().optional().messages({
+        'string.empty': 'Contact Number cannot be empty.',
     }),
 }).required();

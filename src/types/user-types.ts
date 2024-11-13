@@ -1,3 +1,4 @@
+import { ICourseAttributes, ICourseProgressAttributes } from './course-types';
 import { IRatingAttributes } from './rating-types';
 import { TWithAssociations } from './types';
 
@@ -20,6 +21,9 @@ export interface IUserAttributes {
     refreshToken?: IRefreshTokenAttributes;
     resetPassword?: IResetPasswordAttributes;
     ratings?: IRatingAttributes;
+    enrolledCourses?: ICourseAttributes;
+    taughtCourses?: ICourseAttributes[];
+    progressRecords?: ICourseProgressAttributes[];
 }
 
 export interface IRoleAttributes {
@@ -98,7 +102,7 @@ export interface IProfileAttributes {
     gender: string | null;
     dateOfBirth: string | null;
     about: string | null;
-    imageUrl: string | null;
+    imageUrl: string;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
@@ -140,13 +144,19 @@ export interface IChangePasswordRequestBody {
 }
 
 export interface IProfileRequestBody {
+    firstName: string;
+    lastName: string;
     about: string;
     dateOfBirth: string;
     gender: string;
+    phoneNumber: string;
 }
 
 export interface IProfileUpdateParams extends IProfileAttributes {
     file: Express.Multer.File | undefined;
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
 }
 
 export type TAccountConfirmationWithUser = TWithAssociations<IAccountConfirmationAttributes, { user: IUserAttributes }>;

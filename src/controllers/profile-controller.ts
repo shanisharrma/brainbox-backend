@@ -37,13 +37,16 @@ class ProfileController {
             const { body, file, id } = req as IProfileRequest;
 
             // * destructure the body
-            const { about, dateOfBirth, gender } = body;
+            const { about, dateOfBirth, gender, firstName, lastName, phoneNumber } = body;
 
             // * update profile data params
             const updateProfile: Partial<IProfileUpdateParams> = {
                 about,
                 dateOfBirth,
                 gender,
+                firstName,
+                lastName,
+                phoneNumber,
                 file: undefined,
             };
 
@@ -59,7 +62,7 @@ class ProfileController {
 
             const response = await ProfileController.profileService.update(id, updateProfile);
 
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.PROFILE_SUCCESS, response);
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.UPDATED('Profile details'), response);
         } catch (error) {
             HttpError(
                 next,

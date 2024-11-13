@@ -2,7 +2,7 @@
 
 import { DataTypes, Model, Optional } from 'sequelize';
 import connection from '../sequelize';
-import { ICourseAttributes, IRatingAttributes } from '../../types';
+import { ICourseAttributes, IRatingAttributes, IUserAttributes } from '../../types';
 
 type TRatingCreationAttributes = Optional<IRatingAttributes, 'id'>;
 
@@ -16,6 +16,7 @@ class Rating extends Model<IRatingAttributes, TRatingCreationAttributes> impleme
     public readonly updatedAt?: Date | undefined;
 
     public course?: ICourseAttributes | undefined;
+    public student?: IUserAttributes | undefined;
 
     // Declare averageRating as an optional property
     public averageRating?: number | null;

@@ -17,6 +17,8 @@ export interface ICourseAttributes {
     categories?: ICategoryAttributes[];
     ratings?: IRatingAttributes[];
     sections?: ISectionAttributes[];
+    instructor?: IUserAttributes;
+    progressRecords?: ICourseProgressAttributes[];
 }
 
 export interface IEnrollmentAttributes {

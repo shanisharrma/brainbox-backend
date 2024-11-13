@@ -1,9 +1,5 @@
 import { Account_Confirmation, Phone_Number, Profile, Reset_Password, Role, User } from '../database/models';
-import {
-    TUserWithAccountConfirmationAndResetPassword,
-    TUserWithAssociations,
-    TUserWithProfileAssociations,
-} from '../types';
+import { TUserWithAccountConfirmationAndResetPassword, TUserWithAssociations } from '../types';
 import CrudRepository from './crud-repository';
 
 class UserRepository extends CrudRepository<User> {
@@ -32,7 +28,7 @@ class UserRepository extends CrudRepository<User> {
                 { model: Role, required: true, as: 'roles' },
                 { model: Profile, required: true, as: 'profileDetails' },
                 { model: Phone_Number, required: true, as: 'phoneNumber' },
-                { model: Account_Confirmation, as: 'accountConfirmation' },
+                { model: Account_Confirmation, required: true, as: 'accountConfirmation' },
                 { model: Profile, as: 'profileDetails' },
             ],
         });
@@ -71,7 +67,7 @@ class UserRepository extends CrudRepository<User> {
         return response ? (response.get({ plain: true }) as User) : null;
     }
 
-    public async getWithProfileById(id: number): Promise<TUserWithProfileAssociations | null> {
+    public async getWithProfileAndPhoneById(id: number) {
         const response = await this.getOne({
             where: { id },
             include: [
@@ -79,6 +75,11 @@ class UserRepository extends CrudRepository<User> {
                     model: Profile,
                     required: true,
                     as: 'profileDetails',
+                },
+                {
+                    model: Phone_Number,
+                    required: true,
+                    as: 'phoneNumber',
                 },
             ],
         });

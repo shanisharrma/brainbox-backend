@@ -6,9 +6,10 @@ export default {
     INVALID_PHONE_NUMBER: `Invalid phone number.`, //422
     EMAIL_ALREADY_IN_USE: `Email already in use.`, //400
     ACCOUNT_VERIFIED: `Account successfully verified.`, //200
+    ACCOUNT_CANNOT_VERIFIED: `Account can't be verified.`, //400
     INVALID_VERIFICATION_CODE_TOKEN: `Invalid verification code or token.`, //400
     ACCOUNT_ALREADY_VERIFIED: `Account already verified.`, //400
-    ACCOUNT_NOT_VERIFIED: `"Email not verified. Please verify your email to access all features."`, //403
+    ACCOUNT_NOT_VERIFIED: `Email not verified. Please verify your email to access all features.`, //403
     EXPIRED_CONFIRMATION_URL: `Account verification url expired. Please request another after login.`, //400
     LOGIN_SUCCESS: `Login successful.`, //200
     INVALID_CREDENTIALS: `Invalid credentials.`, //401
