@@ -44,12 +44,19 @@ class AuthMiddleware {
 
     public static async checkRole(req: Request, next: NextFunction, userRole: string) {
         try {
-            const { cookies } = req as IAuthenticatedRequest;
-            const { accessToken } = cookies;
+            // const { cookies } = req as IAuthenticatedRequest;
+            // const { accessToken } = cookies;
 
-            if (!accessToken) {
-                throw new AppError(ResponseMessage.AUTHORIZATION_TOKEN_MISSING, StatusCodes.UNAUTHORIZED);
+            // if (!accessToken) {
+            //     throw new AppError(ResponseMessage.AUTHORIZATION_TOKEN_MISSING, StatusCodes.UNAUTHORIZED);
+            // }
+
+            const { headers } = req as IAuthenticatedRequest;
+            if (!headers.authorization) {
+                throw new AppError(ResponseMessage.INVALID_AUTHORIZATION_TOKEN, StatusCodes.UNAUTHORIZED);
             }
+
+            const accessToken = headers.authorization.replace('Bearer ', '');
 
             const userId = await AuthMiddleware.userService.isAuthorized(accessToken, userRole);
 
