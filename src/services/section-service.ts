@@ -3,15 +3,16 @@ import { SectionRepository } from '../repositories';
 import { ISectionRequestBody } from '../types';
 import { ResponseMessage } from '../utils/constants';
 import { AppError } from '../utils/error';
-import CourseService from './course-service';
+import ServiceFactory from './service-factory';
+import { ICourseService } from './interfaces';
 
 class SectionService {
     private sectionRepository: SectionRepository;
-    private courseService: CourseService;
+    private courseService: ICourseService;
 
     constructor() {
         this.sectionRepository = new SectionRepository();
-        this.courseService = new CourseService();
+        this.courseService = ServiceFactory.getInstance().getCourseService();
     }
 
     public async create(courseId: number, instructorId: number, data: ISectionRequestBody) {

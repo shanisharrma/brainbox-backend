@@ -19,6 +19,6 @@ router
 router.route('/categories').get(CategoryController.showAll);
 
 // Get All courses of category: GET /api/v1/categories/:categoryId
-router.route('/categories/:categoryName').get(CategoryController.showAllCourses);
+router.route('/categories/:category').get(CategoryController.showAllCourses);
 
 export default router;

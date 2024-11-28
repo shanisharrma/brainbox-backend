@@ -157,7 +157,7 @@ class SubSectionService {
             }
 
             // * destroy the subsection
-            await subSectionWithSectionWithCourse.destroy();
+            await this.subSectionRepository.destroyById(subSectionId);
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

@@ -38,6 +38,7 @@ export default {
     USER_ALREADY_CREATED: `User already exists.`, //400
     PROFILE_ALREADY_CREATED: `User profile already created.`, //400
     NOT_ENROLLED: `User not enrolled to the course.`, //401
+    INVALID_FORMAT: `Invalid data format.`, //422
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
     CREATED: (entity: string) => `${entity} created successfully.`, //201
@@ -45,4 +46,5 @@ export default {
     DELETED: (entity: string) => `${entity} deleted successfully.`, //200
     ENTITY_REQUIRED: (entity: string) => `${entity} is required.`, //200
     UPLOAD_FAILED: (entity: string) => `Failed to upload ${entity} file. Please try again.`, //500
+    QUERY_PARAMS_REQUIRED: (entity: string) => `Query parameter "${entity}" is required.`, //400
 };

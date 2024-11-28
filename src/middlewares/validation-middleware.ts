@@ -22,6 +22,20 @@ class ValidationMiddleware {
             next();
         };
     }
+
+    public static processRequestBody() {
+        return (req: Request, _: Response, next: NextFunction) => {
+            try {
+                if (typeof req.body.tags === 'string') {
+                    req.body.tags = JSON.parse(req.body.tags);
+                }
+                next();
+            } catch (error) {
+                HttpError(next, error, req, StatusCodes.UNPROCESSABLE_ENTITY);
+                return;
+            }
+        };
+    }
 }
 
 export default ValidationMiddleware;

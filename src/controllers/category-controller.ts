@@ -4,15 +4,16 @@ import { AppError } from '../utils/error';
 import { StatusCodes } from 'http-status-codes';
 import { ResponseMessage } from '../utils/constants';
 import { ICategoryRequestBody } from '../types';
-import { CategoryService } from '../services';
+import { ServiceFactory } from '../services';
+import { Quicker } from '../utils/helper';
 
 interface ICategoryRequest extends Request {
     body: ICategoryRequestBody;
-    params: { categoryName: string };
+    params: { category: string };
 }
 
 class CategoryController {
-    private static categoryService: CategoryService = new CategoryService();
+    private static categoryService = ServiceFactory.getInstance().getCategoryService();
 
     public static async create(req: Request, res: Response, next: NextFunction) {
         try {
@@ -36,7 +37,13 @@ class CategoryController {
     public static async showAll(req: Request, res: Response, next: NextFunction) {
         try {
             const categories = await CategoryController.categoryService.getAll();
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.CATEGORY_SUCCESS, categories);
+
+            const categoriesResponse = categories.map((category) => ({
+                name: category.name,
+                description: category.description,
+            }));
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.CATEGORY_SUCCESS, categoriesResponse);
         } catch (error) {
             HttpError(
                 next,
@@ -51,11 +58,13 @@ class CategoryController {
         try {
             const { params } = req as ICategoryRequest;
 
-            const { categoryName } = params;
+            const { category } = params;
 
-            const allCourses = await CategoryController.categoryService.showAllCourses(categoryName);
+            const categoryName = Quicker.capitalizeWord(category);
 
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.CATEGORY_SUCCESS, allCourses);
+            const response = await CategoryController.categoryService.showAllCourses(categoryName);
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.CATEGORY_SUCCESS, response);
         } catch (error) {
             HttpError(
                 next,

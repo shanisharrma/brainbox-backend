@@ -1,5 +1,5 @@
-import { ICategoryAttributes } from './category-types';
 import { IRatingAttributes } from './rating-types';
+import { ITagsAttributes } from './tags-types';
 import { IUserAttributes } from './user-types';
 
 export interface ICourseAttributes {
@@ -9,16 +9,20 @@ export interface ICourseAttributes {
     whatYouWillLearn: string;
     price: number;
     thumbnail: string;
+    requirements: string;
     instructorId: number;
+    categoryId: number;
+    status: string;
+    sales: number;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;
     students?: IUserAttributes[];
-    categories?: ICategoryAttributes[];
     ratings?: IRatingAttributes[];
     sections?: ISectionAttributes[];
     instructor?: IUserAttributes;
     progressRecords?: ICourseProgressAttributes[];
+    courseTags?: ITagsAttributes[];
 }
 
 export interface IEnrollmentAttributes {
@@ -69,7 +73,10 @@ export interface ICourseRequestBody {
     description: string;
     whatYouWillLearn: string;
     price: number;
-    categories: string[];
+    category: string;
+    tags: string[];
+    requirements: string;
+    status: string;
 }
 
 export interface ISectionRequestBody {
@@ -87,4 +94,6 @@ export interface ISubSectionUpdateParams extends ISubSectionAttributes {
 
 export interface ICourseUpdateParams extends ICourseAttributes {
     file: Express.Multer.File | undefined;
+    tags: string[];
+    category: string;
 }

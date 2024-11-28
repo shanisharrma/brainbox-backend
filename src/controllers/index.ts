@@ -8,6 +8,7 @@ import SubSectionController from './sub-section-controller';
 import PaymentController from './payment-controller';
 import RatingController from './rating-controller';
 import CourseProgressController from './course-progress-controller';
+import TagController from './tag-controller';
 
 export {
     ApiController,
@@ -20,4 +21,5 @@ export {
     PaymentController,
     RatingController,
     CourseProgressController,
+    TagController,
 };

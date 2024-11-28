@@ -42,7 +42,7 @@ class AuthMiddleware {
         }
     }
 
-    public static async checkRole(req: Request, next: NextFunction, userRole: string) {
+    private static async checkRole(req: Request, next: NextFunction, userRole: string) {
         try {
             // const { cookies } = req as IAuthenticatedRequest;
             // const { accessToken } = cookies;

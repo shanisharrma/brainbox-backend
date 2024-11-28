@@ -22,6 +22,7 @@ router
         AuthMiddleware.checkAuth,
         AuthMiddleware.isInstructor,
         upload.single('thumbnail'),
+        ValidationMiddleware.processRequestBody(),
         ValidationMiddleware.validateRequest(schemas.courseSchema),
         CourseController.create,
     );
@@ -39,8 +40,13 @@ router
     .route('/courses/taught')
     .get(AuthMiddleware.checkAuth, AuthMiddleware.isInstructor, CourseController.taughtCourses);
 
+// Single Course for Instructor: GET /api/v1/courses/:courseID
+router
+    .route('/courses/:courseId/edit')
+    .get(AuthMiddleware.checkAuth, AuthMiddleware.isInstructor, CourseController.showEditable);
+
 // Single Course : GET /api/v1/courses/:courseID
-router.route('/courses/:courseId').get(CourseController.show);
+router.route('/courses/:courseId').get(CourseController.showPublic);
 
 // Edit Course : PUT /api/v1/courses/:courseId
 router
@@ -49,6 +55,7 @@ router
         AuthMiddleware.checkAuth,
         AuthMiddleware.isInstructor,
         upload.single('thumbnail'),
+        ValidationMiddleware.processRequestBody(),
         ValidationMiddleware.validateRequest(schemas.updateCourseSchema),
         CourseController.update,
     );

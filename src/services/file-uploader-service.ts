@@ -1,7 +1,7 @@
 import { cloudinary } from '../config';
 import { AppError } from '../utils/error';
 import { StatusCodes } from 'http-status-codes';
-import { UploadApiResponse } from 'cloudinary';
+import { DeleteApiResponse, UploadApiResponse } from 'cloudinary';
 
 interface IUploadOptions {
     folder?: string;
@@ -81,6 +81,48 @@ class FileUploaderService {
 
         // If all validations pass, return the file object
         return file;
+    }
+
+    /**
+     * Delete a single asset from Cloudinary.
+     * @param publicId The public ID of the asset in Cloudinary.
+     */
+    private static async deleteFromCloudinary(publicId: string): Promise<DeleteApiResponse> {
+        return new Promise((resolve, reject) => {
+            cloudinary.uploader.destroy(publicId, (error, result) => {
+                if (error) {
+                    return reject(
+                        new AppError('Failed to delete file from cloudinary.', StatusCodes.INTERNAL_SERVER_ERROR),
+                    );
+                }
+                resolve(result);
+            });
+        });
+    }
+
+    /**
+     * Delete a single file from Cloudinary.
+     * @param publicId The public ID of the asset in Cloudinary.
+     * */
+    public static async deleteFile(publicId: string): Promise<DeleteApiResponse> {
+        return this.deleteFromCloudinary(publicId);
+    }
+
+    /**
+     * Delete multiple assets from Cloudinary.
+     * @param publicIds Array of public IDs of the assets to be deleted.
+     */
+    private static async deleteMultipleFiles(publicIds: string[]): Promise<DeleteApiResponse[]> {
+        const deleteParams = publicIds.map((publicId) => this.deleteFromCloudinary(publicId));
+        return Promise.all(deleteParams);
+    }
+
+    public static async deleteRelatedFiles(publicIds: string[]): Promise<void> {
+        try {
+            await this.deleteMultipleFiles(publicIds);
+        } catch {
+            throw new AppError('Failed to delete related files.', StatusCodes.INTERNAL_SERVER_ERROR);
+        }
     }
 }
 export default FileUploaderService;

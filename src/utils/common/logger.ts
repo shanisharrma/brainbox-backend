@@ -28,7 +28,7 @@ const consoleLogFormat = format.printf((info) => {
     const { level, message, timestamp, meta = {} } = info;
 
     const customLevel = colorizeLevel(level.toUpperCase());
-    const customTimestamp = green(timestamp);
+    const customTimestamp = green(String(timestamp));
     const customMessage = message;
     const customMeta = util.inspect(meta, {
         showHidden: false,
@@ -53,15 +53,17 @@ const consoleTransport = (): Array<ConsoleTransportInstance> => {
 const fileLogFormat = format.printf((info) => {
     const { level, message, timestamp, meta = {} } = info;
     const logMeta: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(meta)) {
-        if (value instanceof Error) {
-            logMeta[key] = {
-                name: value.name,
-                message: value.message,
-                trace: value.stack || '',
-            };
-        } else {
-            logMeta[key] = value;
+    if (typeof meta === 'object' && meta !== null) {
+        for (const [key, value] of Object.entries(meta)) {
+            if (value instanceof Error) {
+                logMeta[key] = {
+                    name: value.name,
+                    message: value.message,
+                    trace: value.stack || '',
+                };
+            } else {
+                logMeta[key] = value;
+            }
         }
     }
     const logData = {

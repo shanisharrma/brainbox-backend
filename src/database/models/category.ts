@@ -13,7 +13,7 @@ class Category extends Model<ICategoryAttributes, TCategoryCreationAttributes> i
     public readonly createdAt?: Date | undefined;
     public readonly updatedAt?: Date | undefined;
 
-    public courses?: ICourseAttributes[] | undefined;
+    public categoryCourses?: ICourseAttributes[] | undefined;
 }
 Category.init(
     {

@@ -5,6 +5,7 @@ import profileRoutes from './profile-routes';
 import categoryRoutes from './category-routes';
 import courseRoutes from './course-routes';
 import paymentRoutes from './payment-routes';
+import tagRoutes from './tag-routes';
 
 const router = express.Router();
 
@@ -48,5 +49,8 @@ router.use(courseRoutes);
 
 // Payment Routes
 router.use(paymentRoutes);
+
+// Tag Routes
+router.use(tagRoutes);
 
 export default router;

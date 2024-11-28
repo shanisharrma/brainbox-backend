@@ -10,18 +10,18 @@ import {
 } from 'sequelize';
 import connection from '../sequelize';
 import {
-    ICategoryAttributes,
     ICourseAttributes,
     ICourseProgressAttributes,
     IRatingAttributes,
     ISectionAttributes,
+    ITagsAttributes,
     IUserAttributes,
 } from '../../types';
-import Category from './category';
 import { BelongsToManyHasAssociationMixin } from 'sequelize';
 import User from './user';
 import { BelongsToManyGetAssociationsMixin } from 'sequelize';
 import { BelongsToManyRemoveAssociationsMixin } from 'sequelize';
+import Tag from './tag';
 
 type TCourseCreationAttributes = Optional<ICourseAttributes, 'id'>;
 
@@ -32,23 +32,27 @@ class Course extends Model<ICourseAttributes, TCourseCreationAttributes> impleme
     public whatYouWillLearn!: string;
     public price!: number;
     public thumbnail!: string;
+    public requirements!: string;
     public instructorId!: number;
+    public status!: string;
+    public sales!: number;
+    public categoryId!: number;
     public readonly createdAt?: Date | undefined;
     public readonly updatedAt?: Date | undefined;
 
     public students?: IUserAttributes[] | undefined;
-    public categories?: ICategoryAttributes[] | undefined;
     public ratings?: IRatingAttributes[] | undefined;
     public sections?: ISectionAttributes[] | undefined;
     public instructor?: IUserAttributes | undefined;
     public progressRecords?: ICourseProgressAttributes[] | undefined;
+    public courseTags?: ITagsAttributes[] | undefined;
 
     // hooks
-    declare hasCategory: BelongsToManyHasAssociationMixin<Category, Category['id']>;
-    declare addCategories: BelongsToManyAddAssociationsMixin<Category, Category['id']>;
-    declare hasCategories: BelongsToManyHasAssociationsMixin<Category, Category['id']>;
-    declare getCategories: BelongsToManyGetAssociationsMixin<Category>;
-    declare removeCategories: BelongsToManyRemoveAssociationsMixin<Category, Category['id']>;
+    declare hasCourseTag: BelongsToManyHasAssociationMixin<Tag, Tag['id']>;
+    declare addCourseTags: BelongsToManyAddAssociationsMixin<Tag, Tag['id']>;
+    declare hasCourseTags: BelongsToManyHasAssociationsMixin<Tag, Tag['id']>;
+    declare getCourseTags: BelongsToManyGetAssociationsMixin<Tag>;
+    declare removeCourseTags: BelongsToManyRemoveAssociationsMixin<Tag, Tag['id']>;
 
     declare addStudent: BelongsToManyAddAssociationMixin<User, User['id']>;
     declare hasStudent: BelongsToManyHasAssociationMixin<User, User['id']>;
@@ -84,9 +88,26 @@ Course.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
+        requirements: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         instructorId: {
             type: DataTypes.INTEGER,
             allowNull: false,
+        },
+        categoryId: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        status: {
+            type: DataTypes.ENUM,
+            values: ['draft', 'published'],
+        },
+        sales: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0,
         },
         createdAt: {
             type: DataTypes.DATE,

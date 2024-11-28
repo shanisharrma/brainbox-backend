@@ -40,6 +40,7 @@ import { ICategoryAttributes, ICourseCategoryAttributes, ICategoryRequestBody } 
 
 import { ICapturePaymentRequestBody, IVerifyPaymentRequestBody } from './payment-types';
 import { IRatingAttributes, IRatingRequestBody } from './rating-types';
+import { ICourseTagsAttributes, ITagsAttributes } from './tags-types';
 
 export {
     THttpResponse,
@@ -85,4 +86,6 @@ export {
     IVerifyPaymentRequestBody,
     IRatingRequestBody,
     ICourseUpdateParams,
+    ITagsAttributes,
+    ICourseTagsAttributes,
 };

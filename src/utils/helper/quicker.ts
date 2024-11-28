@@ -128,6 +128,13 @@ class Quicker {
     public static getDefaultDP(firstName: string, lastName: string) {
         return `${ServerConfig.DEFAULT_DP_API}${firstName} ${lastName}`;
     }
+
+    public static capitalizeWord(string: string) {
+        return string
+            .split('-')
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
+    }
 }
 
 export default Quicker;

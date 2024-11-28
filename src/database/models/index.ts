@@ -11,6 +11,7 @@ import Reset_Password from './reset_password';
 import Role from './role';
 import Section from './section';
 import Sub_Section from './sub_section';
+import Tag from './tag';
 import User from './user';
 
 // Many-to-Many Association between Users and Roles through User_Roles
@@ -129,18 +130,31 @@ Course.belongsTo(User, {
     onUpdate: 'CASCADE',
 });
 
-// Many-to-Many Associations between Course and Category
-Course.belongsToMany(Category, {
-    through: 'Course_Categories',
-    foreignKey: 'courseId',
-    as: 'categories',
+// One-to-Many Associations between Category and Course
+Category.hasMany(Course, {
+    foreignKey: 'categoryId',
+    as: 'categoryCourses',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
-Category.belongsToMany(Course, {
-    through: 'Course_Categories',
+Course.belongsTo(Category, {
     foreignKey: 'categoryId',
-    as: 'courses',
+    as: 'courseCategory',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
+Course.belongsToMany(Tag, {
+    through: 'Course_Tags',
+    foreignKey: 'courseId',
+    as: 'courseTags',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+Tag.belongsToMany(Course, {
+    through: 'Course_Tags',
+    foreignKey: 'tagId',
+    as: 'tagCourses',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
@@ -244,4 +258,5 @@ export {
     Section,
     Sub_Section,
     Course_Progress,
+    Tag,
 };

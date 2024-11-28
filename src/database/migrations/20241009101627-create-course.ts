@@ -32,9 +32,21 @@ module.exports = {
                 type: Sequelize.STRING,
                 allowNull: false,
             },
+            requirements: {
+                type: Sequelize.STRING,
+                allowNull: false,
+            },
             instructorId: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
+            },
+            categoryId: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+            },
+            status: {
+                type: Sequelize.ENUM,
+                values: ['draft', 'published'],
             },
             createdAt: {
                 allowNull: false,

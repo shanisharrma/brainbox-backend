@@ -12,6 +12,7 @@ import FileUploaderService from './file-uploader-service';
 import PaymentService from './payments/payment-service';
 import RatingService from './rating-service';
 import CourseProgressService from './course-progress-service';
+import ServiceFactory from './service-factory';
 
 export {
     PhoneNumberService,
@@ -28,4 +29,5 @@ export {
     PaymentService,
     RatingService,
     CourseProgressService,
+    ServiceFactory,
 };

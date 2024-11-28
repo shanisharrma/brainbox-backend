@@ -1,5 +1,5 @@
 import { Op } from 'sequelize';
-import { Category, Course, User } from '../database/models';
+import { Category, Course, Rating, User } from '../database/models';
 import CrudRepository from './crud-repository';
 
 class CategoryRepository extends CrudRepository<Category> {
@@ -7,18 +7,29 @@ class CategoryRepository extends CrudRepository<Category> {
         super(Category);
     }
 
-    public async getByNames(name: string[]) {
-        return await this.getAll({ where: { name: name } });
+    public async getByName(name: string) {
+        return await this.getOne({ where: { name: name } });
     }
 
     public async showAllCoursesByName(name: string) {
-        return await this.getAll({
+        return await this.getOne({
             where: { name: name },
             include: [
                 {
                     model: Course,
-                    as: 'courses',
-                    include: [{ model: User, required: true, as: 'instructor', attributes: ['firstName', 'lastName'] }],
+                    as: 'categoryCourses',
+                    where: { status: 'published' },
+                    include: [
+                        {
+                            model: User,
+                            as: 'instructor',
+                            attributes: ['firstName', 'lastName'],
+                        },
+                        {
+                            model: Rating,
+                            as: 'ratings',
+                        },
+                    ],
                 },
             ],
         });
@@ -30,8 +41,19 @@ class CategoryRepository extends CrudRepository<Category> {
             include: [
                 {
                     model: Course,
-                    as: 'courses',
-                    include: [{ model: User, required: true, as: 'instructor', attributes: ['firstName', 'lastName'] }],
+                    as: 'categoryCourses',
+                    where: { status: 'published' },
+                    include: [
+                        {
+                            model: User,
+                            as: 'instructor',
+                            attributes: ['firstName', 'lastName'],
+                        },
+                        {
+                            model: Rating,
+                            as: 'ratings',
+                        },
+                    ],
                 },
             ],
         });
