@@ -28,13 +28,20 @@ module.exports = {
                     key: 'id',
                 },
             },
-            subSectionId: {
+            completedSubSections: {
+                type: Sequelize.JSON,
+                allowNull: false,
+                defaultValue: [],
+            },
+            totalSubSections: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
-                references: {
-                    model: 'Sub_Sections',
-                    key: 'id',
-                },
+                defaultValue: 0,
+            },
+            progressPercentage: {
+                type: Sequelize.FLOAT,
+                defaultValue: 0,
+                allowNull: false,
             },
             createdAt: {
                 allowNull: false,

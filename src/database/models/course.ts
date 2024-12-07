@@ -44,7 +44,7 @@ class Course extends Model<ICourseAttributes, TCourseCreationAttributes> impleme
     public ratings?: IRatingAttributes[] | undefined;
     public sections?: ISectionAttributes[] | undefined;
     public instructor?: IUserAttributes | undefined;
-    public progressRecords?: ICourseProgressAttributes[] | undefined;
+    public progressRecord?: ICourseProgressAttributes | undefined;
     public courseTags?: ITagsAttributes[] | undefined;
 
     // hooks

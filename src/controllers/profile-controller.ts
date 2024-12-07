@@ -12,6 +12,22 @@ interface IProfileRequest extends Request {
     id: number;
 }
 
+interface IInstructorCourse {
+    id: number;
+    name: string;
+    description: string;
+    thumbnail: string;
+    price: number;
+    enrolledStudents: number;
+    amountGenerated: number;
+}
+
+interface IInstructorDashboardData {
+    courses: IInstructorCourse[];
+    totalStudents: number;
+    totalRevenue: number;
+}
+
 class ProfileController {
     private static profileService: ProfileService = new ProfileService();
 
@@ -63,6 +79,48 @@ class ProfileController {
             const response = await ProfileController.profileService.update(id, updateProfile);
 
             HttpResponse(req, res, StatusCodes.OK, ResponseMessage.UPDATED('Profile details'), response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async getInstructorData(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req as IProfileRequest;
+
+            const response = await ProfileController.profileService.instructorDashboard(id);
+
+            const taughtCourses: IInstructorCourse[] = response!.taughtCourses!.map((course) => ({
+                id: course.id!,
+                name: course.name,
+                description: course.description,
+                thumbnail: course.thumbnail,
+                price: course.price,
+                enrolledStudents: course.students ? course.students.length : 0,
+                amountGenerated: course.payments
+                    ? course.payments.reduce((acc, payment) => acc + payment.amount, 0)
+                    : 0,
+            }));
+
+            let totalRevenue = 0;
+            let totalStudents = 0;
+            taughtCourses.forEach((course) => {
+                totalStudents += course.enrolledStudents;
+                totalRevenue += course.amountGenerated;
+            });
+
+            const instructorDashboardResponse: IInstructorDashboardData = {
+                courses: taughtCourses,
+                totalRevenue,
+                totalStudents,
+            };
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, instructorDashboardResponse);
         } catch (error) {
             HttpError(
                 next,

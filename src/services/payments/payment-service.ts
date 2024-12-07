@@ -1,31 +1,36 @@
 import { StatusCodes } from 'http-status-codes';
-import { CourseRepository, UserRepository } from '../../repositories';
-import { ResponseMessage } from '../../utils/constants';
+import { CourseRepository, PaymentRepository, UserRepository } from '../../repositories';
+import { Enums, ResponseMessage } from '../../utils/constants';
 import { AppError } from '../../utils/error';
 import { IPaymentGateway, IVerifyPaymentParams } from './gateways';
 import PaymentGatewayFactory from './payment-gateway-factory';
 import { Quicker } from '../../utils/helper';
-import { ServerConfig } from '../../config';
+import CourseProgressService from '../course-progress-service';
 
 class PaymentService {
     private courseRepository: CourseRepository;
     private userRepository: UserRepository;
+    private courseProgressService: CourseProgressService;
+    private paymentRepository: PaymentRepository;
 
     constructor() {
         this.courseRepository = new CourseRepository();
         this.userRepository = new UserRepository();
+        this.courseProgressService = new CourseProgressService();
+        this.paymentRepository = new PaymentRepository();
     }
 
-    public async capture(provider: string, data: { courseId: number; userId: number }) {
+    public async capture(provider: 'stripe' | 'razorpay', data: { courseIds: number[]; userId: number }) {
         const paymentGateway: IPaymentGateway = PaymentGatewayFactory.getPaymentGateway(provider);
         try {
             // * destructure data
-            const { courseId, userId } = data;
+            const { courseIds, userId } = data;
 
             // * check course exists
-            const course = await this.courseRepository.getOneById(courseId);
-            if (!courseId) {
-                throw new AppError(ResponseMessage.NOT_FOUND('Course'), StatusCodes.NOT_FOUND);
+            const courses = await this.courseRepository.getAll({ where: { id: courseIds } });
+
+            if (courses.length !== courseIds.length) {
+                throw new AppError(ResponseMessage.NOT_FOUND('Some Courses'), StatusCodes.NOT_FOUND);
             }
 
             // * check user exists
@@ -35,40 +40,65 @@ class PaymentService {
             }
 
             // * Check user already enrolled
-            const userEnrolled = await course.hasStudent(user);
-            if (userEnrolled) {
-                throw new AppError('User already enrolled to this course.', StatusCodes.BAD_REQUEST);
+            const alreadyEnrolled = [];
+            for (const course of courses) {
+                const isEnrolled = await course.hasStudent(user);
+                if (isEnrolled) {
+                    alreadyEnrolled.push(course);
+                }
+            }
+            if (alreadyEnrolled.length > 0) {
+                throw new AppError(ResponseMessage.USER_ALREADY_ENROLLED, StatusCodes.BAD_REQUEST);
             }
 
-            // * Initiate payment using payment gateway
+            // * calculate the total Amount
+            const totalAmount = courses.reduce((sum, course) => sum + course.price, 0);
+
             const paymentResponse = await paymentGateway.createOrder(
-                course.price,
+                totalAmount,
                 'INR',
                 `receipt_${Quicker.getRandomNumber(8)}`,
-                { email: user.email, courseId: course.id },
+                {
+                    email: user.email,
+                },
             );
+
+            if (paymentResponse) {
+                const payment = await this.paymentRepository.create({
+                    provider,
+                    amount: totalAmount,
+                    currency: paymentResponse.currency,
+                    orderId: paymentResponse.id,
+                    status: Enums.EPaymentStatus.PENDING,
+                    userId,
+                });
+
+                for (const course of courses) {
+                    await payment.addCourse(course);
+                }
+            }
 
             return paymentResponse;
         } catch (error) {
             if (error instanceof AppError) throw error;
-            throw new AppError('Payment Failed', StatusCodes.INTERNAL_SERVER_ERROR);
+            throw new AppError(ResponseMessage.FAILED('Payment Capturing'), StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
     public async verify(
         provider: string,
         paymentResponse: IVerifyPaymentParams,
-        data: { courseId: number; userId: number },
+        data: { courseIds: number[]; userId: number },
     ) {
         const paymentGateway: IPaymentGateway = PaymentGatewayFactory.getPaymentGateway(provider);
         try {
             // * destructure the data
-            const { courseId, userId } = data;
+            const { courseIds, userId } = data;
 
             // * check course exists
-            const course = await this.courseRepository.getOneById(courseId);
-            if (!course) {
-                throw new AppError(ResponseMessage.NOT_FOUND('Course'), StatusCodes.NOT_FOUND);
+            const courses = await this.courseRepository.getAll({ where: { id: courseIds } });
+            if (courses.length !== courseIds.length) {
+                throw new AppError(ResponseMessage.NOT_FOUND('Some Course'), StatusCodes.NOT_FOUND);
             }
 
             // * check user exists
@@ -77,30 +107,52 @@ class PaymentService {
                 throw new AppError(ResponseMessage.NOT_AUTHORIZATION, StatusCodes.UNAUTHORIZED);
             }
 
-            // * get razorpay secret key
-            const razorpaySecretKey = ServerConfig.RAZORPAY.KEY_SECRET as string;
-
             // * verify payment
-            const isVerified = await paymentGateway.verifyPayment(paymentResponse, razorpaySecretKey);
+            const isVerified = await paymentGateway.verifyPayment(paymentResponse);
+
+            // *fetch the payment record
+            const payment = await this.paymentRepository.getOne({ where: { orderId: paymentResponse.orderId } });
+
+            if (!payment) {
+                throw new AppError(ResponseMessage.NOT_FOUND('Payment Record'), StatusCodes.NOT_FOUND);
+            }
 
             // * check payment verified
             if (!isVerified) {
-                throw new AppError('Payment Verification failed.', StatusCodes.UNAUTHORIZED);
+                // * Make the payments failed in the database
+                await this.paymentRepository.update(payment.id, {
+                    status: Enums.EPaymentStatus.FAILED,
+                    paymentId: paymentResponse.paymentId,
+                });
+
+                throw new AppError(ResponseMessage.PAYMENT_VERIFICATION_FAILED, StatusCodes.UNAUTHORIZED);
             }
 
-            // * check if user already enrolled
-            const hasEnrolled = await course.hasStudent(user);
-            if (hasEnrolled) {
-                throw new AppError('User already enrolled in this course', StatusCodes.BAD_REQUEST);
-            }
+            // * make the payment succeeded in the db record
+            await this.paymentRepository.update(payment.id, {
+                status: Enums.EPaymentStatus.SUCCEEDED,
+                paymentId: paymentResponse.paymentId,
+            });
 
             // * enroll the user
-            await course.addStudent(user);
+            // const transaction = await this.courseRepository.startTransaction();
+            // try {
+            for (const course of courses) {
+                if (!(await course.hasStudent(user))) {
+                    await course.addStudent(user);
+                    await this.courseProgressService.create(course.id, user.id, null);
+                }
+            }
+            // await transaction.commit();
+            // } catch (error) {
+            //     await transaction.rollback();
+            //     throw error;
+            // }
 
             // * send payment successful email
         } catch (error) {
             if (error instanceof AppError) throw error;
-            throw new AppError('Payment Failed', StatusCodes.INTERNAL_SERVER_ERROR);
+            throw new AppError(ResponseMessage.FAILED('Payment Verification'), StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 }

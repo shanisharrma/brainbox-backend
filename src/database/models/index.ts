@@ -3,6 +3,7 @@ import Category from './category';
 import Course from './course';
 import Course_Progress from './course_progress';
 import Log from './log';
+import Payment from './payment';
 import Phone_Number from './phone_number';
 import Profile from './profile';
 import Rating from './rating';
@@ -182,7 +183,7 @@ User.hasMany(Rating, {
 });
 Rating.belongsTo(User, {
     foreignKey: 'studentId',
-    as: 'students',
+    as: 'student',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
@@ -215,10 +216,10 @@ Sub_Section.belongsTo(Section, {
     onUpdate: 'CASCADE',
 });
 
-// One-to-Many Associations between Course and Course_Progress
-Course.hasMany(Course_Progress, {
+// One-to-One Associations between Course and Course_Progress
+Course.hasOne(Course_Progress, {
     foreignKey: 'courseId',
-    as: 'progressRecords',
+    as: 'progressRecord',
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
 });
@@ -243,6 +244,36 @@ Course_Progress.belongsTo(User, {
     onUpdate: 'CASCADE',
 });
 
+// Many-to-Many Associations between Course and Payment
+Payment.belongsToMany(Course, {
+    through: 'Payment_Courses',
+    foreignKey: 'paymentId',
+    as: 'courses',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+Course.belongsToMany(Payment, {
+    through: 'Payment_Courses',
+    foreignKey: 'courseId',
+    as: 'payments',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
+// One-To-Many Association between User(Student) and Payment
+Payment.belongsTo(User, {
+    foreignKey: 'userId',
+    as: 'students',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+User.hasMany(Payment, {
+    foreignKey: 'userId',
+    as: 'payments',
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+});
+
 export {
     Log,
     Role,
@@ -259,4 +290,5 @@ export {
     Sub_Section,
     Course_Progress,
     Tag,
+    Payment,
 };

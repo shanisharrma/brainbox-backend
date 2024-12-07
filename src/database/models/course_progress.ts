@@ -13,7 +13,9 @@ class Course_Progress
     public id!: number;
     public studentId!: number;
     public courseId!: number;
-    public subSectionId!: number;
+    public completedSubSections!: number[];
+    public progressPercentage!: number;
+    public totalSubSections!: number;
     public readonly createdAt?: Date | undefined;
     public readonly updatedAt?: Date | undefined;
 }
@@ -33,9 +35,20 @@ Course_Progress.init(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        subSectionId: {
+        completedSubSections: {
+            type: DataTypes.JSON,
+            allowNull: false,
+            defaultValue: [],
+        },
+        progressPercentage: {
+            type: DataTypes.FLOAT,
+            defaultValue: 0,
+            allowNull: false,
+        },
+        totalSubSections: {
             type: DataTypes.INTEGER,
             allowNull: false,
+            defaultValue: 0,
         },
         createdAt: {
             type: DataTypes.DATE,

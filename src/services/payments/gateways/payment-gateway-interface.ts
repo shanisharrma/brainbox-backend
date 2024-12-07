@@ -5,13 +5,12 @@ export interface IPaymentGateway {
         receipt: string,
         notesData: IPaymentNotesData,
     ): Promise<ICreateOrderResponse>;
-    verifyPayment(paymentResponse: IVerifyPaymentParams, paymentSecret: string): Promise<boolean>;
+    verifyPayment(paymentResponse: IVerifyPaymentParams): Promise<boolean>;
     refundPayment(paymentId: string, amount?: number): Promise<IRefundResponse>;
 }
 
 export interface IPaymentNotesData {
     email: string;
-    courseId: number;
 }
 
 export interface ICreateOrderResponse {
@@ -19,12 +18,13 @@ export interface ICreateOrderResponse {
     amount: string | number;
     currency: string;
     status: string;
+    clientSecret: string | null;
 }
 
 export interface IVerifyPaymentParams {
     paymentId: string;
     orderId: string;
-    signature: string;
+    signature?: string;
 }
 
 export interface IRefundResponse {

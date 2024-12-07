@@ -39,6 +39,12 @@ export default {
     PROFILE_ALREADY_CREATED: `User profile already created.`, //400
     NOT_ENROLLED: `User not enrolled to the course.`, //401
     INVALID_FORMAT: `Invalid data format.`, //422
+    FAILED_TO_MAKE_PAYMENT: `Failed to make payment.`, //402
+    FAILED_TO_VERIFY_PAYMENT: `Failed to verify payment.`, //402
+    FAILED_TO_REFUND_PAYMENT: `Failed to refund payment`, //402
+    PAYMENT_VERIFICATION_FAILED: `Payment Verification failed.`, //401
+    USER_ALREADY_ENROLLED: `User already enrolled to this course.`, //400
+    USER_ENROLLED: `User enrolled to the course`, //201
 
     NOT_FOUND: (entity: string) => `${entity} not found!`, //404
     CREATED: (entity: string) => `${entity} created successfully.`, //201
@@ -47,4 +53,5 @@ export default {
     ENTITY_REQUIRED: (entity: string) => `${entity} is required.`, //200
     UPLOAD_FAILED: (entity: string) => `Failed to upload ${entity} file. Please try again.`, //500
     QUERY_PARAMS_REQUIRED: (entity: string) => `Query parameter "${entity}" is required.`, //400
+    FAILED: (entity: string) => `${entity} Failed.`, //500
 };

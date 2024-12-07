@@ -9,9 +9,9 @@ const router = express.Router();
 // ========================================= Payment Routes ================================================
 // ========================================================================================================= //
 
-// Capture Payment : POST /api/v1/courses/:courseId/payments
+// Capture Payment : POST /api/v1/payments/capture
 router
-    .route('/courses/:courseId/payments')
+    .route('/payments/capture')
     .post(
         AuthMiddleware.checkAuth,
         AuthMiddleware.isStudent,
@@ -19,9 +19,9 @@ router
         PaymentController.capture,
     );
 
-// Verify Payment : POST /api/v1/courses/:courseId/payments/verify
+// Verify Payment : POST /api/v1/payments/verify
 router
-    .route('/courses/:courseId/payments/verify')
+    .route('/payments/verify')
     .post(
         AuthMiddleware.checkAuth,
         AuthMiddleware.isStudent,

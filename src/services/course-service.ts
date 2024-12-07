@@ -168,8 +168,42 @@ class CourseService {
 
             // * get enrolled courses
             const courses = await user.getEnrolledCourses();
+            // * get the courseIds
+            const courseIds = courses.map((course) => course.id);
+            // * get complete details of enrolled courses
+            const completeCourseDetails = await this.courseRepository.getCompleteCourseDetailsByIds(courseIds);
 
-            return courses;
+            return completeCourseDetails;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async viewEnrolledCourse(studentId: number, courseId: number) {
+        try {
+            // * get user from studentId
+            const user = await this.userRepository.getOneById(studentId);
+
+            // * check user exists
+            if (!user) {
+                throw new AppError(ResponseMessage.NOT_AUTHORIZATION, StatusCodes.UNAUTHORIZED);
+            }
+
+            // * get the complete course view details
+            const viewCourse = await this.courseRepository.getOneWithSectionSubSectionById(courseId);
+            if (!viewCourse) {
+                throw new AppError(ResponseMessage.NOT_AUTHORIZATION, StatusCodes.UNAUTHORIZED);
+            }
+
+            // * check user enrolled
+            const isEnrolled = await viewCourse.hasStudent(user);
+            if (!isEnrolled) {
+                throw new AppError(ResponseMessage.NOT_ENROLLED, StatusCodes.UNAUTHORIZED);
+            }
+
+            // * return the view course details
+            return viewCourse;
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

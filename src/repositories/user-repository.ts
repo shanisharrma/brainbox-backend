@@ -1,4 +1,13 @@
-import { Account_Confirmation, Phone_Number, Profile, Reset_Password, Role, User } from '../database/models';
+import {
+    Account_Confirmation,
+    Course,
+    Payment,
+    Phone_Number,
+    Profile,
+    Reset_Password,
+    Role,
+    User,
+} from '../database/models';
 import { TUserWithAccountConfirmationAndResetPassword, TUserWithAssociations } from '../types';
 import CrudRepository from './crud-repository';
 
@@ -85,6 +94,30 @@ class UserRepository extends CrudRepository<User> {
         });
         // Return only the dataValues if the response is not null
         return response ? (response.get({ plain: true }) as User) : null;
+    }
+
+    public async getInstructorData(instructorId: number) {
+        const data = await this.getOne({
+            where: { id: instructorId },
+            include: [
+                {
+                    model: Course,
+                    as: 'taughtCourses',
+                    include: [
+                        {
+                            model: User,
+                            as: 'students',
+                        },
+                        {
+                            model: Payment,
+                            as: 'payments',
+                        },
+                    ],
+                },
+            ],
+        });
+
+        return data ? data.get({ plain: true }) : null;
     }
 }
 export default UserRepository;

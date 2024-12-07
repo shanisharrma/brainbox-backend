@@ -5,10 +5,8 @@ import { AppError } from '../utils/error';
 import { StatusCodes } from 'http-status-codes';
 import { ResponseMessage } from '../utils/constants';
 import { ICapturePaymentRequestBody, IVerifyPaymentRequestBody } from '../types';
-import { Quicker } from '../utils/helper';
 
 interface IPaymentRequest extends Request {
-    params: { courseId: string };
     id: number;
 }
 
@@ -21,27 +19,19 @@ interface IVerifyPaymentRequest extends IPaymentRequest {
 }
 
 class PaymentController {
-    private static paymentService: PaymentService;
+    private static paymentService: PaymentService = new PaymentService();
 
     public static async capture(req: Request, res: Response, next: NextFunction) {
         try {
             // * get course id from params and user id from auth
-            const { body, params, id } = req as ICapturePaymentRequest;
+            const { body, id } = req as ICapturePaymentRequest;
 
             // * get provider from body
-            const { provider } = body;
-
-            // * get courseId from params
-            const { courseId } = params;
-
-            // * validate course id
-            if (!Quicker.validateValue(courseId, /^\d+$/)) {
-                throw new AppError('Invalid Course Id format', StatusCodes.BAD_REQUEST);
-            }
+            const { provider, courseIds } = body;
 
             // * call payment capture service
             const paymentResponse = await PaymentController.paymentService.capture(provider, {
-                courseId: Number(courseId),
+                courseIds,
                 userId: id,
             });
 
@@ -60,33 +50,20 @@ class PaymentController {
     public static async verify(req: Request, res: Response, next: NextFunction) {
         try {
             // * destructure request
-            const { body, params, id } = req as IVerifyPaymentRequest;
+            const { body, id } = req as IVerifyPaymentRequest;
 
             // * destructure request body
-            const { orderId, paymentId, provider, signature } = body;
-
-            // * get courseId id from request params
-            const { courseId } = params;
-
-            // * validate the courseId
-            if (!Quicker.validateValue(courseId, /^\d+$/)) {
-                throw new AppError('Invalid course ID format.', StatusCodes.BAD_REQUEST);
-            }
+            const { orderId, paymentId, provider, signature, courseIds } = body;
 
             // * call the verify payment service
             await PaymentController.paymentService.verify(
                 provider,
                 { orderId, paymentId, signature },
-                { courseId: Number(courseId), userId: id },
+                { courseIds, userId: id },
             );
 
             // * return http response
-            HttpResponse(
-                req,
-                res,
-                StatusCodes.CREATED,
-                'Payment verified successfully and user enrolled to the course',
-            );
+            HttpResponse(req, res, StatusCodes.CREATED, ResponseMessage.USER_ENROLLED);
         } catch (error) {
             HttpError(
                 next,

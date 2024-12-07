@@ -21,7 +21,7 @@ class RatingRepository extends CrudRepository<Rating> {
             include: [
                 {
                     model: User,
-                    as: 'students',
+                    as: 'student',
                     attributes: ['firstName', 'lastName', 'email'],
                     include: [{ model: Profile, as: 'profileDetails', attributes: ['imageUrl'] }],
                 },

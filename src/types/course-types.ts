@@ -1,3 +1,4 @@
+import { IPaymentAttributes } from './payment-types';
 import { IRatingAttributes } from './rating-types';
 import { ITagsAttributes } from './tags-types';
 import { IUserAttributes } from './user-types';
@@ -21,8 +22,9 @@ export interface ICourseAttributes {
     ratings?: IRatingAttributes[];
     sections?: ISectionAttributes[];
     instructor?: IUserAttributes;
-    progressRecords?: ICourseProgressAttributes[];
+    progressRecord?: ICourseProgressAttributes;
     courseTags?: ITagsAttributes[];
+    payments?: IPaymentAttributes[];
 }
 
 export interface IEnrollmentAttributes {
@@ -62,7 +64,9 @@ export interface ICourseProgressAttributes {
     id?: number;
     studentId: number;
     courseId: number;
-    subSectionId: number;
+    completedSubSections: number[];
+    progressPercentage: number;
+    totalSubSections: number;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;

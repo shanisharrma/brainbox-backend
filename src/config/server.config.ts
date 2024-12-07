@@ -61,6 +61,8 @@ export default {
         KEY_SECRET: process.env.RAZORPAY_SECRET_ID,
     },
 
-    // Defualt DP Setup
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+
+    // Default DP Setup
     DEFAULT_DP_API: process.env.DEFAULT_DP_API,
 };

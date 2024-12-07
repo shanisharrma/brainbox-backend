@@ -1,9 +1,11 @@
 import { AppError } from '../../utils/error';
 import { IPaymentGateway, RazorpayPaymentService } from './gateways';
+import StripePaymentService from './gateways/stripe-payment-service';
 
 class PaymentGatewayFactory {
     private static gatewaysMap: { [key: string]: () => IPaymentGateway } = {
         razorpay: () => new RazorpayPaymentService(),
+        stripe: () => new StripePaymentService(),
         // Other payment gateways
     };
 

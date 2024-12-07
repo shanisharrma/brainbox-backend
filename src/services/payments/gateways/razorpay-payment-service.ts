@@ -10,6 +10,7 @@ import { ServerConfig } from '../../../config';
 import { StatusCodes } from 'http-status-codes';
 import crypto from 'crypto';
 import { AppError } from '../../../utils/error';
+import { ResponseMessage } from '../../../utils/constants';
 
 class RazorpayPaymentService implements IPaymentGateway {
     private razorpayInstance: Razorpay;
@@ -29,11 +30,11 @@ class RazorpayPaymentService implements IPaymentGateway {
     ): Promise<ICreateOrderResponse> {
         try {
             const orderOptions = {
-                amount,
+                amount: Math.round(amount * 100),
                 currency,
                 receipt,
                 payment_capture: 1,
-                notes: { email: notesData.email, courseId: notesData.courseId },
+                notes: { email: notesData.email },
             };
 
             const order = await this.razorpayInstance.orders.create(orderOptions);
@@ -43,27 +44,31 @@ class RazorpayPaymentService implements IPaymentGateway {
                 amount: order.amount,
                 currency: order.currency,
                 status: order.status,
+                clientSecret: null,
             };
         } catch (error) {
-            throw new AppError('Failed to make payment.', StatusCodes.PAYMENT_REQUIRED, error);
+            throw new AppError(ResponseMessage.FAILED_TO_MAKE_PAYMENT, StatusCodes.PAYMENT_REQUIRED, error);
         }
     }
 
-    public async verifyPayment(paymentResponse: IVerifyPaymentParams, paymentSecret: string): Promise<boolean> {
+    public async verifyPayment(paymentResponse: IVerifyPaymentParams): Promise<boolean> {
         try {
             // * destructure the payment response
             const { paymentId, orderId, signature } = paymentResponse;
+
+            // * get the razorpay secret key
+            const razorpaySecretKey = ServerConfig.RAZORPAY.KEY_SECRET as string;
 
             // * prepare body for generating signature
             const body = orderId + '|' + paymentId;
 
             // * generate signature
-            const generatedSignature = crypto.createHmac('sha256', paymentSecret).update(body).digest('hex');
+            const generatedSignature = crypto.createHmac('sha256', razorpaySecretKey).update(body).digest('hex');
 
             // * verify the signatures
             return generatedSignature === signature;
         } catch (error) {
-            throw new AppError('Failed to verify payment.', StatusCodes.PAYMENT_REQUIRED, error);
+            throw new AppError(ResponseMessage.FAILED_TO_VERIFY_PAYMENT, StatusCodes.PAYMENT_REQUIRED, error);
         }
     }
 
@@ -79,7 +84,7 @@ class RazorpayPaymentService implements IPaymentGateway {
                 status: refund.status,
             };
         } catch (error) {
-            throw new AppError('Failed to verify payment.', StatusCodes.PAYMENT_REQUIRED, error);
+            throw new AppError(ResponseMessage.FAILED_TO_REFUND_PAYMENT, StatusCodes.PAYMENT_REQUIRED, error);
         }
     }
 }

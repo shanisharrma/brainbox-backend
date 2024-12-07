@@ -38,7 +38,12 @@ import {
 
 import { ICategoryAttributes, ICourseCategoryAttributes, ICategoryRequestBody } from './category-types';
 
-import { ICapturePaymentRequestBody, IVerifyPaymentRequestBody } from './payment-types';
+import {
+    IPaymentAttributes,
+    IPaymentCourseAttributes,
+    ICapturePaymentRequestBody,
+    IVerifyPaymentRequestBody,
+} from './payment-types';
 import { IRatingAttributes, IRatingRequestBody } from './rating-types';
 import { ICourseTagsAttributes, ITagsAttributes } from './tags-types';
 
@@ -88,4 +93,6 @@ export {
     ICourseUpdateParams,
     ITagsAttributes,
     ICourseTagsAttributes,
+    IPaymentAttributes,
+    IPaymentCourseAttributes,
 };

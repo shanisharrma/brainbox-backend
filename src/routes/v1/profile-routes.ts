@@ -22,4 +22,7 @@ router
         ProfileController.update,
     );
 
+// Get Instructor Data: GET /api/v1/dashboard/instructor
+router.route('/dashboard/instructor').get(AuthMiddleware.checkAuth, ProfileController.getInstructorData);
+
 export default router;

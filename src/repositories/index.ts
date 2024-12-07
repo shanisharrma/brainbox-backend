@@ -12,6 +12,7 @@ import SubSectionRepository from './sub-section-repository';
 import RatingRepository from './rating-repository';
 import CourseProgressRepository from './course-progress-repository';
 import TagRepository from './tag-repository';
+import PaymentRepository from './payment-repository';
 
 export {
     UserRepository,
@@ -28,4 +29,5 @@ export {
     RatingRepository,
     CourseProgressRepository,
     TagRepository,
+    PaymentRepository,
 };

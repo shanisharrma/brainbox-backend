@@ -14,7 +14,7 @@ class CourseProgressService {
         this.userRepository = new UserRepository();
     }
 
-    public async create(courseId: number, studentId: number, subSectionId: number) {
+    public async create(courseId: number, studentId: number, subSectionId: number | null) {
         try {
             // * check the course exits
             const courseDetails = await this.courseRepository.getOneWithAllAssociationsById(courseId);
@@ -39,74 +39,71 @@ class CourseProgressService {
                 throw new AppError(ResponseMessage.NOT_FOUND('Sections'), StatusCodes.NOT_FOUND);
             }
 
-            // * get all the subSections from the course
-            const subSectionsArray = courseDetails.sections.map((section) => section.subSections);
-            // * flatten the subSections multi-level array to 1 level
-            const subSections = subSectionsArray.flat();
-            // * filter out the subSection which matches the subSectionId
-            const isSubSection = subSections.filter((subSection) => subSection!.id === subSectionId);
-            // * check subSection found or not
-            if (!isSubSection || isSubSection.length <= 0) {
-                throw new AppError(ResponseMessage.NOT_FOUND('Sub Section'), StatusCodes.NOT_FOUND);
+            let completedSubSections: number[] = [];
+            // * check if subSectionId is not null
+            if (subSectionId !== null) {
+                completedSubSections = [subSectionId];
             }
 
-            // * create course progress
-            const courseProgress = await this.courseProgressRepository.create({ courseId, studentId, subSectionId });
+            const totalSubSections = courseDetails.sections.reduce(
+                (total, section) => total + section.subSections!.length,
+                0,
+            );
 
-            // * return response
-            return courseProgress.get({ plain: true });
+            // * create course progress
+            await this.courseProgressRepository.create({
+                courseId,
+                studentId,
+                totalSubSections,
+                completedSubSections,
+                progressPercentage: 0,
+            });
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public async getCourseProgressPercentage(studentId: number, courseId: number) {
+    public async updateProgress(studentId: number, courseId: number, subSectionId: number) {
         try {
-            // * get the course details
-            const courseDetails = await this.courseRepository.getOneWithAllAssociationsById(courseId);
-            if (!courseDetails) {
-                throw new AppError(ResponseMessage.NOT_FOUND('Course'), StatusCodes.NOT_FOUND);
-            }
-
-            // * get the student details and check students exists
-            const student = await this.userRepository.getOneById(studentId);
-            if (!student) {
+            // * get and check the student exists
+            const user = await this.userRepository.getOneById(studentId);
+            if (!user) {
                 throw new AppError(ResponseMessage.NOT_AUTHORIZATION, StatusCodes.UNAUTHORIZED);
             }
 
-            // * check student enrolled in the course
-            const isEnrolled = await courseDetails.hasStudent(student);
-            if (!isEnrolled) {
-                throw new AppError(ResponseMessage.NOT_ENROLLED, StatusCodes.UNAUTHORIZED);
+            // * get the course_progress of the student
+            const courseProgress = await this.courseProgressRepository.getOne({ where: { studentId, courseId } });
+
+            if (!courseProgress) {
+                await this.create(courseId, studentId, subSectionId);
+            } else {
+                // * add the sub section completed list if not already added
+                const updatedSubSections = [...courseProgress.completedSubSections, subSectionId];
+
+                // * Recalculate progress percentage
+                const progressPercentage = (updatedSubSections.length / courseProgress.totalSubSections) * 100;
+
+                // * update the course progress
+                await courseProgress.update({
+                    completedSubSections: updatedSubSections,
+                    progressPercentage,
+                });
             }
+            return courseProgress;
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-            // * check sections exists in course
-            if (!courseDetails.sections || (courseDetails.sections && courseDetails.sections.length <= 0)) {
-                throw new AppError(ResponseMessage.NOT_FOUND('Sections'), StatusCodes.NOT_FOUND);
+    public async getProgress(studentId: number, courseId: number) {
+        try {
+            const courseProgress = await this.courseProgressRepository.getOne({ where: { studentId, courseId } });
+            if (!courseProgress) {
+                throw new AppError(ResponseMessage.NOT_FOUND('Course Progress'), StatusCodes.NOT_FOUND);
             }
-
-            // * get the number of sub_sections in the course
-            const totalLectures = courseDetails.sections.reduce((total, section) => {
-                return total + (section.subSections ? section.subSections.length : 0);
-            }, 0);
-
-            // * get the number of sub_sections completed by the student
-            const courseProgressDetails = await this.courseProgressRepository.getAll({
-                where: { courseId, studentId },
-            });
-            if (!courseProgressDetails) {
-                return 0;
-            }
-
-            // count the number of completed lectures
-            const completedLectures = courseProgressDetails.length;
-
-            // * calculate the course_progress percentage
-            const courseProgressPercentage = (completedLectures / totalLectures) * 100;
-
-            // * return course_progress percentage
-            return courseProgressPercentage;
+            return courseProgress;
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);

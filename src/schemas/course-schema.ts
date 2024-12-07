@@ -23,12 +23,12 @@ export const courseSchema: ObjectSchema<ICourseRequestBody> = Joi.object<ICourse
         'string.empty': 'Category cannot be empty',
         'any.required': 'Category is required',
     }),
-    requirements: Joi.string().min(3).trim().optional().messages({
+    requirements: Joi.string().min(3).trim().required().messages({
         'string.empty': 'Tags cannot be empty',
         'string.min': 'Tags must be at least 3 characters long',
         'any.required': 'Requirements are required',
     }),
-    tags: Joi.array().items(Joi.string().min(3).trim().optional()).messages({
+    tags: Joi.array().items(Joi.string().min(3).trim().required()).messages({
         'array.base': 'Tags must be an array',
         'array.includes': 'Each item of tags must be a string',
         'string.empty': 'Tags cannot be empty',

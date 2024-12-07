@@ -1,4 +1,5 @@
 import { ICourseAttributes, ICourseProgressAttributes } from './course-types';
+import { IPaymentAttributes } from './payment-types';
 import { IRatingAttributes } from './rating-types';
 import { TWithAssociations } from './types';
 
@@ -24,6 +25,7 @@ export interface IUserAttributes {
     enrolledCourses?: ICourseAttributes;
     taughtCourses?: ICourseAttributes[];
     progressRecords?: ICourseProgressAttributes[];
+    payments?: IPaymentAttributes[];
 }
 
 export interface IRoleAttributes {

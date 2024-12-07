@@ -40,7 +40,7 @@ class RatingService {
             const alreadyReviewed = await this.ratingRepository.getAll({
                 where: { courseId: courseId, studentId: studentId },
             });
-            if (alreadyReviewed) {
+            if (!alreadyReviewed) {
                 throw new AppError('You have already reviewed this course.', StatusCodes.FORBIDDEN);
             }
 

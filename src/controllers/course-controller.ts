@@ -13,6 +13,33 @@ interface ICourseRequest extends Request {
     params: { courseId: string };
 }
 
+interface IEnrolledCourseSubSections {
+    id: number;
+    title: string;
+}
+
+interface IEnrolledCourseSections {
+    id: number;
+    name: string;
+    subSections: IEnrolledCourseSubSections[];
+}
+
+interface IEnrolledCourseResponse {
+    id: number;
+    name: string;
+    description: string;
+    price: number;
+    thumbnail: string;
+    status: string;
+    createdAt: Date;
+    totalDuration: number;
+    sections: IEnrolledCourseSections[];
+    progress: {
+        completedSubSections: number[] | undefined;
+        percentage: number | undefined;
+    };
+}
+
 class CourseController {
     private static courseService = ServiceFactory.getInstance().getCourseService();
 
@@ -113,7 +140,73 @@ class CourseController {
             // * call category service
             const response = await CourseController.courseService.enrolledCourses(id);
 
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, response);
+            // * setCourseResponse
+            const enrolledCourseResponse: IEnrolledCourseResponse[] = response.map((course) => ({
+                id: course.id!,
+                name: course.name,
+                description: course.description,
+                price: course.price,
+                thumbnail: course.thumbnail,
+                status: course.status,
+                createdAt: course.createdAt!,
+                totalDuration: course.sections!.reduce((sectionAcc, section) => {
+                    const sectionDuration = section.subSections?.reduce((acc, subSection) => {
+                        return acc + parseFloat(subSection.duration);
+                    }, 0);
+                    return sectionAcc + (sectionDuration as number);
+                }, 0),
+                sections: course.sections!.map((section) => ({
+                    id: section.id!,
+                    name: section.name,
+                    subSections: section.subSections!.map((subSection) => ({
+                        id: subSection.id!,
+                        title: subSection.title,
+                    })),
+                })),
+                progress: {
+                    completedSubSections: course.progressRecord?.completedSubSections,
+                    percentage: course.progressRecord?.progressPercentage,
+                },
+            }));
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, enrolledCourseResponse);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
+
+    public static async viewEnrolledCourses(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id, params } = req as ICourseRequest;
+            const { courseId } = params;
+
+            // * call category service
+            const response = await CourseController.courseService.viewEnrolledCourse(id, Number(courseId));
+
+            // * setCourseResponse
+            const viewEnrolledCourseResponse = {
+                id: response.id!,
+                name: response.name,
+                sections: response.sections!.map((section) => ({
+                    id: section.id!,
+                    name: section.name,
+                    subSections: section.subSections!.map((subSection) => ({
+                        id: subSection.id!,
+                        title: subSection.title,
+                        description: subSection.description,
+                        video: subSection.videoUrl,
+                    })),
+                })),
+                progress: {
+                    completedSubSections: response.progressRecord?.completedSubSections,
+                    progressPercentage: response.progressRecord?.progressPercentage,
+                },
+            };
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, viewEnrolledCourseResponse);
         } catch (error) {
             HttpError(
                 next,

@@ -9,6 +9,7 @@ import PhoneNumberService from './phone-number-service';
 import { ParseError } from 'libphonenumber-js';
 
 interface IProfileResponse {
+    id: number;
     firstName: string;
     lastName: string;
     email: string;
@@ -58,6 +59,7 @@ class ProfileService {
             }
 
             const profileResponse: IProfileResponse = {
+                id: userWithAssociations.id!,
                 firstName: userWithAssociations.firstName,
                 lastName: userWithAssociations.lastName,
                 email: userWithAssociations.email,
@@ -141,6 +143,7 @@ class ProfileService {
             const profile = await this.profileRepository.getOneById(userWithAssociations.profileDetails.id!);
 
             const profileResponse: IProfileResponse = {
+                id: userWithAssociations.id!,
                 firstName: userWithAssociations.firstName,
                 lastName: userWithAssociations.lastName,
                 email: userWithAssociations.email,
@@ -244,6 +247,17 @@ class ProfileService {
             if (error instanceof ParseError) {
                 throw new AppError(error.message, StatusCodes.UNPROCESSABLE_ENTITY);
             }
+            if (error instanceof AppError) throw error;
+            throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public async instructorDashboard(instructorId: number) {
+        try {
+            const instructorData = await this.userRepository.getInstructorData(instructorId);
+
+            return instructorData;
+        } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError(ResponseMessage.SOMETHING_WENT_WRONG, StatusCodes.INTERNAL_SERVER_ERROR);
         }

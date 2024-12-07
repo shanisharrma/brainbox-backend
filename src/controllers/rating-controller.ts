@@ -62,7 +62,23 @@ class RatingController {
             // * call create rating service
             const response = await RatingController.ratingService.showAll();
 
-            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, response);
+            const ratingResponse = response.map((rating) => ({
+                id: rating.id,
+                rating: rating.rating,
+                review: rating.review,
+                students: {
+                    firstName: rating.student?.firstName,
+                    lastName: rating.student?.lastName,
+                    profileDetails: {
+                        imageUrl: rating.student?.profileDetails?.imageUrl,
+                    },
+                },
+                course: {
+                    name: rating.course?.name,
+                },
+            }));
+
+            HttpResponse(req, res, StatusCodes.OK, ResponseMessage.SUCCESS, ratingResponse);
         } catch (error) {
             HttpError(
                 next,

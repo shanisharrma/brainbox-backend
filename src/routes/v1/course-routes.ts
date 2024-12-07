@@ -35,6 +35,11 @@ router
     .route('/courses/enrolled')
     .get(AuthMiddleware.checkAuth, AuthMiddleware.isStudent, CourseController.enrolledCourses);
 
+// Get Enrolled Courses to View by enrolled student : GET /api/v1/courses/:courseId/view
+router
+    .route('/courses/:courseId/view')
+    .get(AuthMiddleware.checkAuth, AuthMiddleware.isStudent, CourseController.viewEnrolledCourses);
+
 // Get Instructor Courses : Get /api/v1/courses/taught
 router
     .route('/courses/taught')
@@ -149,14 +154,9 @@ router.route('/ratings').get(RatingController.showAll);
 // ======================================= Course Progress Routes =========================================
 // ========================================================================================================= //
 
-// Add Course Progress : POST /api/v1/courses/:courseId/subsections/:subSectionId
+// Add Course Progress : PUT /api/v1/courses/:courseId/subsections/:subSectionId
 router
     .route('/courses/:courseId/subsections/:subSectionId')
-    .post(AuthMiddleware.checkAuth, AuthMiddleware.isStudent, CourseProgressController.create);
-
-// Get Course Progress Percentage : GET /api/v1/course-progress/:courseId
-router
-    .route('/course-progress/:courseId')
-    .get(AuthMiddleware.checkAuth, AuthMiddleware.isStudent, CourseProgressController.getCourseProgressPercentage);
+    .put(AuthMiddleware.checkAuth, AuthMiddleware.isStudent, CourseProgressController.update);
 
 export default router;

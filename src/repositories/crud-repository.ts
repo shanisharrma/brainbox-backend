@@ -2,6 +2,7 @@ import { CreationAttributes, DestroyOptions, FindOptions, Model, ModelStatic } f
 import { AppError } from '../utils/error';
 import { ResponseMessage } from '../utils/constants';
 import { StatusCodes } from 'http-status-codes';
+import connection from '../database/sequelize';
 
 class CrudRepository<T extends Model> {
     private model: ModelStatic<T>;
@@ -10,12 +11,16 @@ class CrudRepository<T extends Model> {
         this.model = model;
     }
 
+    public async startTransaction() {
+        return await connection.transaction();
+    }
+
     public async create(data: CreationAttributes<T>): Promise<T> {
         const response = await this.model.create(data);
         return response;
     }
 
-    public async getOneById(id: number): Promise<T> {
+    public async getOneById(id: number | string): Promise<T> {
         const response = await this.model.findByPk(id);
         if (!response) {
             throw new AppError(ResponseMessage.NOT_FOUND('Resource'), StatusCodes.NOT_FOUND);
@@ -33,7 +38,7 @@ class CrudRepository<T extends Model> {
         return response;
     }
 
-    public async destroyById(id: number): Promise<boolean> {
+    public async destroyById(id: number | string): Promise<boolean> {
         const response = await this.getOneById(id);
         await response.destroy();
         return true;
@@ -43,7 +48,7 @@ class CrudRepository<T extends Model> {
         await this.model.destroy(options);
     }
 
-    public async update(id: number, data: Partial<T['_attributes']>): Promise<T> {
+    public async update(id: number | string, data: Partial<T['_attributes']>): Promise<T> {
         const response = await this.getOneById(id);
         return await response.update(data);
     }

@@ -13,11 +13,6 @@ interface ICourseProgressRequest extends Request {
     id: number;
 }
 
-interface IResponseData {
-    percentage: number;
-    message: string;
-}
-
 class CourseProgressController {
     private static courseProgressService: CourseProgressService = new CourseProgressService();
 
@@ -45,28 +40,38 @@ class CourseProgressController {
         }
     }
 
-    public static async getCourseProgressPercentage(req: Request, res: Response, next: NextFunction) {
+    public static async update(req: Request, res: Response, next: NextFunction) {
         try {
             // * destructure the request
             const { params, id } = req as ICourseProgressRequest;
             // * get course id and subSection id
-            const { courseId } = params;
+            const { subSectionId, courseId } = params;
 
-            const response = await CourseProgressController.courseProgressService.getCourseProgressPercentage(
-                Number(courseId),
+            const response = await CourseProgressController.courseProgressService.updateProgress(
                 id,
+                Number(courseId),
+                Number(subSectionId),
             );
 
-            const responseData: IResponseData = {
-                percentage: response,
-                message: 'Keep it up',
-            };
+            HttpResponse(req, res, StatusCodes.CREATED, ResponseMessage.UPDATED('Course Progress'), response);
+        } catch (error) {
+            HttpError(
+                next,
+                error,
+                req,
+                error instanceof AppError ? error.statusCode : StatusCodes.INTERNAL_SERVER_ERROR,
+            );
+        }
+    }
 
-            if (response === 0) {
-                responseData.message = 'Start your journey today and beat your friends.';
-            }
+    public static async getProgress(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { params, id } = req as ICourseProgressRequest;
+            const { courseId } = params;
 
-            HttpResponse(req, res, StatusCodes.CREATED, ResponseMessage.CREATED('Course Progress'), responseData);
+            const response = await CourseProgressController.courseProgressService.getProgress(id, Number(courseId));
+
+            HttpResponse(req, res, StatusCodes.CREATED, ResponseMessage.SUCCESS, response);
         } catch (error) {
             HttpError(
                 next,
