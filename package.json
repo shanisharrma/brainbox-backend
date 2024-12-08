@@ -4,7 +4,7 @@
     "description": "Learn new skill everyday",
     "main": "dist/server.js",
     "scripts": {
-        "deploy": "npm install && npm run dist && npm run db:migrate:up:prod && npm run db:seed:all:prod",
+        "deploy": "npm install && npm run dist && npm run db:migrate:up:prod",
         "dist": "npx tsc",
         "dev": "cross-env NODE_ENV=development nodemon src/server.ts",
         "start": "cross-env NODE_ENV=production node dist/server.js",
