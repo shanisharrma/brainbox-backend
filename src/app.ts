@@ -5,7 +5,7 @@ import { ErrorMiddleware } from './middlewares';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { swaggerDocs } from './config';
+import { ServerConfig, swaggerDocs } from './config';
 
 const app = express();
 
@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(
     cors({
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'OPTIONS'],
-        origin: ['http://localhost:5173', 'http://localhost:4173', 'https://brainbox-frontend.netlify.app/'],
+        origin: [ServerConfig.FRONTEND_URL as string],
         credentials: true,
         allowedHeaders: ['Content-Type', 'Authorization'],
     }),
